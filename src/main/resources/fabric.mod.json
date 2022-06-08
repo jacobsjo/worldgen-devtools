@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "df-command",
-  "version": "{version}",
+  "version": "${version}",
   "name": "Df Command",
   "description": "",
   "authors": [],
