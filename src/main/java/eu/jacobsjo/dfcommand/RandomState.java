@@ -77,7 +77,7 @@ public final class RandomState {
                     RandomSource randomSource = bl ? this.newLegacyInstance(0L) : RandomState.this.random.fromHashOf(new ResourceLocation("terrain"));
                     return blendedNoise.withNewRandom(randomSource);
                 } else {
-                    return densityFunction;// (DensityFunction)(densityFunction instanceof DensityFunctions.EndIslandDensityFunction ? new DensityFunctions.EndIslandDensityFunction(l) : densityFunction);
+                    return (InstanceOfHelper.isInstanceOfEndIslandDensityFunction(densityFunction) ? DensityFunctions.endIslands(l) : densityFunction);
                 }
             }
 
