@@ -1,8 +1,7 @@
 package eu.jacobsjo.dfcommand;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -19,22 +18,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class RandomState {
     final PositionalRandomFactory random;
-    private final Registry<NormalNoise.NoiseParameters> noises;
+    private final HolderGetter<NormalNoise.NoiseParameters> noises;
     private final Map<ResourceKey<NormalNoise.NoiseParameters>, NormalNoise> noiseIntances;
 
     private final DensityFunction.Visitor visitor;
 
-    public static RandomState create(RegistryAccess registryAccess, ResourceKey<NoiseGeneratorSettings> resourceKey, long l) {
-        return create((NoiseGeneratorSettings)registryAccess.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY).getOrThrow(resourceKey), registryAccess.registryOrThrow(Registry.NOISE_REGISTRY), l);
+//    public static RandomState create(HolderGetter.Provider provider, ResourceKey<NoiseGeneratorSettings> resourceKey, long l) {
+//        return create((NoiseGeneratorSettings)provider.lookupOrThrow(Registries.NOISE_SETTINGS).getOrThrow(resourceKey).value(), provider.lookupOrThrow(Registries.NOISE), l);
+//    }
+
+    public static RandomState create(NoiseGeneratorSettings noiseGeneratorSettings, HolderGetter<NormalNoise.NoiseParameters> holderGetter, long l) {
+        return new RandomState(noiseGeneratorSettings, holderGetter, l);
     }
 
-    public static RandomState create(NoiseGeneratorSettings noiseGeneratorSettings, Registry<NormalNoise.NoiseParameters> registry, long l) {
-        return new RandomState(noiseGeneratorSettings, registry, l);
-    }
-
-    private RandomState(NoiseGeneratorSettings noiseGeneratorSettings, Registry<NormalNoise.NoiseParameters> registry, final long l) {
+    private RandomState(NoiseGeneratorSettings noiseGeneratorSettings, HolderGetter<NormalNoise.NoiseParameters> holderGetter, final long l) {
         this.random = noiseGeneratorSettings.getRandomSource().newInstance(l).forkPositional();
-        this.noises = registry;
+        this.noises = holderGetter;
         this.noiseIntances = new ConcurrentHashMap();
         final boolean bl = noiseGeneratorSettings.useLegacyRandomSource();
 

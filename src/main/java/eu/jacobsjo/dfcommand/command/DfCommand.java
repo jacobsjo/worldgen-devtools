@@ -13,7 +13,9 @@ import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseRouter;
+import net.minecraft.world.phys.Vec3;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -67,7 +70,7 @@ public final class DfCommand{
         for (String value : NOISE_ROUTER_VALUES){
             noiseRouterArgument = noiseRouterArgument.then(Commands.literal(value)
                     .executes((commandContext)->{
-                        return getDensity(commandContext.getSource(), value, new BlockPos(commandContext.getSource().getPosition()), commandContext.getSource().getLevel());
+                        return getDensity(commandContext.getSource(), value, BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel());
                     })
                     .then(Commands.argument("pos", BlockPosArgument.blockPos())
                             .executes((commandContext)-> {
@@ -79,13 +82,14 @@ public final class DfCommand{
         commandDispatcher.register(
             Commands.literal("getdensity")
                     .then(Commands.literal("density_function")
-                        .then(Commands.argument("density_function", ResourceKeyArgument.key(Registry.DENSITY_FUNCTION_REGISTRY))
+                        .then(Commands.argument("density_function", ResourceKeyArgument.key(Registries.DENSITY_FUNCTION))
                             .executes((commandContext)->{
-                                return getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registry.DENSITY_FUNCTION_REGISTRY, ERROR_INVALID_DENSITY_FUNCTION), new BlockPos(commandContext.getSource().getPosition()), commandContext.getSource().getLevel());
+                                Vec3 pos = commandContext.getSource().getPosition();
+                                return getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel());
                             })
                             .then(Commands.argument("pos", BlockPosArgument.blockPos())
                                 .executes((commandContext)->{
-                                    return getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registry.DENSITY_FUNCTION_REGISTRY, ERROR_INVALID_DENSITY_FUNCTION), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel());
+                                    return getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel());
                                 }))
                         )
                     )
@@ -95,7 +99,6 @@ public final class DfCommand{
 
     public static int getDensity(CommandSourceStack commandSourceStack, String routerDensityFunction, BlockPos pos, ServerLevel level) throws CommandSyntaxException {
         ChunkGenerator chunkGenerator = level.getChunkSource().getGenerator();
-        RandomState randomState;
         if (chunkGenerator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
             NoiseRouter router = noiseBasedChunkGenerator.generatorSettings().value().noiseRouter();
             DensityFunction densityFunction = switch (routerDensityFunction) {
@@ -134,13 +137,16 @@ public final class DfCommand{
     }
 
     public static int getDensity(CommandSourceStack commandSourceStack, DensityFunction densityFunction, BlockPos pos, NoiseGeneratorSettings generatorSettings, ServerLevel level){
-        RandomState randomState = RandomState.create(generatorSettings, level.registryAccess().registryOrThrow(Registry.NOISE_REGISTRY), level.getSeed());
+        HolderGetter.Provider registryAccess = level.registryAccess().asGetterLookup();
+        RandomState randomState = RandomState.create(generatorSettings, registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed());
 
         double value = densityFunction.mapAll(randomState.getVisitor()).compute( new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
 
         DecimalFormat format = new DecimalFormat("0.000");
 
-        commandSourceStack.sendSuccess(Component.translatable("commands.jacobsjo.getdensity.result", format.format(value)), true);
+        commandSourceStack.sendSuccess(() -> {
+            return Component.translatable("commands.jacobsjo.getdensity.result", format.format(value));
+        }, true);
         return (int) (value * 1000);
     }
 
