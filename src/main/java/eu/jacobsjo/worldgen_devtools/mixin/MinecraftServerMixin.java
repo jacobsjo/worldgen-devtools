@@ -53,17 +53,17 @@ public abstract class MinecraftServerMixin {
     private static final Set<ResourceKey<?>> RELOADED_REGISTRIES = new HashSet<>(List.of(
             Registries.CONFIGURED_CARVER,   // WORKS!
             Registries.CONFIGURED_FEATURE,  // WORKS!
-            //Registries.PLACED_FEATURE,    // Broken: biome check
+            Registries.PLACED_FEATURE,      // WORKS!
             Registries.DIMENSION_TYPE,      // WORKS, not synconized with client
-            Registries.NOISE,               // Broken: no effect
-            Registries.DENSITY_FUNCTION,    // Probably Broken: no effect
-            Registries.NOISE_SETTINGS,      // Broken: no effect
+            Registries.NOISE,               // WORKS!
+            Registries.DENSITY_FUNCTION,    // WORKS (probably)
+            Registries.NOISE_SETTINGS,      // WORKS
             Registries.STRUCTURE_SET,       // WORKS, but not with /resetchunks, and not new sets?
             Registries.PROCESSOR_LIST,      // WORKS!
             Registries.TEMPLATE_POOL,       // WORKS, but not with /resetchunks
             Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, //Whatever
-            //Registries.BIOME,
-            Registries.STRUCTURE            // WORKS!
+            Registries.BIOME,               // WORKS, effects not syncronized with client
+            Registries.STRUCTURE            // WORKS! (/locate is slightly broken...)
 
             //Presets
             //Registries.WORLD_PRESET,
