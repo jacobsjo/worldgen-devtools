@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ChunkMap.class)
 public abstract class ChunkMapMixin implements UpdatableGeneratorChunkMap {
 
-    @Shadow public ChunkGenerator generator;
+    @Shadow private ChunkGenerator generator;
 
     @Mutable @Shadow @Final private ChunkGeneratorStructureState chunkGeneratorState;
 

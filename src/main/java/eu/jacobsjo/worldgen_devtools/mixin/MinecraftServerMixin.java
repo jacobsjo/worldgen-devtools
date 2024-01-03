@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import eu.jacobsjo.worldgen_devtools.RegistryResetter;
+import eu.jacobsjo.worldgen_devtools.SwitchToConfigurationCallback;
 import eu.jacobsjo.worldgen_devtools.UpdatableGeneratorChunkMap;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
@@ -28,7 +29,6 @@ import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.storage.WorldData;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,7 +42,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Mixin(MinecraftServer.class)
@@ -81,23 +80,9 @@ public abstract class MinecraftServerMixin {
 
     @Shadow @Final private static Logger LOGGER;
 
-    @Shadow @Final protected WorldData worldData;
-
-    @Shadow public abstract boolean isDedicatedServer();
-
-    @Shadow public abstract int getFunctionCompilationLevel();
-
-    @Shadow @Final private Executor executor;
-
-    @Shadow public abstract LayeredRegistryAccess<RegistryLayer> registries();
-
-    @Shadow public abstract RegistryAccess.Frozen registryAccess();
-
     @Shadow public abstract ServerConnectionListener getConnection();
 
     @Shadow @Final private Map<ResourceKey<Level>, ServerLevel> levels;
-
-    @Shadow public abstract Set<ResourceKey<Level>> levelKeys();
 
     @Inject (method = "method_29437", at = @At("HEAD"))
     private void thenCompose(RegistryAccess.Frozen frozen, ImmutableList<PackResources> immutableList, CallbackInfoReturnable<CompletionStage<?>> cir) {
@@ -106,7 +91,6 @@ public abstract class MinecraftServerMixin {
         Map<ResourceKey<Level>, DataResult<JsonElement>> generators = new HashMap<>();
         this.levels.forEach((key, level) -> generators.put(key, ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, getRegistrtyInfoLookup()), level.getChunkSource().getGenerator())));
 
-        //config();
 
         // Worldgen registries
         Map<ResourceKey<?>, Exception> exceptionMap = new HashMap<>();
@@ -156,14 +140,9 @@ public abstract class MinecraftServerMixin {
                 resourceManager, this.registries, RegistryLayer.DIMENSIONS, RegistryDataLoader.DIMENSION_REGISTRIES
         );*/
 
-        //unconfig();
-
-        LOGGER.info("TEST!");
 
         generators.forEach((key, json) -> {
-            LOGGER.info(key.toString());
             DataResult<ChunkGenerator> dataResult2 = json.flatMap((jsonElement) -> {
-                LOGGER.info(jsonElement.toString());
                 return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, getRegistrtyInfoLookup()), jsonElement);
             });
             dataResult2.result().ifPresent((chunkGenerator) -> {
@@ -172,6 +151,9 @@ public abstract class MinecraftServerMixin {
             });
 
         } );
+
+        syncClient();
+
     }
 
     @Unique
@@ -221,25 +203,22 @@ public abstract class MinecraftServerMixin {
         };
     }
 
-    private void config() {
+    @Unique
+    private void syncClient() {
         for (Connection connection : getConnection().getConnections()) {
             PacketListener var5 = connection.getPacketListener();
             if (var5 instanceof ServerGamePacketListenerImpl impl) {
+                ((SwitchToConfigurationCallback) impl).worldgenDevtools$onSwitchToConfiguration(() -> {
+                    PacketListener listener = connection.getPacketListener();
+                    if (listener instanceof ServerConfigurationPacketListenerImpl impl2) {
+                        impl2.startConfiguration();
+                    }
+                });
                 impl.switchToConfig();
             }
         }
+
     }
-
-    private void unconfig() {
-        for (Connection connection : getConnection().getConnections()) {
-            PacketListener var5 = connection.getPacketListener();
-            if (var5 instanceof ServerConfigurationPacketListenerImpl impl) {
-                impl.returnToWorld();
-            }
-        }
-    }
-
-
 
     @Unique
     private static void logErrors(Map<ResourceKey<?>, Exception> map) {

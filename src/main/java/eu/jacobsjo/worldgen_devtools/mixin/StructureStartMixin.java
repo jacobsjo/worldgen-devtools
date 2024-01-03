@@ -16,7 +16,6 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,13 +27,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class StructureStartMixin implements HolderStructureStart {
 
     @Mutable @Shadow @Final private Structure structure;
-    @Shadow @Final private static Logger LOGGER;
     @Unique
     Holder<Structure> holder;
 
     @Override
     public void worldgenDevtools$setHolder(Holder.Reference<Structure> holder) {
-        LOGGER.info("Set holder to {}", holder.key().location());
         this.holder = holder;
     }
 
