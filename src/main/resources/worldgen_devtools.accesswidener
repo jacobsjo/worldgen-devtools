@@ -1,0 +1,8 @@
+accessWidener v2 named
+mutable field net/minecraft/server/MinecraftServer registries Lnet/minecraft/core/LayeredRegistryAccess;
+accessible method net/minecraft/server/MinecraftServer$ReloadableResources <init> (Lnet/minecraft/server/packs/resources/CloseableResourceManager;Lnet/minecraft/server/ReloadableServerResources;)V
+accessible method net/minecraft/resources/RegistryDataLoader loadRegistryContents (Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/WritableRegistry;Lcom/mojang/serialization/Decoder;Ljava/util/Map;)V
+accessible field net/minecraft/core/MappedRegistry frozen Z
+accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V
+accessible field net/minecraft/world/level/levelgen/structure/Structure settings Lnet/minecraft/world/level/levelgen/structure/Structure$StructureSettings;
+mutable field net/minecraft/world/level/levelgen/structure/Structure settings Lnet/minecraft/world/level/levelgen/structure/Structure$StructureSettings;
