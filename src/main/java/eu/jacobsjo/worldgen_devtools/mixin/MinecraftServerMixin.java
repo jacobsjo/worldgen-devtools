@@ -109,19 +109,6 @@ public abstract class MinecraftServerMixin {
             });
         });
 
-        /*
-        generators.forEach((key, json) -> {
-            DataResult<ChunkGenerator> dataResult2 = json.flatMap((jsonElement) -> {
-                return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), jsonElement);
-            });
-            dataResult2.result().ifPresent((chunkGenerator) -> {
-                ChunkMap chunkMap = this.levels.get(key).getChunkSource().chunkMap;
-                ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
-            });
-
-        } );
-         */
-
         syncClient();
 
     }
@@ -207,11 +194,7 @@ public abstract class MinecraftServerMixin {
     private static void logErrors(Map<ResourceKey<?>, Exception> map) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        Map<ResourceLocation, Map<ResourceLocation, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> {
-            return ((ResourceKey)entry.getKey()).registry();
-        }, Collectors.toMap((entry) -> {
-            return ((ResourceKey)entry.getKey()).location();
-        }, Map.Entry::getValue)));
+        Map<ResourceLocation, Map<ResourceLocation, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).location(), Map.Entry::getValue)));
         map2.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
             printWriter.printf("> Errors in registry %s:%n", entry.getKey());
             (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {
@@ -220,7 +203,7 @@ public abstract class MinecraftServerMixin {
             });
         });
         printWriter.flush();
-        LOGGER.error((String)"Registry loading errors:\n{}", (StringWriter)stringWriter);
+        LOGGER.error("Registry loading errors:\n{}", stringWriter);
     }
 
 
