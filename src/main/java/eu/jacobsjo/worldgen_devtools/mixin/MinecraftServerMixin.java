@@ -2,8 +2,8 @@ package eu.jacobsjo.worldgen_devtools.mixin;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.worldgen_devtools.RegistryResetter;
 import eu.jacobsjo.worldgen_devtools.SwitchToConfigurationCallback;
 import eu.jacobsjo.worldgen_devtools.UpdatableGeneratorChunkMap;
@@ -29,6 +29,7 @@ import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.LevelStem;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,40 +41,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
-
-
-    @Unique
-    private static final Set<ResourceKey<?>> RELOADED_REGISTRIES = new HashSet<>(List.of(
-            Registries.CONFIGURED_CARVER,   // WORKS!
-            Registries.CONFIGURED_FEATURE,  // WORKS!
-            Registries.PLACED_FEATURE,      // WORKS!
-            Registries.DIMENSION_TYPE,      // WORKS, not synconized with client
-            Registries.NOISE,               // WORKS!
-            Registries.DENSITY_FUNCTION,    // WORKS (probably)
-            Registries.NOISE_SETTINGS,      // WORKS
-            Registries.STRUCTURE_SET,       // WORKS, but not with /resetchunks, and not new sets?
-            Registries.PROCESSOR_LIST,      // WORKS!
-            Registries.TEMPLATE_POOL,       // WORKS, but not with /resetchunks
-            Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, //Whatever
-            Registries.BIOME,               // WORKS, effects not syncronized with client
-            Registries.STRUCTURE            // WORKS! (/locate is slightly broken...)
-
-            //Presets
-            //Registries.WORLD_PRESET,
-            //Registries.FLAT_LEVEL_GENERATOR_PRESET,
-
-            //Non-worldgen
-            //Registries.TRIM_PATTERN,
-            //Registries.TRIM_MATERIAL,
-            //Registries.DAMAGE_TYPE
-            //Registries.CHAT_TYPE,
-    ));
 
     @Shadow
     private LayeredRegistryAccess<RegistryLayer> registries;
@@ -88,62 +64,55 @@ public abstract class MinecraftServerMixin {
     private void thenCompose(RegistryAccess.Frozen frozen, ImmutableList<PackResources> immutableList, CallbackInfoReturnable<CompletionStage<?>> cir) {
         CloseableResourceManager resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, immutableList);
 
-        Map<ResourceKey<Level>, DataResult<JsonElement>> generators = new HashMap<>();
-        this.levels.forEach((key, level) -> generators.put(key, ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, getRegistrtyInfoLookup()), level.getChunkSource().getGenerator())));
+        // Store old dimensions
+        RegistryAccess.Frozen dimensionsContextLayer = this.registries.getAccessForLoading(RegistryLayer.DIMENSIONS);
+        RegistryAccess.Frozen dimensionsNewLayer = this.registries.getLayer(RegistryLayer.DIMENSIONS);
+        RegistryOps.RegistryInfoLookup dimensionsLookup = getRegistrtyInfoLookup(dimensionsContextLayer, dimensionsNewLayer, false);
+
+        Map<ResourceLocation, JsonElement> generators = new HashMap<>();
+        this.levels.forEach((key, level) -> generators.put(key.location(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow(false, err -> LOGGER.error(err))));
 
 
-        // Worldgen registries
+        // Reload Worldgen registries
         Map<ResourceKey<?>, Exception> exceptionMap = new HashMap<>();
 
-        RegistryAccess.Frozen beforeLayer = this.registries.getAccessForLoading(RegistryLayer.WORLDGEN);
-        RegistryAccess.Frozen layer = this.registries.getLayer(RegistryLayer.WORLDGEN);
+        RegistryAccess.Frozen worldgenContextLayer = this.registries.getAccessForLoading(RegistryLayer.WORLDGEN);
+        RegistryAccess.Frozen worldgenNewLayer = this.registries.getLayer(RegistryLayer.WORLDGEN);
+        RegistryOps.RegistryInfoLookup worldgenLookup = getRegistrtyInfoLookup(worldgenContextLayer, worldgenNewLayer, true);
 
-        final Map<ResourceKey<? extends Registry<?>>, RegistryOps.RegistryInfo<?>> lookupMap = new HashMap<>();
-        beforeLayer.registries().forEach((registryEntry) -> {
-            lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value()));
-        });
-
-        layer.registries().forEach((registryEntry) -> {
-            assert registryEntry.value() instanceof MappedRegistry;
-            MappedRegistry<?> registry = (MappedRegistry<?>) registryEntry.value();
-
-            if (RELOADED_REGISTRIES.stream().anyMatch(d -> d.equals(registryEntry.key()))) {
-                ((RegistryResetter) registry).reset();
-                lookupMap.put(registryEntry.key(), createInfoForNewRegistry(registry));
-            } else {
-                lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value()));
-            }
-        });
-        RegistryOps.RegistryInfoLookup registryInfoLookup = new RegistryOps.RegistryInfoLookup() {
-            public <E> Optional<RegistryOps.RegistryInfo<E>> lookup(ResourceKey<? extends Registry<? extends E>> resourceKey) {
-                return Optional.ofNullable((RegistryOps.RegistryInfo<E>) lookupMap.get(resourceKey));
-            }
-        };
-
-        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
-            if (RELOADED_REGISTRIES.stream().anyMatch(d -> d.equals(data.key()))) {
-                loadData(registryInfoLookup, resourceManager, data, layer, exceptionMap);
-            }
-
-        });
+        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> loadData(worldgenLookup, resourceManager, data, worldgenNewLayer, exceptionMap));
 
         if (!exceptionMap.isEmpty()) {
             logErrors(exceptionMap);
-            exceptionMap.values().forEach(e -> LOGGER.error(e.getMessage()));
             throw new IllegalStateException("Failed to load registries due to above errors");
         }
 
-        // Dimension registry
-        //TODO this doesn't work: dimensions aren't reloaded and saving breaks on server stop "java.lang.IllegalStateException: Overworld settings missing"
+        // Reload Dimension registry
+        MappedRegistry<LevelStem> levelStemRegistry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable());
+        RegistryDataLoader.loadRegistryContents(dimensionsLookup, resourceManager, Registries.LEVEL_STEM, levelStemRegistry, LevelStem.CODEC, exceptionMap);
+
+        Stream<ResourceLocation> dimensionKeys = Stream.concat(levelStemRegistry.keySet().stream(), generators.keySet().stream()).distinct();
+
+        dimensionKeys.forEach(key -> {
+            levelStemRegistry.getOptional(key).map(LevelStem::generator) .or(() -> {
+                JsonElement json = generators.get(key);
+                if (json == null) return Optional.empty();
+                return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), json).result();
+            }).ifPresent(chunkGenerator -> {
+                ServerLevel level = this.levels.get(ResourceKey.create(Registries.DIMENSION, key));
+                if (level == null){
+                    LOGGER.warn("adding new dimension not supported; trying to add {}", key);
+                    return;
+                }
+                ChunkMap chunkMap = level.getChunkSource().chunkMap;
+                ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
+            });
+        });
+
         /*
-        reloadRegistryLayer(
-                resourceManager, this.registries, RegistryLayer.DIMENSIONS, RegistryDataLoader.DIMENSION_REGISTRIES
-        );*/
-
-
         generators.forEach((key, json) -> {
             DataResult<ChunkGenerator> dataResult2 = json.flatMap((jsonElement) -> {
-                return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, getRegistrtyInfoLookup()), jsonElement);
+                return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), jsonElement);
             });
             dataResult2.result().ifPresent((chunkGenerator) -> {
                 ChunkMap chunkMap = this.levels.get(key).getChunkSource().chunkMap;
@@ -151,6 +120,7 @@ public abstract class MinecraftServerMixin {
             });
 
         } );
+         */
 
         syncClient();
 
@@ -191,11 +161,24 @@ public abstract class MinecraftServerMixin {
 
 
     @Unique
-    private RegistryOps.RegistryInfoLookup getRegistrtyInfoLookup(){
+    private RegistryOps.RegistryInfoLookup getRegistrtyInfoLookup(RegistryAccess.Frozen contextLayer, RegistryAccess.Frozen newLayer, boolean reset){
+
         final Map<ResourceKey<? extends Registry<?>>, RegistryOps.RegistryInfo<?>> lookupMap = new HashMap<>();
-        this.registries.getAccessForLoading(RegistryLayer.DIMENSIONS).registries().forEach((registryEntry) -> {
+        contextLayer.registries().forEach((registryEntry) -> {
             lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value()));
         });
+
+        newLayer.registries().forEach((registryEntry) -> {
+            assert registryEntry.value() instanceof MappedRegistry;
+            MappedRegistry<?> registry = (MappedRegistry<?>) registryEntry.value();
+            if (reset) {
+                ((RegistryResetter) registry).reset();
+                lookupMap.put(registryEntry.key(), createInfoForNewRegistry(registry));
+            } else {
+                lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value()));
+            }
+        });
+
         return new RegistryOps.RegistryInfoLookup() {
             public <E> Optional<RegistryOps.RegistryInfo<E>> lookup(ResourceKey<? extends Registry<? extends E>> resourceKey) {
                 return Optional.ofNullable((RegistryOps.RegistryInfo<E>) lookupMap.get(resourceKey));
