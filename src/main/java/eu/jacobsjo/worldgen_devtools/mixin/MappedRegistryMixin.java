@@ -7,19 +7,27 @@ import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Mixin(MappedRegistry.class)
-public class MappedRegistryMixin<T> implements RegistryResetter {
+public abstract class MappedRegistryMixin<T> implements RegistryResetter {
 
 
     @Shadow @Final private ObjectList<Holder.Reference<T>> byId;
@@ -42,24 +50,64 @@ public class MappedRegistryMixin<T> implements RegistryResetter {
 
     @Shadow private @Nullable List<Holder.Reference<T>> holdersInOrder;
 
-    @Override
-    public void reset() {
-        this.byKey.forEach((key, value) -> value.bindValue(null));
+    @Shadow public abstract @Nullable T get(@Nullable ResourceKey<T> key);
 
-        this.byId.clear();
-        this.toId.clear();
-        this.byLocation.clear();
-        //this.byKey.clear();
-        this.byValue.clear();
-        this.lifecycles.clear();
-        this.tags.clear();
-        this.frozen = false;
-        this.nextId = 0;
+    @Shadow public abstract int getId(@Nullable T value);
+
+    @Shadow public abstract Holder.Reference<T> registerMapping(int id, ResourceKey<T> key, T value, Lifecycle lifecycle);
+
+    @Shadow private @Nullable Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
+    @Shadow @Final private ResourceKey<? extends Registry<T>> key;
+    @Shadow @Final private static Logger LOGGER;
+    @Unique private boolean reloading = false;
+    @Unique private Set<ResourceKey<T>> outdatedKeys;
+
+    @Override
+    public void worldgenDevtools$startReload(){
+        if (this.unregisteredIntrusiveHolders != null){
+            throw new IllegalStateException("Trying to reload registry " + key.toString() + " which has intrusive holders.");
+        }
+
+        this.outdatedKeys = new HashSet<>(byKey.keySet());
+
         this.holdersInOrder = null;
+        this.frozen = false;
+        this.reloading = true;
     }
 
-    @Override
-    public void unfreeze(){
-        this.frozen = false;
+    @Inject(method = "freeze", at = @At("HEAD"))
+    public void freeze(CallbackInfoReturnable<Registry<T>> cir){
+        if (this.reloading){
+            this.outdatedKeys.forEach(key -> {
+                this.byKey.get(key).bindValue(null); // make sure outdated holder is unbound, causing Exceptions should they still be in use
+
+                // remove old element from registry
+                T value = this.get(key);
+                int id = this.getId(value);
+                this.toId.remove(value, id);
+                this.byValue.remove(value);
+                this.lifecycles.remove(value);
+                this.byLocation.remove(key.location());
+                this.byKey.remove(key);
+                LOGGER.info("Removing {} from registry", key);
+            });
+            this.reloading = false;
+        }
+    }
+
+    @Inject(method = "register", at = @At("HEAD"), cancellable = true)
+    public void register(ResourceKey<T> key, T value, Lifecycle lifecycle, CallbackInfoReturnable<Holder.Reference<T>> cir) {
+        if (this.reloading && this.byLocation.containsKey(key.location())){
+            // existing element that is changed
+            this.outdatedKeys.remove(key);
+            T oldValue = this.get(key);
+            int id = this.getId(oldValue);
+            this.byLocation.remove(key.location());
+            cir.setReturnValue(this.registerMapping(id, key, value, lifecycle));
+            this.toId.remove(oldValue, id);
+            this.byValue.remove(oldValue);
+            this.lifecycles.remove(oldValue);
+            cir.cancel();
+        }
     }
 }

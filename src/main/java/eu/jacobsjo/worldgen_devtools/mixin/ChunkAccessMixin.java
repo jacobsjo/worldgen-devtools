@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class ChunkAccessMixin {
     @Shadow @Final private static LongSet EMPTY_REFERENCE_SET;
     @Shadow @Final private static Logger LOGGER;
     @Shadow @Final protected LevelHeightAccessor levelHeightAccessor;
+    @Shadow @Final private Map<Structure, StructureStart> structureStarts;
     @Unique
     private Map<ResourceLocation, StructureStart> structureStartsByLocation;
     @Unique
@@ -44,88 +46,72 @@ public class ChunkAccessMixin {
 
     @Inject(method="<init>(Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/chunk/UpgradeData;Lnet/minecraft/world/level/LevelHeightAccessor;Lnet/minecraft/core/Registry;J[Lnet/minecraft/world/level/chunk/LevelChunkSection;Lnet/minecraft/world/level/levelgen/blending/BlendingData;)V", at = @At("TAIL"))
     private void init(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData, CallbackInfo info){
-        this.structureRegistry = ((Level) levelHeightAccessor).registryAccess().registry(Registries.STRUCTURE).orElseThrow();
-        this.structureStartsByLocation = Maps.newHashMap();
-        this.structuresRefencesByLocation = Maps.newHashMap();
+        if (!((Level) levelHeightAccessor).isClientSide()) {
+            this.structureRegistry = ((Level) levelHeightAccessor).registryAccess().registry(Registries.STRUCTURE).orElseThrow();
+            this.structureStartsByLocation = Maps.newHashMap();
+            this.structuresRefencesByLocation = Maps.newHashMap();
+        }
     }
 
-
-
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Nullable @Overwrite
-    public StructureStart getStartForStructure(Structure structure) {
-        return this.structureStartsByLocation.get(structureRegistry.getKey(structure));
+    @Inject(method = "getStartForStructure", at=@At("HEAD"), cancellable = true)
+    public void getStartForStructure(Structure structure, CallbackInfoReturnable<StructureStart> cir) {
+        if (structureRegistry == null) return;
+        cir.setReturnValue(this.structureStartsByLocation.get(structureRegistry.getKey(structure)));
+        cir.cancel();
     }
 
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Overwrite
-    public void setStartForStructure(Structure structure, StructureStart structureStart) {
+    @Inject(method = "setStartForStructure", at=@At("HEAD"), cancellable = true)
+    public void setStartForStructure(Structure structure, StructureStart structureStart, CallbackInfo ci) {
+        if (structureRegistry == null) return;
         this.structureStartsByLocation.put(structureRegistry.getKey(structure), structureStart);
         this.unsaved = true;
+        ci.cancel();
     }
 
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Overwrite
-    public Map<Structure, StructureStart> getAllStarts() {
-        return Collections.unmodifiableMap(this.structureStartsByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(structureRegistry.get(e.getKey()), e.getValue()), HashMap::putAll));
+    @Inject(method = "getAllStarts", at=@At("HEAD"), cancellable = true)
+    public void getAllStarts(CallbackInfoReturnable<Map<Structure, StructureStart>> cir) {
+        if (structureRegistry == null) return;
+        cir.setReturnValue(Collections.unmodifiableMap(this.structureStartsByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(structureRegistry.get(e.getKey()), e.getValue()), HashMap::putAll)));
+        cir.cancel();
     }
 
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Overwrite
-    public void setAllStarts(Map<Structure, StructureStart> map) {
+    @Inject(method = "setAllStarts", at=@At("HEAD"), cancellable = true)
+    public void setAllStarts(Map<Structure, StructureStart> structureStarts, CallbackInfo ci) {
+        if (structureRegistry == null) return;
         this.structureStartsByLocation.clear();
-        map.forEach(this::setStartForStructure);
+        structureStarts.forEach((structure, structureStart) -> this.structureStartsByLocation.put(structureRegistry.getKey(structure), structureStart));
         this.unsaved = true;
+        ci.cancel();
     }
 
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Overwrite
-    public LongSet getReferencesForStructure(Structure structure) {
-        return this.structuresRefencesByLocation.getOrDefault(structureRegistry.getKey(structure), EMPTY_REFERENCE_SET);
+    @Inject(method = "getReferencesForStructure", at=@At("HEAD"), cancellable = true)
+    public void getReferencesForStructure(Structure structure, CallbackInfoReturnable<LongSet> cir) {
+        if (structureRegistry == null) return;
+        cir.setReturnValue(this.structuresRefencesByLocation.getOrDefault(structureRegistry.getKey(structure), EMPTY_REFERENCE_SET));
+        cir.cancel();
     }
 
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Overwrite
-    public void addReferenceForStructure(Structure structure, long l) {
-        (this.structuresRefencesByLocation.computeIfAbsent(structureRegistry.getKey(structure), (structurex) -> new LongOpenHashSet())).add(l);
+    @Inject(method = "addReferenceForStructure", at=@At("HEAD"), cancellable = true)
+    public void addReferenceForStructure(Structure structure, long reference, CallbackInfo ci) {
+        if (structureRegistry == null) return;
+        (this.structuresRefencesByLocation.computeIfAbsent(structureRegistry.getKey(structure), (structurex) -> new LongOpenHashSet())).add(reference);
         this.unsaved = true;
+        ci.cancel();
     }
 
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Overwrite
-    public Map<Structure, LongSet> getAllReferences() {
-        return Collections.unmodifiableMap(this.structuresRefencesByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(structureRegistry.get(e.getKey()), e.getValue()), HashMap::putAll));
+    @Inject(method = "getAllReferences", at=@At("HEAD"), cancellable = true)
+    public void getAllReferences(CallbackInfoReturnable<Map<Structure, LongSet>> cir) {
+        if (structureRegistry == null) return;
+        cir.setReturnValue(Collections.unmodifiableMap(this.structuresRefencesByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(structureRegistry.get(e.getKey()), e.getValue()), HashMap::putAll)));
+        cir.cancel();
     }
 
-    /**
-     * @author eu.jacobsjo.worldgen_devtools
-     * @reason Changing structure start saving to save key instead, so registry changes work
-     */
-    @Overwrite
-    public void setAllReferences(Map<Structure, LongSet> map) {
+    @Inject(method = "setAllReferences", at=@At("HEAD"), cancellable = true)
+    public void setAllReferences(Map<Structure, LongSet> structureReferencesMap, CallbackInfo ci) {
+        if (structureRegistry == null) return;
         this.structuresRefencesByLocation.clear();
-        map.forEach((structure, reference) -> this.structuresRefencesByLocation.put(structureRegistry.getKey(structure), reference));
+        structureReferencesMap.forEach((structure, reference) -> this.structuresRefencesByLocation.put(structureRegistry.getKey(structure), reference));
         this.unsaved = true;
+        ci.cancel();
     }
 }

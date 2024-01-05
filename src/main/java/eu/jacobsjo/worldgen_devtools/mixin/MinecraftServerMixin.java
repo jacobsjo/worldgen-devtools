@@ -159,7 +159,7 @@ public abstract class MinecraftServerMixin {
             assert registryEntry.value() instanceof MappedRegistry;
             MappedRegistry<?> registry = (MappedRegistry<?>) registryEntry.value();
             if (reset) {
-                ((RegistryResetter) registry).reset();
+                ((RegistryResetter) registry).worldgenDevtools$startReload();
                 lookupMap.put(registryEntry.key(), createInfoForNewRegistry(registry));
             } else {
                 lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value()));
