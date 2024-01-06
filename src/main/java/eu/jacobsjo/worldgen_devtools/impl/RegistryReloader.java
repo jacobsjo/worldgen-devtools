@@ -106,6 +106,9 @@ public class RegistryReloader {
      */
     public static void syncClient(ServerConnectionListener serverConnection) {
         for (Connection connection : serverConnection.getConnections()) {
+            if (connection.isMemoryConnection()) {
+                continue;
+            }
             PacketListener var5 = connection.getPacketListener();
             if (var5 instanceof ServerGamePacketListenerImpl impl) {
                 ((SwitchToConfigurationCallback) impl).worldgenDevtools$onSwitchToConfiguration(() -> {

@@ -15,6 +15,7 @@
     "StructureStartMixin"
   ],
   "client": [
+    "MinecraftServerMixinClient"
   ],
   "injectors": {
     "defaultRequire": 1
