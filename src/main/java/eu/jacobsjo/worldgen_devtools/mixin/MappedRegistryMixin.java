@@ -67,7 +67,6 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     public void freeze(CallbackInfoReturnable<Registry<T>> cir){
         if (this.reloading){
             this.outdatedKeys.forEach(key -> {
-                this.byKey.get(key).bindValue(null); // make sure outdated holder is unbound, causing Exceptions should they still be in use
 
                 // remove old element from registry
                 T value = this.get(key);
@@ -77,6 +76,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
                 this.byValue.remove(value);
                 this.lifecycles.remove(value);
                 this.byLocation.remove(key.location());
+                this.byKey.get(key).bindValue(null); // make sure outdated holder is unbound, causing Exceptions should they still be in use
                 this.byKey.remove(key);
                 LOGGER.info("Removing {} from registry", key);
             });
