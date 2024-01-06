@@ -22,6 +22,9 @@ import java.util.List;
 
 public class ResetChunksCommandMixin {
 
+    /**
+     * Fixes the /resetChunks command to resend biomes for the reset chunks to clients.
+     */
     @Inject(method = "resetChunks", at = @At("RETURN"))
     private static void resetChunks(CommandSourceStack source, int range, boolean skipOldChunks, CallbackInfoReturnable<Integer> cir){
         ServerLevel serverLevel = source.getLevel();

@@ -7,6 +7,9 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
+/**
+ * A small fix for a crash that happens when reloading during world generation.
+ */
 @Mixin(ChunkGenerator.class)
 public class ChunkGeneratorMixin {
 

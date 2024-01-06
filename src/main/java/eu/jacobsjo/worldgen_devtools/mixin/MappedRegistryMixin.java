@@ -1,16 +1,14 @@
 package eu.jacobsjo.worldgen_devtools.mixin;
 
 import com.mojang.serialization.Lifecycle;
-import eu.jacobsjo.worldgen_devtools.RegistryResetter;
+import eu.jacobsjo.worldgen_devtools.api.ReloadableRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -27,41 +25,28 @@ import java.util.Map;
 import java.util.Set;
 
 @Mixin(MappedRegistry.class)
-public abstract class MappedRegistryMixin<T> implements RegistryResetter {
-
-
+public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow @Final private ObjectList<Holder.Reference<T>> byId;
-
     @Shadow @Final private Reference2IntMap<T> toId;
-
     @Shadow @Final private Map<ResourceLocation, Holder.Reference<T>> byLocation;
-
     @Shadow @Final private Map<ResourceKey<T>, Holder.Reference<T>> byKey;
-
     @Shadow @Final private Map<T, Holder.Reference<T>> byValue;
-
     @Shadow @Final private Map<T, Lifecycle> lifecycles;
-
-    @Shadow private volatile Map<TagKey<T>, HolderSet.Named<T>> tags;
-
     @Shadow private boolean frozen;
-
-    @Shadow private int nextId;
-
     @Shadow private @Nullable List<Holder.Reference<T>> holdersInOrder;
-
     @Shadow public abstract @Nullable T get(@Nullable ResourceKey<T> key);
-
     @Shadow public abstract int getId(@Nullable T value);
-
     @Shadow public abstract Holder.Reference<T> registerMapping(int id, ResourceKey<T> key, T value, Lifecycle lifecycle);
-
     @Shadow private @Nullable Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
     @Shadow @Final private ResourceKey<? extends Registry<T>> key;
     @Shadow @Final private static Logger LOGGER;
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys;
 
+
+    /**
+     * configures the registry for reloading and marks all current keys as outdated.
+     */
     @Override
     public void worldgenDevtools$startReload(){
         if (this.unregisteredIntrusiveHolders != null){
@@ -75,6 +60,9 @@ public abstract class MappedRegistryMixin<T> implements RegistryResetter {
         this.reloading = true;
     }
 
+    /**
+     * when refreezing a reloading registry, remove all keys that are still outdated.
+     */
     @Inject(method = "freeze", at = @At("HEAD"))
     public void freeze(CallbackInfoReturnable<Registry<T>> cir){
         if (this.reloading){
@@ -85,6 +73,7 @@ public abstract class MappedRegistryMixin<T> implements RegistryResetter {
                 T value = this.get(key);
                 int id = this.getId(value);
                 this.toId.remove(value, id);
+                this.byId.set(id, null);
                 this.byValue.remove(value);
                 this.lifecycles.remove(value);
                 this.byLocation.remove(key.location());
@@ -95,6 +84,9 @@ public abstract class MappedRegistryMixin<T> implements RegistryResetter {
         }
     }
 
+    /**
+     * when registering into a reloading registry, override existing ResourceLocations and unmark key as outdated.
+     */
     @Inject(method = "register", at = @At("HEAD"), cancellable = true)
     public void register(ResourceKey<T> key, T value, Lifecycle lifecycle, CallbackInfoReturnable<Holder.Reference<T>> cir) {
         if (this.reloading && this.byLocation.containsKey(key.location())){

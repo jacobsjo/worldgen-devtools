@@ -17,8 +17,10 @@ import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,19 +30,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Vanilla uses {@link ChunkAccess#structureStarts} and {@link ChunkAccess#structuresRefences} to map structures to
+ * structure starts and references. This mixin changes it to use {@link #structureStartsByLocation} and
+ * {@link #structuresRefencesByLocation} which use {@link ResourceLocation}s instead. This change is only done on the
+ * logical server.
+ */
 @Mixin(ChunkAccess.class)
 public class ChunkAccessMixin {
 
     @Shadow protected volatile boolean unsaved;
     @Shadow @Final private static LongSet EMPTY_REFERENCE_SET;
-    @Shadow @Final private static Logger LOGGER;
-    @Shadow @Final protected LevelHeightAccessor levelHeightAccessor;
-    @Shadow @Final private Map<Structure, StructureStart> structureStarts;
+
     @Unique
     private Map<ResourceLocation, StructureStart> structureStartsByLocation;
     @Unique
     private Map<ResourceLocation, LongSet> structuresRefencesByLocation;
-
     @Unique
     private Registry<Structure> structureRegistry;
 

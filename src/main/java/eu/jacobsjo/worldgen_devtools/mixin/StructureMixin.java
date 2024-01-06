@@ -1,6 +1,6 @@
 package eu.jacobsjo.worldgen_devtools.mixin;
 
-import eu.jacobsjo.worldgen_devtools.HolderStructureStart;
+import eu.jacobsjo.worldgen_devtools.api.HolderStructureStart;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -23,6 +23,10 @@ import java.util.function.Predicate;
 
 @Mixin(Structure.class)
 public abstract class StructureMixin {
+
+    /**
+     * Calls {@link HolderStructureStart#worldgenDevtools$setHolder} after creation of a {@link StructureStart}. See {@link StructureStartMixin}.
+     */
     @Inject(method = "generate", at = @At("RETURN"))
     public void generate(RegistryAccess registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkPos chunkPos, int i, LevelHeightAccessor levelHeightAccessor, Predicate<Holder<Biome>> predicate, CallbackInfoReturnable<StructureStart> cir) {
         Registry<Structure> registry = registryAccess.registry(Registries.STRUCTURE).orElseThrow();

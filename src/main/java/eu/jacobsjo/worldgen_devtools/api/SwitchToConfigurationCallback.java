@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgen_devtools;
+package eu.jacobsjo.worldgen_devtools.api;
 
 public interface SwitchToConfigurationCallback {
     interface Callback {

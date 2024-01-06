@@ -1,6 +1,6 @@
 package eu.jacobsjo.worldgen_devtools.mixin;
 
-import eu.jacobsjo.worldgen_devtools.HolderStructureStart;
+import eu.jacobsjo.worldgen_devtools.api.HolderStructureStart;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -23,6 +23,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+/**
+ * In vanilla, {@link StructureStart} uses direct references to {@link Structure}s. This is problematic when reloading the
+ * registries. Therefore, this mixin changes it to use a {@link Holder}< Structure > instead. The {@link #worldgenDevtools$setHolder}
+ * method needs to be called after creation of the structure start.
+ */
 @Mixin(StructureStart.class)
 public class StructureStartMixin implements HolderStructureStart {
 
@@ -35,22 +40,34 @@ public class StructureStartMixin implements HolderStructureStart {
         this.holder = holder;
     }
 
+    /**
+     * calls {@link #worldgenDevtools$setHolder} after creation from loading.
+     */
     @Inject(method = "loadStaticStart", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
     private static void loadStaticStart(StructurePieceSerializationContext structurePieceSerializationContext, CompoundTag compoundTag, long l, CallbackInfoReturnable<StructureStart> cir, String string){
         Registry<Structure> registry = structurePieceSerializationContext.registryAccess().registryOrThrow(Registries.STRUCTURE);
         ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getHolderOrThrow(ResourceKey.create(Registries.STRUCTURE, new ResourceLocation(string))));
     }
 
+    /**
+     * Sets {@link #structure} from holder imediately before usage.
+     */
     @Inject(method = "getBoundingBox", at = @At(value = "HEAD"))
     public void getBoundingBox(CallbackInfoReturnable<BoundingBox> cir) {
         this.structure = this.holder.value();
     }
 
+    /**
+     * Sets {@link #structure} from holder imediately before usage.
+     */
     @Inject(method = "placeInChunk", at = @At(value = "HEAD"))
     public void placeInChunk(WorldGenLevel worldGenLevel, StructureManager structureManager, ChunkGenerator chunkGenerator, RandomSource randomSource, BoundingBox boundingBox, ChunkPos chunkPos, CallbackInfo ci) {
         this.structure = this.holder.value();
     }
 
+    /**
+     * Sets {@link #structure} from holder imediately before usage.
+     */
     @Inject(method = "createTag", at = @At(value = "HEAD"))
     public void createTag(CallbackInfoReturnable<BoundingBox> cir) {
         if (this.holder == null){
@@ -59,6 +76,9 @@ public class StructureStartMixin implements HolderStructureStart {
         this.structure = this.holder.value();
     }
 
+    /**
+     * Sets {@link #structure} from holder imediately before usage.
+     */
     @Inject(method = "getStructure", at = @At(value = "HEAD"))
     public void getStructure(CallbackInfoReturnable<Structure> cir) {
         this.structure = this.holder.value();
