@@ -30,6 +30,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.PrintWriter;
@@ -58,7 +59,7 @@ public class RegistryReloader {
         RegistryOps.RegistryInfoLookup dimensionsLookup = getRegistrtyInfoLookup(dimensionsContextLayer, dimensionsNewLayer, false);
 
         Map<ResourceLocation, JsonElement> generators = new HashMap<>();
-        levels.forEach((key, level) -> generators.put(key.location(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow(false, err -> LOGGER.error(err))));
+        levels.forEach((key, level) -> generators.put(key.location(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow(false, LOGGER::error)));
 
 
         // Reload Worldgen registries
@@ -83,21 +84,19 @@ public class RegistryReloader {
         Stream<ResourceLocation> dimensionKeys = Stream.concat(levelStemRegistry.keySet().stream(), generators.keySet().stream()).distinct();
 
         //for each found dimension, create a generator and set it for the dimension, if one exists. Adding new dimensions isn't supported.
-        dimensionKeys.forEach(key -> {
-            levelStemRegistry.getOptional(key).map(LevelStem::generator).or(() -> {
-                JsonElement json = generators.get(key);
-                if (json == null) return Optional.empty();
-                return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), json).result();
-            }).ifPresent(chunkGenerator -> {
-                ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key));
-                if (level == null){
-                    LOGGER.warn("adding new dimension not supported; trying to add {}", key);
-                    return;
-                }
-                ChunkMap chunkMap = level.getChunkSource().chunkMap;
-                ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
-            });
-        });
+        dimensionKeys.forEach(key -> levelStemRegistry.getOptional(key).map(LevelStem::generator).or(() -> {
+            JsonElement json = generators.get(key);
+            if (json == null) return Optional.empty();
+            return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), json).result();
+        }).ifPresent(chunkGenerator -> {
+            ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key));
+            if (level == null){
+                LOGGER.warn("adding new dimension not supported; trying to add {}", key);
+                return;
+            }
+            ChunkMap chunkMap = level.getChunkSource().chunkMap;
+            ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
+        }));
     }
 
     /**
@@ -154,9 +153,7 @@ public class RegistryReloader {
     private static RegistryOps.RegistryInfoLookup getRegistrtyInfoLookup(RegistryAccess.Frozen contextLayer, RegistryAccess.Frozen newLayer, boolean reset){
 
         final Map<ResourceKey<? extends Registry<?>>, RegistryOps.RegistryInfo<?>> lookupMap = new HashMap<>();
-        contextLayer.registries().forEach((registryEntry) -> {
-            lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value()));
-        });
+        contextLayer.registries().forEach((registryEntry) -> lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value())));
 
         newLayer.registries().forEach((registryEntry) -> {
             assert registryEntry.value() instanceof MappedRegistry;
@@ -170,7 +167,7 @@ public class RegistryReloader {
         });
 
         return new RegistryOps.RegistryInfoLookup() {
-            public <E> Optional<RegistryOps.RegistryInfo<E>> lookup(ResourceKey<? extends Registry<? extends E>> resourceKey) {
+            public <E> @NotNull Optional<RegistryOps.RegistryInfo<E>> lookup(ResourceKey<? extends Registry<? extends E>> resourceKey) {
                 return Optional.ofNullable((RegistryOps.RegistryInfo<E>) lookupMap.get(resourceKey));
             }
         };
@@ -185,7 +182,7 @@ public class RegistryReloader {
             printWriter.printf("> Errors in registry %s:%n", entry.getKey());
             (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {
                 printWriter.printf(">> Errors in element %s:%n", entryx.getKey());
-                ((Exception)entryx.getValue()).printStackTrace(printWriter);
+                (entryx.getValue()).printStackTrace(printWriter);
             });
         });
         printWriter.flush();

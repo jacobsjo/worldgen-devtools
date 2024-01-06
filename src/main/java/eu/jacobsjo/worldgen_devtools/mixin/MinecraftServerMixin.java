@@ -25,8 +25,7 @@ import java.util.concurrent.CompletionStage;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
-    @Shadow
-    private LayeredRegistryAccess<RegistryLayer> registries;
+    @Shadow @Final private LayeredRegistryAccess<RegistryLayer> registries;
     @Shadow @Final private Map<ResourceKey<Level>, ServerLevel> levels;
     @Shadow public abstract ServerConnectionListener getConnection();
 

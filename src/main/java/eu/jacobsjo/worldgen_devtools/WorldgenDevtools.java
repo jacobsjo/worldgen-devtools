@@ -7,9 +7,7 @@ import net.minecraft.server.commands.ResetChunksCommand;
 public class WorldgenDevtools implements ModInitializer{
     @Override
     public void onInitialize() {
-        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
-            ResetChunksCommand.register(dispatcher);
-        }));
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> ResetChunksCommand.register(dispatcher));
 
     }
 }

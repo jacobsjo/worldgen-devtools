@@ -38,7 +38,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow public abstract int getId(@Nullable T value);
     @Shadow public abstract Holder.Reference<T> registerMapping(int id, ResourceKey<T> key, T value, Lifecycle lifecycle);
     @Shadow private @Nullable Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
-    @Shadow @Final private ResourceKey<? extends Registry<T>> key;
+    @Shadow @Final ResourceKey<? extends Registry<T>> key;
     @Shadow @Final private static Logger LOGGER;
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys;

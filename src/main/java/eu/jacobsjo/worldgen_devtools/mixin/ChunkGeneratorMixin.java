@@ -19,7 +19,7 @@ public class ChunkGeneratorMixin {
      */
     @Overwrite
     private static void method_39788(IntSet intSet, FeatureSorter.StepFeatureData stepFeatureData, PlacedFeature placedFeature){
-        int id = stepFeatureData.indexMapping().applyAsInt((PlacedFeature)placedFeature);
+        int id = stepFeatureData.indexMapping().applyAsInt(placedFeature);
         /*
          if id is -1 then the placedFeature wasn't found in the indexMapping. This happens when biomeDecoration happends
          during reload but the featureSorter hasn't rerun yet. This can cause some chunks with missinge features.

@@ -4,6 +4,5 @@ public interface SwitchToConfigurationCallback {
     interface Callback {
         void handle();
     }
-    public void worldgenDevtools$onSwitchToConfiguration(SwitchToConfigurationCallback.Callback callback);
-
+    void worldgenDevtools$onSwitchToConfiguration(SwitchToConfigurationCallback.Callback callback);
 }
