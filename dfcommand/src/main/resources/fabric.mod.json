@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "df-command",
+  "version": "${version}",
+  "name": "Df Command",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/df-command/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "eu.jacobsjo.dfcommand.client.DfCommandClient"
+    ],
+    "main": [
+      "eu.jacobsjo.dfcommand.DfCommandMod"
+    ]
+  },
+  "mixins": [
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.7",
+    "fabric": "*",
+    "minecraft": "~1.20",
+    "java": ">=17"
+  }
+}
