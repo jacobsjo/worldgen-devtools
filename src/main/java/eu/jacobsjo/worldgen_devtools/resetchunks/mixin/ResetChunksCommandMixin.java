@@ -12,7 +12,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
@@ -43,5 +45,13 @@ public class ResetChunksCommandMixin {
         }
 
         serverChunkCache.chunkMap.resendBiomesForChunks(chunks);
+    }
+
+    /**
+     * changes the minimum permission of the resetchunk command from 2 to 4
+     */
+    @ModifyConstant(method = "method_38625", constant = @Constant(intValue = 2))
+    private static int hasPermission(int value){
+        return 4;
     }
 }
