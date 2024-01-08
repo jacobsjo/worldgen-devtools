@@ -14,13 +14,14 @@
 
     ],
     "main": [
-      "eu.jacobsjo.worldgen_devtools.resetchunks.ResetChunksInit",
-      "eu.jacobsjo.worldgen_devtools.dfcommand.DfCommandInit"
+      "eu.jacobsjo.worldgen_devtools.vanilla_commands.VanillaCommandsInit",
+      "eu.jacobsjo.worldgen_devtools.dfcommand.DfCommandInit",
+      "eu.jacobsjo.worldgen_devtools.reload_registries.ReloadRegistriesInit"
     ]
   },
   "mixins": [
     "worldgen_devtools.reload_registries.mixins.json",
-    "worldgen_devtools.resetchunks.mixins.json"
+    "worldgen_devtools.vanilla_commands.mixins.json"
   ],
   "accessWidener": "worldgen_devtools.accesswidener",
   "depends": {

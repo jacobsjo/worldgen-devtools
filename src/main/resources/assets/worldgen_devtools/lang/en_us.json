@@ -1,0 +1,8 @@
+{
+  "commands.jacobsjo.getdensity.result": "Density: %s",
+  "commands.jacobsjo.getdensity.density_function.invalid": "Invalid density_function %s",
+  "commands.jacobsjo.getdensity.noise_router.invalid":"Invalid noise router entry %s",
+  "commands.jacobsjo.getdensity.noise_router.no": "This dimension has no noise router",
+  "gamerule.reloadRegistries": "Reload registries (experimental)",
+  "gamerule.syncAfterRegistryReload": "Syncronize clients after a registry reload"
+}
