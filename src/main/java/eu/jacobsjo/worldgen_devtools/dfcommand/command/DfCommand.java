@@ -1,4 +1,4 @@
-package eu.jacobsjo.dfcommand.command;
+package eu.jacobsjo.worldgen_devtools.dfcommand.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -6,7 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import eu.jacobsjo.dfcommand.RandomState;
+import eu.jacobsjo.worldgen_devtools.dfcommand.RandomState;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceKeyArgument;

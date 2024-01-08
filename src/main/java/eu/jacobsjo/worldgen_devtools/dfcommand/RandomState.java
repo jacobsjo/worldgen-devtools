@@ -1,4 +1,4 @@
-package eu.jacobsjo.dfcommand;
+package eu.jacobsjo.worldgen_devtools.dfcommand;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
@@ -22,10 +22,6 @@ public final class RandomState {
     private final Map<ResourceKey<NormalNoise.NoiseParameters>, NormalNoise> noiseIntances;
 
     private final DensityFunction.Visitor visitor;
-
-//    public static RandomState create(HolderGetter.Provider provider, ResourceKey<NoiseGeneratorSettings> resourceKey, long l) {
-//        return create((NoiseGeneratorSettings)provider.lookupOrThrow(Registries.NOISE_SETTINGS).getOrThrow(resourceKey).value(), provider.lookupOrThrow(Registries.NOISE), l);
-//    }
 
     public static RandomState create(NoiseGeneratorSettings noiseGeneratorSettings, HolderGetter<NormalNoise.NoiseParameters> holderGetter, long l) {
         return new RandomState(noiseGeneratorSettings, holderGetter, l);
@@ -76,7 +72,7 @@ public final class RandomState {
                     RandomSource randomSource = bl ? this.newLegacyInstance(0L) : RandomState.this.random.fromHashOf(new ResourceLocation("terrain"));
                     return blendedNoise.withNewRandom(randomSource);
                 } else {
-                    return (InstanceOfHelper.isInstanceOfEndIslandDensityFunction(densityFunction) ? DensityFunctions.endIslands(l) : densityFunction);
+                    return (densityFunction instanceof DensityFunctions.EndIslandDensityFunction ? DensityFunctions.endIslands(l) : densityFunction);
                 }
             }
 

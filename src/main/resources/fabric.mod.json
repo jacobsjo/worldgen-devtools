@@ -14,7 +14,8 @@
 
     ],
     "main": [
-      "eu.jacobsjo.worldgen_devtools.resetchunks.ResetChunksInit"
+      "eu.jacobsjo.worldgen_devtools.resetchunks.ResetChunksInit",
+      "eu.jacobsjo.worldgen_devtools.dfcommand.DfCommandInit"
     ]
   },
   "mixins": [
