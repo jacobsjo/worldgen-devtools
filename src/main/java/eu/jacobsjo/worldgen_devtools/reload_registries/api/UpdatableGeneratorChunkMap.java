@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgen_devtools.api;
+package eu.jacobsjo.worldgen_devtools.reload_registries.api;
 
 import net.minecraft.world.level.chunk.ChunkGenerator;
 

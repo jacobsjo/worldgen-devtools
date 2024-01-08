@@ -11,14 +11,15 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "eu.jacobsjo.worldgen_devtools.client.WorldgenDevtoolsClient"
+
     ],
     "main": [
-      "eu.jacobsjo.worldgen_devtools.WorldgenDevtools"
+      "eu.jacobsjo.worldgen_devtools.resetchunks.ResetChunksInit"
     ]
   },
   "mixins": [
-    "worldgen_devtools.mixins.json"
+    "worldgen_devtools.reload_registries.mixins.json",
+    "worldgen_devtools.resetchunks.mixins.json"
   ],
   "accessWidener": "worldgen_devtools.accesswidener",
   "depends": {

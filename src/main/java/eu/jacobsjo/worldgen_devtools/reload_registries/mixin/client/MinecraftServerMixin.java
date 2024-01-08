@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,11 +13,11 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 @Environment(value= EnvType.CLIENT)
 @Mixin(MinecraftServer.class)
-public class MinecraftServerMixinClient {
+public class MinecraftServerMixin {
     /**
      * After the resources are reloaded on an embedded server, we need reload the chunks on the local player. The method
      * returns a {@link CompletableFuture}, so we only reload the chunks when that is done. See also
-     * {@link MinecraftServerMixin#afterReloadResources} for resyncing remove clients.
+     * {@link eu.jacobsjo.worldgen_devtools.reload_registries.mixin.MinecraftServerMixin#afterReloadResources} for resyncing remove clients.
      */
     @Inject(method = "reloadResources", at = @At("RETURN"))
     private void afterReloadResources(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir){

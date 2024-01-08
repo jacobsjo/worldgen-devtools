@@ -1,13 +1,13 @@
-package eu.jacobsjo.worldgen_devtools.impl;
+package eu.jacobsjo.worldgen_devtools.reload_registries.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
-import eu.jacobsjo.worldgen_devtools.api.ReloadableRegistry;
-import eu.jacobsjo.worldgen_devtools.api.SwitchToConfigurationCallback;
-import eu.jacobsjo.worldgen_devtools.api.UpdatableGeneratorChunkMap;
+import eu.jacobsjo.worldgen_devtools.reload_registries.api.ReloadableRegistry;
+import eu.jacobsjo.worldgen_devtools.reload_registries.api.SwitchToConfigurationCallback;
+import eu.jacobsjo.worldgen_devtools.reload_registries.api.UpdatableGeneratorChunkMap;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;

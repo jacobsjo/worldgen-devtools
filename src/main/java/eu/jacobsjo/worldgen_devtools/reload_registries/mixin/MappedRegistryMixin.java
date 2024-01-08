@@ -1,7 +1,7 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin;
 
 import com.mojang.serialization.Lifecycle;
-import eu.jacobsjo.worldgen_devtools.api.ReloadableRegistry;
+import eu.jacobsjo.worldgen_devtools.reload_registries.api.ReloadableRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.core.Holder;

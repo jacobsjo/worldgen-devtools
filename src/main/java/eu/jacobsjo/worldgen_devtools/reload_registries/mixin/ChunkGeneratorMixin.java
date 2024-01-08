@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.world.level.biome.FeatureSorter;

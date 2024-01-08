@@ -1,6 +1,6 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin;
 
-import eu.jacobsjo.worldgen_devtools.api.HolderStructureStart;
+import eu.jacobsjo.worldgen_devtools.reload_registries.api.HolderStructureStart;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;

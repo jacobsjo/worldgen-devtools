@@ -1,6 +1,6 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin;
 
-import eu.jacobsjo.worldgen_devtools.api.UpdatableGeneratorChunkMap;
+import eu.jacobsjo.worldgen_devtools.reload_registries.api.UpdatableGeneratorChunkMap;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ChunkMap;

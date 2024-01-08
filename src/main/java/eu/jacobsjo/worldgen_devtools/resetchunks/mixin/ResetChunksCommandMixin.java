@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.resetchunks.mixin;
 
 
 import net.minecraft.commands.CommandSourceStack;

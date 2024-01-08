@@ -1,7 +1,7 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin;
 
 
-import eu.jacobsjo.worldgen_devtools.api.SwitchToConfigurationCallback;
+import eu.jacobsjo.worldgen_devtools.reload_registries.api.SwitchToConfigurationCallback;
 import net.minecraft.network.protocol.game.ServerboundConfigurationAcknowledgedPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;

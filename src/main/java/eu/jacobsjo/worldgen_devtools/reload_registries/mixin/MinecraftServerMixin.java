@@ -1,7 +1,7 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin;
 
 import com.google.common.collect.ImmutableList;
-import eu.jacobsjo.worldgen_devtools.impl.RegistryReloader;
+import eu.jacobsjo.worldgen_devtools.reload_registries.impl.RegistryReloader;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -41,7 +41,7 @@ public abstract class MinecraftServerMixin {
 
     /**
      * After the resources are reloaded we need to resync the registries with the clients. The method returns a {@link CompletableFuture},
-     * so we only resync the remote clients when that is done. See also {@link MinecraftServerMixinClient#afterReloadResources} for
+     * so we only resync the remote clients when that is done. See also {@link eu.jacobsjo.worldgen_devtools.reload_registries.mixin.client.MinecraftServerMixin#afterReloadResources} for
      * reloading chunks on the local client.
      */
     @Inject(method = "reloadResources", at = @At("RETURN"))

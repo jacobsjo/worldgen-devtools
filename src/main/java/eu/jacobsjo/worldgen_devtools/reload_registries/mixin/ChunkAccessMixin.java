@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgen_devtools.mixin;
+package eu.jacobsjo.worldgen_devtools.reload_registries.mixin;
 
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
