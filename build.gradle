@@ -69,7 +69,7 @@ java {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/worldgen_devtools.accesswidener")
+    accessWidenerPath = file("src/main/resources/worldgendevtools.accesswidener")
 }
 
 jar {

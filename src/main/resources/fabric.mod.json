@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
-  "id": "worldgen_devtools",
+  "id": "worldgendevtools",
   "version": "${version}",
   "name": "Worldgen Devtools",
   "description": "Tools to simplify the creation of worldgen datapacks.",
   "authors": ["jacobsjo"],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/worldgen_devtools/icon.png",
+  "icon": "assets/worldgendevtools/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
 
     ],
     "main": [
-      "eu.jacobsjo.worldgen_devtools.vanilla_commands.VanillaCommandsInit",
-      "eu.jacobsjo.worldgen_devtools.dfcommand.DfCommandInit",
-      "eu.jacobsjo.worldgen_devtools.reload_registries.ReloadRegistriesInit",
-      "eu.jacobsjo.worldgen_devtools.worldgen_settings.WorldgenSettingsInit"
+      "eu.jacobsjo.worldgendevtools.vanillacommands.VanillaCommandsInit",
+      "eu.jacobsjo.worldgendevtools.dfcommand.DfCommandInit",
+      "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
+      "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit"
     ]
   },
   "mixins": [
-    "worldgen_devtools.reload_registries.mixins.json",
-    "worldgen_devtools.vanilla_commands.mixins.json",
-    "worldgen_devtools.worldgen_settings.mixins.json"
+    "worldgendevtools.reloadregistries.mixins.json",
+    "worldgendevtools.vanillacommands.mixins.json",
+    "worldgendevtools.worldgensettings.mixins.json"
   ],
-  "accessWidener": "worldgen_devtools.accesswidener",
+  "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
