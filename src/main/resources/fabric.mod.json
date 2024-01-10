@@ -16,12 +16,14 @@
     "main": [
       "eu.jacobsjo.worldgen_devtools.vanilla_commands.VanillaCommandsInit",
       "eu.jacobsjo.worldgen_devtools.dfcommand.DfCommandInit",
-      "eu.jacobsjo.worldgen_devtools.reload_registries.ReloadRegistriesInit"
+      "eu.jacobsjo.worldgen_devtools.reload_registries.ReloadRegistriesInit",
+      "eu.jacobsjo.worldgen_devtools.worldgen_settings.WorldgenSettingsInit"
     ]
   },
   "mixins": [
     "worldgen_devtools.reload_registries.mixins.json",
-    "worldgen_devtools.vanilla_commands.mixins.json"
+    "worldgen_devtools.vanilla_commands.mixins.json",
+    "worldgen_devtools.worldgen_settings.mixins.json"
   ],
   "accessWidener": "worldgen_devtools.accesswidener",
   "depends": {
