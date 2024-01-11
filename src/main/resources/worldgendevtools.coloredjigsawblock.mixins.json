@@ -4,9 +4,9 @@
   "package": "eu.jacobsjo.worldgendevtools.coloredjigsawblock.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-
   ],
   "client": [
+    "client.GameMasterBlockItemMixin",
     "client.ItemRendererMixin"
   ],
   "injectors": {
