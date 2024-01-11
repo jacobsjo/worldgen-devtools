@@ -32,15 +32,15 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     @Override
     public void render(JigsawBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
 
-        JigsawBlockEntityRenderer.render(blockEntity.getName(), blockEntity.getTarget(), blockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION), poseStack, buffer, packedLight, packedOverlay, false);
+        JigsawBlockEntityRenderer.render(blockEntity.getName(), blockEntity.getTarget(), blockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION), poseStack, buffer, packedOverlay, false);
     }
 
-    public static void render(ResourceLocation name, ResourceLocation target, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, boolean renderEmpty) {
+    public static void render(ResourceLocation name, ResourceLocation target, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay, boolean renderEmpty) {
         ResourceLocation location = name.equals(EMPTY_RESOURCE_LOCATION) ? target : name;
 
         if (location.equals(EMPTY_RESOURCE_LOCATION)) {
             if (renderEmpty){
-                render(0.843f, 0.761f, 0.843f, orientation, poseStack, buffer, packedLight, packedOverlay);
+                render(0.843f, 0.761f, 0.843f, orientation, poseStack, buffer, packedOverlay);
             }
             return;
         }
@@ -50,15 +50,15 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
         float g = ((float) (hash >> 8 & 0xFF)) / 0xFF;
         float b = ((float) (hash >> 16 & 0xFF)) / 0xFF;
 
-        render(r, g, b, orientation, poseStack, buffer, packedLight, packedOverlay);
+        render(r, g, b, orientation, poseStack, buffer, packedOverlay);
     }
 
-    public static void render(float r, float g, float b, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay){
+    public static void render(float r, float g, float b, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay){
         poseStack.pushPose();
         poseStack.scale(1 + OFFSET * 2, 1 + OFFSET * 2, 1 + OFFSET * 2);
         poseStack.translate(-OFFSET, -OFFSET, -OFFSET);
         poseStack.rotateAround(getRotation(orientation), 0.5f, 0.5f, 0.5f);
-        modelPart.render(poseStack, buffer.getBuffer(RENDER_TYPE), packedLight, packedOverlay, r, g, b, 1.0f);
+        modelPart.render(poseStack, buffer.getBuffer(RENDER_TYPE), 0xF000F0, packedOverlay, r, g, b, 1.0f);
         poseStack.popPose();
     }
 

@@ -15,12 +15,12 @@ public class JigsawBlockItemRenderer implements BuiltinItemRendererRegistry.Dyna
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack poseStack, MultiBufferSource buffer, int light, int overlay) {
         CompoundTag tag = stack.getTagElement("BlockEntityTag");
         if (tag == null) {
-            JigsawBlockEntityRenderer.render(EMPTY_RESOURCE_LOCATION, EMPTY_RESOURCE_LOCATION, FrontAndTop.NORTH_UP, poseStack, buffer, light, overlay, true);
+            JigsawBlockEntityRenderer.render(EMPTY_RESOURCE_LOCATION, EMPTY_RESOURCE_LOCATION, FrontAndTop.NORTH_UP, poseStack, buffer, overlay, true);
         } else {
             ResourceLocation name = new ResourceLocation(tag.getString("name"));
             ResourceLocation target = new ResourceLocation(tag.getString("target"));
 
-            JigsawBlockEntityRenderer.render(name, target, FrontAndTop.NORTH_UP, poseStack, buffer, light, overlay, true);
+            JigsawBlockEntityRenderer.render(name, target, FrontAndTop.NORTH_UP, poseStack, buffer, overlay, true);
         }
     }
 }
