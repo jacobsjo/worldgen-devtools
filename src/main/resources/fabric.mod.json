@@ -11,19 +11,21 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-
+      "eu.jacobsjo.worldgendevtools.coloredjigsawblock.client.JigsawBlockEntityRenderingClientInit"
     ],
     "main": [
       "eu.jacobsjo.worldgendevtools.vanillacommands.VanillaCommandsInit",
       "eu.jacobsjo.worldgendevtools.dfcommand.DfCommandInit",
       "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
-      "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit"
+      "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit",
+      "eu.jacobsjo.worldgendevtools.coloredjigsawblock.JigsawBlockEntityRenderingInit"
     ]
   },
   "mixins": [
     "worldgendevtools.reloadregistries.mixins.json",
     "worldgendevtools.vanillacommands.mixins.json",
-    "worldgendevtools.worldgensettings.mixins.json"
+    "worldgendevtools.worldgensettings.mixins.json",
+    "worldgendevtools.coloredjigsawblock.mixins.json"
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
