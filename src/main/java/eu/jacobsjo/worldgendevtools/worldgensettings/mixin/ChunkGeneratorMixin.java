@@ -13,8 +13,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChunkGenerator.class)
 public class ChunkGeneratorMixin {
+    /**
+     * don't apply biome decoration (features) if the maxChunkStatus gamerule forbids it
+     */
     @Inject(method= "applyBiomeDecoration", at=@At("HEAD"), cancellable = true)
-    public void applyCarvers(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager, CallbackInfo ci) {
+    public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager, CallbackInfo ci) {
         if (!level.getLevelData().getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().features){
             ci.cancel();
         };

@@ -17,7 +17,7 @@ import org.joml.Quaternionf;
 
 public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBlockEntity> {
     private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation("worldgendevtools","textures/entity/jigsaw.png");
-    private static final RenderType RENDER_TYPE = RenderType. entityTranslucent(TEXTURE_LOCATION);
+    private static final RenderType RENDER_TYPE = RenderType.entityTranslucentCull(TEXTURE_LOCATION);
 
     private static final float OFFSET = 0.001f;
 

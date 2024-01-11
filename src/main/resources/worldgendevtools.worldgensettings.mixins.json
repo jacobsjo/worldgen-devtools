@@ -6,7 +6,7 @@
   "mixins": [
     "ChunkGeneratorMixin",
     "NoiseBasedChunkGeneratorMixin",
-    "StructureTemplateMixin"
+    "SinglePoolElementMixin"
   ],
   "client": [
   ],

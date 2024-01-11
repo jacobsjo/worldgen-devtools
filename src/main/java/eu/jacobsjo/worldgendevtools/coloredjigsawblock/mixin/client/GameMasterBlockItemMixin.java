@@ -19,6 +19,9 @@ public class GameMasterBlockItemMixin extends BlockItem {
         super(block, properties);
     }
 
+    /**
+     * Overrides appendHoverText to add a tooltip for jigsaw block items that have BlockEntityTag stored.
+     */
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced){
         if (!stack.getItem().equals(Items.JIGSAW))
