@@ -1,15 +1,14 @@
-package eu.jacobsjo.worldgendevtools.vanillacommands;
+package eu.jacobsjo.worldgendevtools.reloadchunks;
 
+import eu.jacobsjo.worldgendevtools.reloadchunks.impl.ResetChunksCommand;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.server.commands.ChaseCommand;
 
-public class VanillaCommandsInit implements ModInitializer {
+public class ReloadChunksInit implements ModInitializer {
     @Override
     public void onInitialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            //ResetChunksCommand.register(dispatcher);
-            ChaseCommand.register(dispatcher);
+            ResetChunksCommand.register(dispatcher);
         });
     }
 }

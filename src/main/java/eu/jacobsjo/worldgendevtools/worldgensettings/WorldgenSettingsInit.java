@@ -12,6 +12,7 @@ public class WorldgenSettingsInit implements ModInitializer {
     public static GameRules.Key<GameRules.BooleanValue> APPLY_PROCESSOR_LISTS;
     public static GameRules.Key<GameRules.BooleanValue> KEEP_JIGSAWS;
     public static GameRules.Key<GameRules.BooleanValue> APPLY_GRAVITY_PROCESSOR;
+    public static GameRules.Key<GameRules.BooleanValue> SAVE_CHUNKS;
 
     @Override
     public void onInitialize() {
@@ -19,6 +20,7 @@ public class WorldgenSettingsInit implements ModInitializer {
         APPLY_PROCESSOR_LISTS = GameRuleRegistry.register("applyProcessorLists", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
         KEEP_JIGSAWS = GameRuleRegistry.register("keepJigsaws", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
         APPLY_GRAVITY_PROCESSOR = GameRuleRegistry.register("applyGravityProcessor", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
+        SAVE_CHUNKS = GameRuleRegistry.register("saveChunks", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     }
 
 }
