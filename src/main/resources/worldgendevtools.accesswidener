@@ -2,3 +2,8 @@ accessWidener v2 named
 accessible method net/minecraft/resources/RegistryDataLoader loadRegistryContents (Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/WritableRegistry;Lcom/mojang/serialization/Decoder;Ljava/util/Map;)V
 accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V
 accessible class net/minecraft/world/level/levelgen/DensityFunctions$EndIslandDensityFunction
+accessible field net/minecraft/server/level/DistanceManager tickets Lit/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap;
+accessible field net/minecraft/server/level/DistanceManager playerTicketManager Lnet/minecraft/server/level/DistanceManager$PlayerTicketTracker;
+accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker onLevelChange (JIZZ)V
+accessible method net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker getLevel (J)I
+accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker haveTicketFor (I)Z

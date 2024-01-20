@@ -1,6 +1,6 @@
-package eu.jacobsjo.worldgendevtools.reloadchunks;
+package eu.jacobsjo.worldgendevtools.resetchunks;
 
-import eu.jacobsjo.worldgendevtools.reloadchunks.impl.ResetChunksCommand;
+import eu.jacobsjo.worldgendevtools.resetchunks.impl.ResetChunksCommand;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 

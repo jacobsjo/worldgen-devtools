@@ -8,7 +8,6 @@ public class VanillaCommandsInit implements ModInitializer {
     @Override
     public void onInitialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            //ResetChunksCommand.register(dispatcher);
             ChaseCommand.register(dispatcher);
         });
     }

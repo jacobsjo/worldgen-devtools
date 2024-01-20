@@ -18,14 +18,15 @@
       "eu.jacobsjo.worldgendevtools.dfcommand.DfCommandInit",
       "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
       "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit",
-      "eu.jacobsjo.worldgendevtools.coloredjigsawblock.JigsawBlockEntityRenderingInit"
+      "eu.jacobsjo.worldgendevtools.coloredjigsawblock.JigsawBlockEntityRenderingInit",
+      "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit"
     ]
   },
   "mixins": [
     "worldgendevtools.reloadregistries.mixins.json",
-    "worldgendevtools.vanillacommands.mixins.json",
     "worldgendevtools.worldgensettings.mixins.json",
-    "worldgendevtools.coloredjigsawblock.mixins.json"
+    "worldgendevtools.coloredjigsawblock.mixins.json",
+    "worldgendevtools.resetchunks.mixins.json"
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
