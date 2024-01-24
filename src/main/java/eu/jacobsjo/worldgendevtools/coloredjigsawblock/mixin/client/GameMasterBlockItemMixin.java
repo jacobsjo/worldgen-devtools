@@ -8,11 +8,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 
 @Mixin(GameMasterBlockItem.class)
 public class GameMasterBlockItemMixin extends BlockItem {
+
+    @Unique
     private static final ResourceLocation EMPTY_RESOURCE_LOCATION = new ResourceLocation("empty");
 
     public GameMasterBlockItemMixin(Block block, Properties properties) {
@@ -35,12 +38,12 @@ public class GameMasterBlockItemMixin extends BlockItem {
         ResourceLocation targetName = new ResourceLocation(tag.getString("target"));
         ResourceLocation targetPool = new ResourceLocation(tag.getString("pool"));
 
-        if (!name.equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.name_tooltip", name.toString()));
+        if (!targetPool.equals(EMPTY_RESOURCE_LOCATION)){
+            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_pool_tooltip", targetPool.toString()));
         }
 
-        if (!targetPool.equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_pool_tooltip", targetName.toString()));
+        if (!name.equals(EMPTY_RESOURCE_LOCATION)){
+            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.name_tooltip", name.toString()));
         }
 
         if (!targetName.equals(EMPTY_RESOURCE_LOCATION)){
