@@ -4,7 +4,9 @@ import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import net.minecraft.Util;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderOwner;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -20,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,13 +34,15 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow @Final private Map<T, Holder.Reference<T>> byValue;
     @Shadow @Final private Map<T, Lifecycle> lifecycles;
     @Shadow private boolean frozen;
-    @Shadow private @Nullable List<Holder.Reference<T>> holdersInOrder;
     @Shadow public abstract @Nullable T get(@Nullable ResourceKey<T> key);
     @Shadow public abstract int getId(@Nullable T value);
-    @Shadow public abstract Holder.Reference<T> registerMapping(int id, ResourceKey<T> key, T value, Lifecycle lifecycle);
     @Shadow private @Nullable Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
     @Shadow @Final ResourceKey<? extends Registry<T>> key;
     @Shadow @Final private static Logger LOGGER;
+
+    @Shadow public abstract HolderOwner<T> holderOwner();
+
+    @Shadow private Lifecycle registryLifecycle;
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys;
 
@@ -55,7 +58,6 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
         this.outdatedKeys = new HashSet<>(byKey.keySet());
 
-        this.holdersInOrder = null;
         this.frozen = false;
         this.reloading = true;
     }
@@ -94,11 +96,27 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
             this.outdatedKeys.remove(key);
             T oldValue = this.get(key);
             int id = this.getId(oldValue);
-            this.byLocation.remove(key.location());
-            cir.setReturnValue(this.registerMapping(id, key, value, lifecycle));
+
             this.toId.remove(oldValue, id);
             this.byValue.remove(oldValue);
             this.lifecycles.remove(oldValue);
+
+            if (this.byValue.containsKey(value)) {
+                // would also crash if reassigning value to new key, but this shouldn't happen in practice.
+                Util.pauseInIde(new IllegalStateException("Adding duplicate value '" + value + "' to registry"));
+            }
+
+            Holder.Reference<T> reference = this.byKey.computeIfAbsent(key, resourceKeyx -> Holder.Reference.createStandAlone(this.holderOwner(), resourceKeyx));
+
+            this.byKey.put(key, reference);
+            this.byLocation.put(key.location(), reference);
+            this.byValue.put(value, reference);
+            this.byId.set(id, reference);
+            this.toId.put(value, id);
+            this.lifecycles.put(value, lifecycle);
+            this.registryLifecycle = this.registryLifecycle.add(lifecycle);
+
+            cir.setReturnValue(reference);
             cir.cancel();
         }
     }

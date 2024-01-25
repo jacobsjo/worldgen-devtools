@@ -78,7 +78,7 @@ public class RegistryReloader {
 
         // Reload Dimension registry
         MappedRegistry<LevelStem> levelStemRegistry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable());
-        RegistryDataLoader.loadRegistryContents(dimensionsLookup, resourceManager, Registries.LEVEL_STEM, levelStemRegistry, LevelStem.CODEC, exceptionMap);
+        RegistryDataLoader.loadContentsFromManager(resourceManager, dimensionsLookup, levelStemRegistry, LevelStem.CODEC, exceptionMap);
 
         // combine dimensions loaded from datapack with already existing dimensions (prioritize new)
         Stream<ResourceLocation> dimensionKeys = Stream.concat(levelStemRegistry.keySet().stream(), generators.keySet().stream()).distinct();
@@ -105,9 +105,11 @@ public class RegistryReloader {
      */
     public static void syncClient(ServerConnectionListener serverConnection) {
         for (Connection connection : serverConnection.getConnections()) {
-            if (connection.isMemoryConnection()) {
-                continue;
-            }
+            //if (connection.isMemoryConnection()) {
+            // TODO: do something so player position isn't reset
+            //
+            //    continue;
+            //}
             PacketListener var5 = connection.getPacketListener();
             if (var5 instanceof ServerGamePacketListenerImpl impl) {
                 ((SwitchToConfigurationCallback) impl).worldgenDevtools$onSwitchToConfiguration(() -> {
@@ -139,7 +141,7 @@ public class RegistryReloader {
             return;
         }
 
-        RegistryDataLoader.loadRegistryContents(registryInfoLookup, resourceManager, data.key(), (WritableRegistry<T>) registry.get(), data.elementCodec(), exceptionMap);
+        RegistryDataLoader.loadContentsFromManager(resourceManager, registryInfoLookup, (WritableRegistry<T>) registry.get(), data.elementCodec(), exceptionMap);
     }
 
     private static <T> RegistryOps.RegistryInfo<T> createInfoForNewRegistry(WritableRegistry<T> writableRegistry) {
