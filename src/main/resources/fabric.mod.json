@@ -19,14 +19,16 @@
       "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
       "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit",
       "eu.jacobsjo.worldgendevtools.coloredjigsawblock.JigsawBlockEntityRenderingInit",
-      "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit"
+      "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit",
+      "eu.jacobsjo.worldgendevtools.profiling.ProfilingInit"
     ]
   },
   "mixins": [
     "worldgendevtools.reloadregistries.mixins.json",
     "worldgendevtools.worldgensettings.mixins.json",
     "worldgendevtools.coloredjigsawblock.mixins.json",
-    "worldgendevtools.resetchunks.mixins.json"
+    "worldgendevtools.resetchunks.mixins.json",
+    "worldgendevtools.profiling.mixins.json"
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
