@@ -46,8 +46,7 @@ public abstract class MinecraftServerMixin {
 
     /**
      * After the resources are reloaded we need to resync the registries with the clients. The method returns a {@link CompletableFuture},
-     * so we only resync the remote clients when that is done. See also {@link eu.jacobsjo.worldgendevtools.reloadregistries.mixin.client.MinecraftServerMixin#afterReloadResources} for
-     * reloading chunks on the local client.
+     * so we only resync the clients when that is done.
      */
     @Inject(method = "reloadResources", at = @At("RETURN"))
     private void afterReloadResources(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir){

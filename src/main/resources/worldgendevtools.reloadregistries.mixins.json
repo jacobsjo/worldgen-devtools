@@ -14,6 +14,7 @@
     "StructureStartMixin"
   ],
   "client": [
+    "client.IntegratedPlayerListMixin"
   ],
   "injectors": {
     "defaultRequire": 1

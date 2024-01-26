@@ -3,6 +3,7 @@ package eu.jacobsjo.worldgendevtools.reloadregistries.impl;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
@@ -10,8 +11,11 @@ import eu.jacobsjo.worldgendevtools.reloadregistries.api.SwitchToConfigurationCa
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.UpdatableGeneratorChunkMap;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.protocol.configuration.ClientboundRegistryDataPacket;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -105,17 +109,19 @@ public class RegistryReloader {
      */
     public static void syncClient(ServerConnectionListener serverConnection) {
         for (Connection connection : serverConnection.getConnections()) {
-            //if (connection.isMemoryConnection()) {
-            // TODO: do something so player position isn't reset
-            //
-            //    continue;
-            //}
             PacketListener var5 = connection.getPacketListener();
             if (var5 instanceof ServerGamePacketListenerImpl impl) {
                 ((SwitchToConfigurationCallback) impl).worldgenDevtools$onSwitchToConfiguration(() -> {
                     PacketListener listener = connection.getPacketListener();
                     if (listener instanceof ServerConfigurationPacketListenerImpl impl2) {
-                        impl2.startConfiguration();
+                        LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess = serverConnection.getServer().registries();
+                        DynamicOps<Tag> dynamicOps = RegistryOps.create(NbtOps.INSTANCE, layeredRegistryAccess.compositeAccess());
+                        RegistrySynchronization.packRegistries(
+                                dynamicOps,
+                                layeredRegistryAccess.getAccessFrom(RegistryLayer.WORLDGEN),
+                                (resourceKey, list) -> impl2.send(new ClientboundRegistryDataPacket(resourceKey, list))
+                        );
+                        impl2.returnToWorld();
                     }
                 });
                 impl.switchToConfig();
