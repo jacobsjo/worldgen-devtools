@@ -7,5 +7,12 @@
   "gamerule.syncAfterRegistryReload": "Syncronize clients after a registry reload",
   "item.minecraft.jigsaw.name_tooltip": "Name: %s",
   "item.minecraft.jigsaw.target_name_tooltip": "Target Name: %s",
-  "item.minecraft.jigsaw.target_pool_tooltip": "Target Pool: %s"
+  "item.minecraft.jigsaw.target_pool_tooltip": "Target Pool: %s",
+
+  "worldgendevtools.profiling.command.no_information": "No chunks have profiling information saved",
+  "worldgendevtools.profiling.command.header": "Profiling of %d chunks:",
+  "worldgendevtools.profiling.command.header.one": "Profiling of chunk %d:",
+  "worldgendevtools.profiling.command.entry.key": "[%s]: ",
+  "worldgendevtools.profiling.command.entry.value": "%sms/chunk (total: %sms)",
+  "worldgendevtools.profiling.command.entry.value.single": "%sms"
 }

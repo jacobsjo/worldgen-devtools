@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.chunk.ChunkStatus;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,11 +30,19 @@ public class ChunkgenProfilingInformation {
         this.statusDurations = new HashMap<>();
     }
 
-    public Duration getStatusDurection(ChunkStatus status){
-        return this.statusDurations.get(BuiltInRegistries.CHUNK_STATUS.getKey(status));
+    public Duration getStatusDuration(ChunkStatus status){
+        return this.getStatusDuration(BuiltInRegistries.CHUNK_STATUS.getKey(status));
     }
 
-    @Override
+    public Duration getStatusDuration(ResourceLocation status) {
+        Duration duration = this.statusDurations.get(status);
+        if (duration == null){
+            return Duration.ZERO;
+        }
+        return duration;
+    }
+
+        @Override
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
         this.statusDurations.forEach((key, value) -> stringBuilder.append(String.format("%s: %.2fms\n", key.toString(), value.toNanos() * 1e-6d)));
@@ -42,6 +51,14 @@ public class ChunkgenProfilingInformation {
 
     public void setStatusDurection(ChunkStatus status, Duration duration){
         this.statusDurations.put(BuiltInRegistries.CHUNK_STATUS.getKey(status), duration);
+    }
+
+    public static ChunkgenProfilingInformation sum(Collection<ChunkgenProfilingInformation> informations){
+        Map<ResourceLocation, Duration> durationSums = new HashMap<>();
+
+        BuiltInRegistries.CHUNK_STATUS.keySet().forEach(status -> durationSums.put(status, informations.stream().map(i -> i.getStatusDuration(status)).reduce(Duration.ZERO, Duration::plus)));
+
+        return new ChunkgenProfilingInformation(durationSums);
     }
 
 }
