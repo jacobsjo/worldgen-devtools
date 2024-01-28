@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "eu.jacobsjo.worldgendevtools.locatefeature.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "LocateCommandMixin",
+    "PlacedFeatureMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

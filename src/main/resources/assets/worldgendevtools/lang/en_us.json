@@ -14,5 +14,13 @@
   "worldgendevtools.profiling.command.header.one": "Profiling of chunk %d:",
   "worldgendevtools.profiling.command.entry.key": "[%s]: ",
   "worldgendevtools.profiling.command.entry.value": "%sms/chunk (total: %sms)",
-  "worldgendevtools.profiling.command.entry.value.single": "%sms"
+  "worldgendevtools.profiling.command.entry.value.single": "%sms",
+
+  "worldgendevtools.locatefeature.command.success.single": "Found %s 1 time in chunk at %3$s",
+  "worldgendevtools.locatefeature.command.success.multiple": "Found %s %s times in chunk at %s",
+  "worldgendevtools.locatefeature.command.success.many": "Found %s %s times in chunk at %s ... (%s more)",
+  "worldgendevtools.locatefeature.command.success.nearby": "The nearest %s is at %s (%s blocks away)",
+
+  "worldgendevtools.locatefeature.command.failure.no_attachment": "The feature positions are not saved in this chunk",
+  "worldgendevtools.locatefeature.command.failure.not_nearby": "Could not find a feature of type \"%s\" within reasonable distance"
 }
