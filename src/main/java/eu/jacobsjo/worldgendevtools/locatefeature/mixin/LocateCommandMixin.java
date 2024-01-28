@@ -19,7 +19,6 @@ public class LocateCommandMixin {
                     remap = false
             )
     )
-
     private static LiteralArgumentBuilder<CommandSourceStack> register(LiteralArgumentBuilder<CommandSourceStack> command){
         return LocateFeature.addSubcommand(command);
     }
