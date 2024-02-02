@@ -26,7 +26,8 @@
     "worldgendevtools.reloadregistries.mixins.json",
     "worldgendevtools.worldgensettings.mixins.json",
     "worldgendevtools.coloredjigsawblock.mixins.json",
-    "worldgendevtools.resetchunks.mixins.json"
+    "worldgendevtools.resetchunks.mixins.json",
+    "worldgendevtools.loggingimprovements.mixins.json"
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
