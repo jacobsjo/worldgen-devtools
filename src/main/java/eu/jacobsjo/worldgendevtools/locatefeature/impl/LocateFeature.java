@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class LocateFeature {
+    private static final int MAX_RANGE = 10;
 
     private static final Logger LOGGER = LoggerFactory.getLogger("worldgendevtools");
 
@@ -68,13 +70,13 @@ public class LocateFeature {
     }
 
     public static int locateNearbyFeature(CommandSourceStack source, ResourceKey<ConfiguredFeature<?, ?>> feature, BlockPos sourcePos, ChunkPos centerChunkPos ){
-        for (int range = 1 ; range <= 5 ; range++){
+        for (int range = 1 ; range <= MAX_RANGE ; range++){
             Stream<BlockPos> foundPositions = Stream.empty();
             for (int x = -range ; x <= range ; x++){
                 for (int z = -range ; z <= range ; z++) {
                     if (Math.abs(x) < range && Math.abs(z) < range) continue;
 
-                    ChunkAccess chunk = source.getLevel().getChunk(centerChunkPos.x + x, centerChunkPos.z + z);
+                    ChunkAccess chunk = source.getLevel().getChunk(centerChunkPos.x + x, centerChunkPos.z + z, ChunkStatus.EMPTY);
                     FeaturePositions featurePositions = chunk.getAttached(LocateFeatureInit.FEATURE_POSITION_ATTACHMENT);
                     if (featurePositions == null) continue;
 
