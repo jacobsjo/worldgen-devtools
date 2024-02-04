@@ -29,6 +29,7 @@
     "worldgendevtools.worldgensettings.mixins.json",
     "worldgendevtools.coloredjigsawblock.mixins.json",
     "worldgendevtools.resetchunks.mixins.json",
+    "worldgendevtools.loggingimprovements.mixins.json",
     "worldgendevtools.profiling.mixins.json",
     "worldgendevtools.locatefeature.mixins.json"
   ],
