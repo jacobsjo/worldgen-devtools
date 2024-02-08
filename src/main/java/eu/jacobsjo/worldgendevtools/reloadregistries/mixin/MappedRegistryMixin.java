@@ -5,10 +5,7 @@ import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.Util;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderOwner;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +29,6 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow @Final private Map<ResourceLocation, Holder.Reference<T>> byLocation;
     @Shadow @Final private Map<ResourceKey<T>, Holder.Reference<T>> byKey;
     @Shadow @Final private Map<T, Holder.Reference<T>> byValue;
-    @Shadow @Final private Map<T, Lifecycle> lifecycles;
     @Shadow private boolean frozen;
     @Shadow public abstract @Nullable T get(@Nullable ResourceKey<T> key);
     @Shadow public abstract int getId(@Nullable T value);
@@ -43,6 +39,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow public abstract HolderOwner<T> holderOwner();
 
     @Shadow private Lifecycle registryLifecycle;
+    @Shadow @Final private Map<ResourceKey<T>, RegistrationInfo> registrationInfos;
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys;
 
@@ -76,7 +73,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
                 this.toId.remove(value, id);
                 this.byId.set(id, null);
                 this.byValue.remove(value);
-                this.lifecycles.remove(value);
+                this.registrationInfos.remove(key);
                 this.byLocation.remove(key.location());
                 this.byKey.get(key).bindValue(null); // make sure outdated holder is unbound, causing Exceptions should they still be in use
                 this.byKey.remove(key);
@@ -90,7 +87,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
      * when registering into a reloading registry, override existing ResourceLocations and unmark key as outdated.
      */
     @Inject(method = "register", at = @At("HEAD"), cancellable = true)
-    public void register(ResourceKey<T> key, T value, Lifecycle lifecycle, CallbackInfoReturnable<Holder.Reference<T>> cir) {
+    public void register(ResourceKey<T> key, T value, RegistrationInfo registrationInfo, CallbackInfoReturnable<Holder.Reference<T>> cir) {
         if (this.reloading && this.byLocation.containsKey(key.location())){
             // existing element that is changed
             this.outdatedKeys.remove(key);
@@ -99,7 +96,6 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
             this.toId.remove(oldValue, id);
             this.byValue.remove(oldValue);
-            this.lifecycles.remove(oldValue);
 
             if (this.byValue.containsKey(value)) {
                 // would also crash if reassigning value to new key, but this shouldn't happen in practice.
@@ -113,8 +109,8 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
             this.byValue.put(value, reference);
             this.byId.set(id, reference);
             this.toId.put(value, id);
-            this.lifecycles.put(value, lifecycle);
-            this.registryLifecycle = this.registryLifecycle.add(lifecycle);
+            this.registrationInfos.put(key, registrationInfo);
+            this.registryLifecycle = this.registryLifecycle.add(registrationInfo.lifecycle());
 
             cir.setReturnValue(reference);
             cir.cancel();

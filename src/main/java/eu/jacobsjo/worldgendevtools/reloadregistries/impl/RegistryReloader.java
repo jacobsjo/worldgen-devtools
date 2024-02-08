@@ -26,8 +26,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.network.config.JoinWorldTask;
+import net.minecraft.server.network.config.SynchronizeRegistriesTask;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -40,6 +43,7 @@ import org.slf4j.Logger;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -111,17 +115,20 @@ public class RegistryReloader {
         for (Connection connection : serverConnection.getConnections()) {
             PacketListener var5 = connection.getPacketListener();
             if (var5 instanceof ServerGamePacketListenerImpl impl) {
+
                 ((SwitchToConfigurationCallback) impl).worldgenDevtools$onSwitchToConfiguration(() -> {
                     PacketListener listener = connection.getPacketListener();
                     if (listener instanceof ServerConfigurationPacketListenerImpl impl2) {
                         LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess = serverConnection.getServer().registries();
-                        DynamicOps<Tag> dynamicOps = RegistryOps.create(NbtOps.INSTANCE, layeredRegistryAccess.compositeAccess());
-                        RegistrySynchronization.packRegistries(
-                                dynamicOps,
-                                layeredRegistryAccess.getAccessFrom(RegistryLayer.WORLDGEN),
-                                (resourceKey, list) -> impl2.send(new ClientboundRegistryDataPacket(resourceKey, list))
-                        );
-                        impl2.returnToWorld();
+
+                        List<KnownPack> list = serverConnection.getServer().getResourceManager().listPacks().flatMap((packResources) -> {
+                            return packResources.location().knownPackInfo().stream();
+                        }).toList();
+
+                        impl2.synchronizeRegistriesTask = new SynchronizeRegistriesTask(list, layeredRegistryAccess);
+                        impl2.configurationTasks.add(impl2.synchronizeRegistriesTask);
+                        impl2.configurationTasks.add(new JoinWorldTask());
+                        impl2.startNextTask();
                     }
                 });
                 impl.switchToConfig();

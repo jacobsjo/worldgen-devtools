@@ -7,3 +7,7 @@ accessible field net/minecraft/server/level/DistanceManager playerTicketManager 
 accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker onLevelChange (JIZZ)V
 accessible method net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker getLevel (J)I
 accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker haveTicketFor (I)Z
+
+accessible field net/minecraft/server/network/ServerConfigurationPacketListenerImpl synchronizeRegistriesTask Lnet/minecraft/server/network/config/SynchronizeRegistriesTask;
+accessible field net/minecraft/server/network/ServerConfigurationPacketListenerImpl configurationTasks Ljava/util/Queue;
+accessible method net/minecraft/server/network/ServerConfigurationPacketListenerImpl startNextTask ()V

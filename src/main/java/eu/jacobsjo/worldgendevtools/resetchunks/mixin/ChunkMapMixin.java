@@ -10,6 +10,7 @@ import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.storage.ChunkStorage;
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,8 +25,8 @@ import java.util.stream.Collectors;
 
 @Mixin(ChunkMap.class)
 public abstract class ChunkMapMixin extends ChunkStorage implements ResettableChunkMap {
-    public ChunkMapMixin(Path path, DataFixer dataFixer, boolean bl) {
-        super(path, dataFixer, bl);
+    public ChunkMapMixin(RegionStorageInfo regionStorageInfo, Path path, DataFixer dataFixer, boolean bl) {
+        super(regionStorageInfo, path, dataFixer, bl);
     }
     @Shadow @Final private static Logger LOGGER;
     @Shadow @Final ServerLevel level;
