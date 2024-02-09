@@ -61,7 +61,7 @@ public class ChunkProfilingCommand {
 
             int chunkCount = informations.size();
             if (chunkCount == 1) {
-                message.append(Component.translatable("worldgendevtools.profiling.command.header.one", centerChunkPos).withColor(HEADER_COLOR));
+                message.append(Component.translatable("worldgendevtools.profiling.command.header.one", centerChunkPos.toString()).withColor(HEADER_COLOR));
             } else {
                 message.append(Component.translatable("worldgendevtools.profiling.command.header", chunkCount).withColor(HEADER_COLOR));
             }
