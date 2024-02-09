@@ -19,19 +19,24 @@
       "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
       "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit",
       "eu.jacobsjo.worldgendevtools.coloredjigsawblock.JigsawBlockEntityRenderingInit",
-      "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit"
+      "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit",
+      "eu.jacobsjo.worldgendevtools.profiling.ProfilingInit",
+      "eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit"
     ]
   },
   "mixins": [
     "worldgendevtools.reloadregistries.mixins.json",
     "worldgendevtools.worldgensettings.mixins.json",
     "worldgendevtools.coloredjigsawblock.mixins.json",
-    "worldgendevtools.resetchunks.mixins.json"
+    "worldgendevtools.resetchunks.mixins.json",
+    "worldgendevtools.loggingimprovements.mixins.json",
+    "worldgendevtools.profiling.mixins.json",
+    "worldgendevtools.locatefeature.mixins.json"
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "fabric": "*",
+    "fabric": ">=${fabric_version}",
     "minecraft": ">=1.20.5- <1.20.6-"
   }
 }

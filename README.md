@@ -61,6 +61,18 @@ Returns the value of the density function `df` at the specified postion (or the 
 Returns the value of the density function specified in the given entry of the noise router of the current dimension at
 the specified postion (or the position of the player)
 
+## Profiling of Worldgen Performance
+
+The time it took to generate each step of each chunk is recorded and saved in each chunk. To access it, use
+the `/chunkprofiling <range>` command. Range controlls the amount of chunks to average the performance over; defaults
+to `0`.
+
+## Locate Feature
+
+Use `/locate featrue <placed_feature>` to locate a configured feature nearby. If the current chunk contains the feature
+multiple times, it will list the up to 5 closest positions. This only works if the chunk is generated while this mod is
+installed.
+
 ## Gamerules
 
 Gamerules added by this mod:
