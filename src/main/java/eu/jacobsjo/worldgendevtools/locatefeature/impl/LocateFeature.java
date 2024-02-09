@@ -89,7 +89,7 @@ public class LocateFeature {
                 return showLocateResult(source, feature.location(), minPos.get(), sourcePos);
             }
         }
-        source.sendFailure(Component.translatable("worldgendevtools.locatefeature.command.failure.not_nearby", feature.location()));
+        source.sendFailure(Component.translatable("worldgendevtools.locatefeature.command.failure.not_nearby", feature.location().toString()));
         return -1;
     }
 
@@ -109,7 +109,7 @@ public class LocateFeature {
 
         String translationKey = (positions.size() == 1 ? "single" : (positions.size() <= 5) ? "multiple" : "many");
 
-        source.sendSuccess(() -> Component.translatable("worldgendevtools.locatefeature.command.success." + translationKey, location, positions.size(), positionsComponent, positions.size() - 5), true);
+        source.sendSuccess(() -> Component.translatable("worldgendevtools.locatefeature.command.success." + translationKey, location.toString(), positions.size(), positionsComponent, positions.size() - 5), true);
 
         return (int) Math.round(Math.sqrt(sortedPositions.get(0).distSqr(sourcePos)));
     }
@@ -127,7 +127,7 @@ public class LocateFeature {
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + position.getX() + " " + position.getY() + " " + position.getZ()))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
                 );
-        source.sendSuccess(() -> Component.translatable("worldgendevtools.locatefeature.command.success.nearby", location, component, dist), false);
+        source.sendSuccess(() -> Component.translatable("worldgendevtools.locatefeature.command.success.nearby", location.toString(), component, dist), false);
         return dist;
     }
 }
