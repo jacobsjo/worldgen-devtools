@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit;
 import eu.jacobsjo.worldgendevtools.reloadregistries.impl.RegistryReloader;
 import net.minecraft.core.LayeredRegistryAccess;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RegistryLayer;
@@ -38,7 +37,7 @@ public abstract class MinecraftServerMixin {
      * @param resources the collected resources
      */
     @Inject (method = "method_29437", at = @At("HEAD"))
-    private void thenCompose(RegistryAccess.Frozen frozen, ImmutableList<PackResources> resources, CallbackInfoReturnable<CompletionStage<?>> cir) {
+    private void thenCompose(ImmutableList<PackResources> resources, CallbackInfoReturnable<CompletionStage<?>> cir) {
         if (this.getGameRules().getBoolean(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
             RegistryReloader.reloadRegistries(this.registries, this.levels, resources);
         }

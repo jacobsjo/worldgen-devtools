@@ -1,9 +1,13 @@
 package eu.jacobsjo.worldgendevtools.coloredjigsawblock.mixin.client;
 
-import net.minecraft.nbt.CompoundTag;
+import com.mojang.serialization.DataResult;
+import eu.jacobsjo.worldgendevtools.coloredjigsawblock.impl.JigsawBlockData;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
@@ -30,24 +34,24 @@ public class GameMasterBlockItemMixin extends BlockItem {
         if (!stack.getItem().equals(Items.JIGSAW))
             return;
 
-        CompoundTag tag = stack.getTagElement("BlockEntityTag");
-        if (tag == null)
+        TypedDataComponent<CustomData> blockEntityData = stack.getComponents().getTyped(DataComponents.BLOCK_ENTITY_DATA);
+        if (blockEntityData == null)
             return;
 
-        ResourceLocation name = new ResourceLocation(tag.getString("name"));
-        ResourceLocation targetName = new ResourceLocation(tag.getString("target"));
-        ResourceLocation targetPool = new ResourceLocation(tag.getString("pool"));
+        DataResult<JigsawBlockData> data = blockEntityData.value().read(JigsawBlockData.CODEC);
+        if (data.isError() || data.result().isEmpty())
+            return;
 
-        if (!targetPool.equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_pool_tooltip", targetPool.toString()));
+        if (!data.result().get().targetPool().equals(EMPTY_RESOURCE_LOCATION)){
+            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_pool_tooltip", data.result().get().targetPool().toString()));
         }
 
-        if (!name.equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.name_tooltip", name.toString()));
+        if (!data.result().get().name().equals(EMPTY_RESOURCE_LOCATION)){
+            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.name_tooltip", data.result().get().name().toString()));
         }
 
-        if (!targetName.equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_name_tooltip", targetName.toString()));
+        if (!data.result().get().target().equals(EMPTY_RESOURCE_LOCATION)){
+            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_name_tooltip", data.result().get().target().toString()));
         }
     }
 }
