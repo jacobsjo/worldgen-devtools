@@ -7,6 +7,7 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
+import net.minecraft.world.level.chunk.status.WorldGenContext;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
@@ -29,6 +30,8 @@ public abstract class ChunkMapMixin implements UpdatableGeneratorChunkMap {
 
     @Shadow @Final ServerLevel level;
 
+    @Shadow private WorldGenContext worldGenContext;
+
     @Override
     public void worldgenDevtools$setGenerator(ChunkGenerator generator) {
         RegistryAccess registryAccess = this.level.registryAccess();
@@ -41,5 +44,6 @@ public abstract class ChunkMapMixin implements UpdatableGeneratorChunkMap {
             this.randomState = RandomState.create(NoiseGeneratorSettings.dummy(), registryAccess.lookupOrThrow(Registries.NOISE), seed);
         }
         this.chunkGeneratorState = this.generator.createState(registryAccess.lookupOrThrow(Registries.STRUCTURE_SET), this.randomState, seed);
+        this.worldGenContext = new WorldGenContext(this.worldGenContext.level(), generator, this.worldGenContext.structureManager(), this.worldGenContext.lightEngine());
     }
 }
