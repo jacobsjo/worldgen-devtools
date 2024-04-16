@@ -13,7 +13,8 @@
     "MinecraftServerMixin",
     "ServerGamePacketListenerImplMixin",
     "StructureMixin",
-    "StructureStartMixin"
+    "StructureStartMixin",
+    "WolfVariantsMixin"
   ],
   "client": [
     "client.IntegratedPlayerListMixin"

@@ -129,12 +129,6 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
         if (this.outdatedKeys.contains(key)) {
             this.outdatedKeys.remove(key);
             this.requiredNewKeys.add(key);
-            //cir.getReturnValue().bindValue(null);
         }
     }
-
-//    @ModifyReturnValue(method = "holders", at = @At("RETURN"))
-//    public Stream<Holder.Reference<T>> filterHolders(Stream<Holder.Reference<T>> original){
-//        return original.filter(holder -> !this.outdatedKeys.contains(holder.key()));
-//    }
 }
