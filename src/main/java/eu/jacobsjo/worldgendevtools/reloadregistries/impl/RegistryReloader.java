@@ -93,7 +93,7 @@ public class RegistryReloader {
 
         //for each found dimension, create a generator and set it for the dimension, if one exists. Adding new dimensions isn't supported.
         dimensionKeys.forEach(key -> {
-            LOGGER.info("Handling dimension: {}", key);
+            LOGGER.info("Reloading dimension: {}", key);
             LevelStem levelStem = levelStemRegistry.getOptional(key).or(() -> normalDimensions.get(key)).orElseThrow();  // TODO replace throw with dummy generator
             ChunkGenerator chunkGenerator = levelStem.generator();
 
@@ -107,7 +107,6 @@ public class RegistryReloader {
             ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
 
             level.dimensionTypeRegistration = levelStem.type();
-            LOGGER.info("changes dimension type of {} to {}", key, levelStem.type());
         });
     }
 

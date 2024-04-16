@@ -1,6 +1,7 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.Registry;
@@ -43,6 +44,7 @@ public class ChunkAccessMixin {
     @Shadow protected volatile boolean unsaved;
     @Shadow @Final private static LongSet EMPTY_REFERENCE_SET;
 
+    @Shadow @Final protected LevelChunkSection[] sections;
     @Unique
     private Map<ResourceLocation, StructureStart> structureStartsByLocation;
     @Unique
@@ -121,13 +123,9 @@ public class ChunkAccessMixin {
         ci.cancel();
     }
 
-    // don't crash when biomes are unregistered
-    //@ModifyReturnValue(method = "getNoiseBiome", at=@At("RETURN"))
-    //public Holder<Biome> getNoiseBiome(Holder<Biome> original){
-    //    if (registryAccess == null) return original;
-    //    if (!original.isBound()){
-    //        return registryAccess.registryOrThrow(Registries.BIOME).getHolder(Biomes.PLAINS).orElseThrow();
-    //    }
-    //    return original;
-    //}
+    // Fix crash when fewer sections exist than the world it high (happens when chaning world height in reload)
+    @ModifyExpressionValue(method = "getNoiseBiome", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkAccess;getSectionIndex(I)I"))
+    public int getNoiseBiome(int original){
+        return Math.min(original, this.sections.length - 1);
+    }
 }
