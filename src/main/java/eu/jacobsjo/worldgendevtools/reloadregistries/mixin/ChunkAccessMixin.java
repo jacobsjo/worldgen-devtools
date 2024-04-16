@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
@@ -47,12 +48,12 @@ public class ChunkAccessMixin {
     @Unique
     private Map<ResourceLocation, LongSet> structuresRefencesByLocation;
     @Unique
-    private Registry<Structure> structureRegistry;
+    private RegistryAccess registryAccess;
 
     @Inject(method="<init>(Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/chunk/UpgradeData;Lnet/minecraft/world/level/LevelHeightAccessor;Lnet/minecraft/core/Registry;J[Lnet/minecraft/world/level/chunk/LevelChunkSection;Lnet/minecraft/world/level/levelgen/blending/BlendingData;)V", at = @At("TAIL"))
     private void init(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData, CallbackInfo info){
         if (!((Level) levelHeightAccessor).isClientSide()) {
-            this.structureRegistry = ((Level) levelHeightAccessor).registryAccess().registry(Registries.STRUCTURE).orElseThrow();
+            this.registryAccess = ((Level) levelHeightAccessor).registryAccess();
             this.structureStartsByLocation = Maps.newHashMap();
             this.structuresRefencesByLocation = Maps.newHashMap();
         }
@@ -60,63 +61,73 @@ public class ChunkAccessMixin {
 
     @Inject(method = "getStartForStructure", at=@At("HEAD"), cancellable = true)
     public void getStartForStructure(Structure structure, CallbackInfoReturnable<StructureStart> cir) {
-        if (structureRegistry == null) return;
-        cir.setReturnValue(this.structureStartsByLocation.get(structureRegistry.getKey(structure)));
+        if (registryAccess == null) return;
+        cir.setReturnValue(this.structureStartsByLocation.get(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure)));
         cir.cancel();
     }
 
     @Inject(method = "setStartForStructure", at=@At("HEAD"), cancellable = true)
     public void setStartForStructure(Structure structure, StructureStart structureStart, CallbackInfo ci) {
-        if (structureRegistry == null) return;
-        this.structureStartsByLocation.put(structureRegistry.getKey(structure), structureStart);
+        if (registryAccess == null) return;
+        this.structureStartsByLocation.put(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), structureStart);
         this.unsaved = true;
         ci.cancel();
     }
 
     @Inject(method = "getAllStarts", at=@At("HEAD"), cancellable = true)
     public void getAllStarts(CallbackInfoReturnable<Map<Structure, StructureStart>> cir) {
-        if (structureRegistry == null) return;
-        cir.setReturnValue(Collections.unmodifiableMap(this.structureStartsByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(structureRegistry.get(e.getKey()), e.getValue()), HashMap::putAll)));
+        if (registryAccess == null) return;
+        cir.setReturnValue(Collections.unmodifiableMap(this.structureStartsByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(registryAccess.registryOrThrow(Registries.STRUCTURE).get(e.getKey()), e.getValue()), HashMap::putAll)));
         cir.cancel();
     }
 
     @Inject(method = "setAllStarts", at=@At("HEAD"), cancellable = true)
     public void setAllStarts(Map<Structure, StructureStart> structureStarts, CallbackInfo ci) {
-        if (structureRegistry == null) return;
+        if (registryAccess == null) return;
         this.structureStartsByLocation.clear();
-        structureStarts.forEach((structure, structureStart) -> this.structureStartsByLocation.put(structureRegistry.getKey(structure), structureStart));
+        structureStarts.forEach((structure, structureStart) -> this.structureStartsByLocation.put(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), structureStart));
         this.unsaved = true;
         ci.cancel();
     }
 
     @Inject(method = "getReferencesForStructure", at=@At("HEAD"), cancellable = true)
     public void getReferencesForStructure(Structure structure, CallbackInfoReturnable<LongSet> cir) {
-        if (structureRegistry == null) return;
-        cir.setReturnValue(this.structuresRefencesByLocation.getOrDefault(structureRegistry.getKey(structure), EMPTY_REFERENCE_SET));
+        if (registryAccess == null) return;
+        cir.setReturnValue(this.structuresRefencesByLocation.getOrDefault(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), EMPTY_REFERENCE_SET));
         cir.cancel();
     }
 
     @Inject(method = "addReferenceForStructure", at=@At("HEAD"), cancellable = true)
     public void addReferenceForStructure(Structure structure, long reference, CallbackInfo ci) {
-        if (structureRegistry == null) return;
-        (this.structuresRefencesByLocation.computeIfAbsent(structureRegistry.getKey(structure), (structurex) -> new LongOpenHashSet())).add(reference);
+        if (registryAccess == null) return;
+        (this.structuresRefencesByLocation.computeIfAbsent(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), (structurex) -> new LongOpenHashSet())).add(reference);
         this.unsaved = true;
         ci.cancel();
     }
 
     @Inject(method = "getAllReferences", at=@At("HEAD"), cancellable = true)
     public void getAllReferences(CallbackInfoReturnable<Map<Structure, LongSet>> cir) {
-        if (structureRegistry == null) return;
-        cir.setReturnValue(Collections.unmodifiableMap(this.structuresRefencesByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(structureRegistry.get(e.getKey()), e.getValue()), HashMap::putAll)));
+        if (registryAccess == null) return;
+        cir.setReturnValue(Collections.unmodifiableMap(this.structuresRefencesByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(registryAccess.registryOrThrow(Registries.STRUCTURE).get(e.getKey()), e.getValue()), HashMap::putAll)));
         cir.cancel();
     }
 
     @Inject(method = "setAllReferences", at=@At("HEAD"), cancellable = true)
     public void setAllReferences(Map<Structure, LongSet> structureReferencesMap, CallbackInfo ci) {
-        if (structureRegistry == null) return;
+        if (registryAccess == null) return;
         this.structuresRefencesByLocation.clear();
-        structureReferencesMap.forEach((structure, reference) -> this.structuresRefencesByLocation.put(structureRegistry.getKey(structure), reference));
+        structureReferencesMap.forEach((structure, reference) -> this.structuresRefencesByLocation.put(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), reference));
         this.unsaved = true;
         ci.cancel();
     }
+
+    // don't crash when biomes are unregistered
+    //@ModifyReturnValue(method = "getNoiseBiome", at=@At("RETURN"))
+    //public Holder<Biome> getNoiseBiome(Holder<Biome> original){
+    //    if (registryAccess == null) return original;
+    //    if (!original.isBound()){
+    //        return registryAccess.registryOrThrow(Registries.BIOME).getHolder(Biomes.PLAINS).orElseThrow();
+    //    }
+    //    return original;
+    //}
 }

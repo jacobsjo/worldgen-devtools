@@ -7,6 +7,7 @@
     "ChunkAccessMixin",
     "ChunkGeneratorMixin",
     "ChunkMapMixin",
+    "HolderMixin",
     "MappedRegistryMixin",
     "MinecraftServerMixin",
     "ServerGamePacketListenerImplMixin",

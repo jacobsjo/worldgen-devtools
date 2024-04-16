@@ -1,9 +1,7 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.impl;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.SwitchToConfigurationCallback;
@@ -33,6 +31,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.WorldDimensions;
+import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RegistryReloader {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     /**
      * Reloades the registries.
@@ -55,16 +55,14 @@ public class RegistryReloader {
      * @param resources datapack resources
      */
     public static void reloadRegistries(LayeredRegistryAccess<RegistryLayer> registries, Map<ResourceKey<Level>, ServerLevel> levels, ImmutableList<PackResources> resources){
+        LOGGER.info("Reloading registries");
+
         CloseableResourceManager resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, resources);
 
         // Store old dimensions
         RegistryAccess.Frozen dimensionsContextLayer = registries.getAccessForLoading(RegistryLayer.DIMENSIONS);
         RegistryAccess.Frozen dimensionsNewLayer = registries.getLayer(RegistryLayer.DIMENSIONS);
         RegistryOps.RegistryInfoLookup dimensionsLookup = getRegistrtyInfoLookup(dimensionsContextLayer, dimensionsNewLayer, false);
-
-        Map<ResourceLocation, JsonElement> generators = new HashMap<>();
-        levels.forEach((key, level) -> generators.put(key.location(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow()));
-
 
         // Reload Worldgen registries
         Map<ResourceKey<?>, Exception> exceptionMap = new HashMap<>();
@@ -74,6 +72,10 @@ public class RegistryReloader {
         RegistryOps.RegistryInfoLookup worldgenLookup = getRegistrtyInfoLookup(worldgenContextLayer, worldgenNewLayer, true);
 
         RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> loadData(worldgenLookup, resourceManager, data, worldgenNewLayer, exceptionMap));
+        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
+            Registry<?> registry = worldgenNewLayer.registry(data.key()).orElseThrow();
+            registry.freeze();
+        });
 
         if (!exceptionMap.isEmpty()) {
             logErrors(exceptionMap);
@@ -84,23 +86,29 @@ public class RegistryReloader {
         MappedRegistry<LevelStem> levelStemRegistry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable());
         RegistryDataLoader.loadContentsFromManager(resourceManager, dimensionsLookup, levelStemRegistry, LevelStem.CODEC, exceptionMap);
 
+        WorldDimensions normalDimensions = WorldPresets.createNormalWorldDimensions(dimensionsContextLayer);
+
         // combine dimensions loaded from datapack with already existing dimensions (prioritize new)
-        Stream<ResourceLocation> dimensionKeys = Stream.concat(levelStemRegistry.keySet().stream(), generators.keySet().stream()).distinct();
+        Stream<ResourceKey<LevelStem>> dimensionKeys = Stream.concat(levelStemRegistry.registryKeySet().stream(), normalDimensions.dimensions().keySet().stream()).distinct();
 
         //for each found dimension, create a generator and set it for the dimension, if one exists. Adding new dimensions isn't supported.
-        dimensionKeys.forEach(key -> levelStemRegistry.getOptional(key).map(LevelStem::generator).or(() -> {
-            JsonElement json = generators.get(key);
-            if (json == null) return Optional.empty();
-            return ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), json).result();
-        }).ifPresent(chunkGenerator -> {
-            ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key));
+        dimensionKeys.forEach(key -> {
+            LOGGER.info("Handling dimension: {}", key);
+            LevelStem levelStem = levelStemRegistry.getOptional(key).or(() -> normalDimensions.get(key)).orElseThrow();  // TODO replace throw with dummy generator
+            ChunkGenerator chunkGenerator = levelStem.generator();
+
+            ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key.location()));
             if (level == null){
                 LOGGER.warn("adding new dimension not supported; trying to add {}", key);
                 return;
             }
+
             ChunkMap chunkMap = level.getChunkSource().chunkMap;
             ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
-        }));
+
+            level.dimensionTypeRegistration = levelStem.type();
+            LOGGER.info("changes dimension type of {} to {}", key, levelStem.type());
+        });
     }
 
     /**

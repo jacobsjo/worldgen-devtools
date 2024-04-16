@@ -1,6 +1,7 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 
 import com.mojang.serialization.Lifecycle;
+import eu.jacobsjo.worldgendevtools.reloadregistries.api.OutdatedHolder;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
@@ -20,7 +21,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Mixin(MappedRegistry.class)
 public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
@@ -40,9 +43,16 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
     @Shadow private Lifecycle registryLifecycle;
     @Shadow @Final private Map<ResourceKey<T>, RegistrationInfo> registrationInfos;
-    @Unique private boolean reloading = false;
-    @Unique private Set<ResourceKey<T>> outdatedKeys;
 
+    @Shadow public abstract Stream<Holder.Reference<T>> holders();
+
+    @Shadow public abstract Optional<Holder.Reference<T>> getHolder(ResourceKey<T> key);
+
+    @Shadow public abstract ResourceKey<? extends Registry<T>> key();
+
+    @Unique private boolean reloading = false;
+    @Unique private Set<ResourceKey<T>> outdatedKeys = new HashSet<>();
+    @Unique private Set<ResourceKey<T>> requiredNewKeys = new HashSet<>();
 
     /**
      * configures the registry for reloading and marks all current keys as outdated.
@@ -53,7 +63,8 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
             throw new IllegalStateException("Trying to reload registry " + key.toString() + " which has intrusive holders.");
         }
 
-        this.outdatedKeys = new HashSet<>(byKey.keySet());
+        this.outdatedKeys = new HashSet<>(this.byKey.keySet());
+        this.requiredNewKeys.clear();
 
         this.frozen = false;
         this.reloading = true;
@@ -66,19 +77,13 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     public void freeze(CallbackInfoReturnable<Registry<T>> cir){
         if (this.reloading){
             this.outdatedKeys.forEach(key -> {
-
-                // remove old element from registry
-                T value = this.get(key);
-                int id = this.getId(value);
-                this.toId.remove(value, id);
-                this.byId.set(id, null);
-                this.byValue.remove(value);
-                this.registrationInfos.remove(key);
-                this.byLocation.remove(key.location());
-                this.byKey.get(key).bindValue(null); // make sure outdated holder is unbound, causing Exceptions should they still be in use
-                this.byKey.remove(key);
-                LOGGER.info("Removing {} from registry", key);
+                LOGGER.info("Outdated element {} remains in registry", key);
+                Holder.Reference<T> holder = this.getHolder(key).orElseThrow();
+                ((OutdatedHolder) holder).worldgenDevtools$markOutdated(true);
             });
+            if (!this.requiredNewKeys.isEmpty()){
+                throw new IllegalStateException("References remain to newly removed keys from registry " + this.key() + ": " + this.requiredNewKeys);
+            }
             this.reloading = false;
         }
     }
@@ -91,6 +96,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
         if (this.reloading && this.byLocation.containsKey(key.location())){
             // existing element that is changed
             this.outdatedKeys.remove(key);
+            this.requiredNewKeys.remove(key);
             T oldValue = this.get(key);
             int id = this.getId(oldValue);
 
@@ -116,4 +122,18 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
             cir.cancel();
         }
     }
+
+    @Inject(method = "getOrCreateHolderOrThrow", at = @At("RETURN"))
+    public void getOrCreateHolderOrThrow(ResourceKey<T> key, CallbackInfoReturnable<Holder.Reference<T>> cir){
+        if (this.outdatedKeys.contains(key)) {
+            this.outdatedKeys.remove(key);
+            this.requiredNewKeys.add(key);
+            //cir.getReturnValue().bindValue(null);
+        }
+    }
+
+//    @ModifyReturnValue(method = "holders", at = @At("RETURN"))
+//    public Stream<Holder.Reference<T>> filterHolders(Stream<Holder.Reference<T>> original){
+//        return original.filter(holder -> !this.outdatedKeys.contains(holder.key()));
+//    }
 }

@@ -11,3 +11,6 @@ accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker
 accessible field net/minecraft/server/network/ServerConfigurationPacketListenerImpl synchronizeRegistriesTask Lnet/minecraft/server/network/config/SynchronizeRegistriesTask;
 accessible field net/minecraft/server/network/ServerConfigurationPacketListenerImpl configurationTasks Ljava/util/Queue;
 accessible method net/minecraft/server/network/ServerConfigurationPacketListenerImpl startNextTask ()V
+
+accessible field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/minecraft/core/Holder;
+mutable field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/minecraft/core/Holder;
