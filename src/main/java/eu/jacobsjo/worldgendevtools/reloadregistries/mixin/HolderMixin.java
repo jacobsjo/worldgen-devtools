@@ -20,4 +20,9 @@ public class HolderMixin<T> implements OutdatedHolder {
         this.outdated = outdated;
     }
 
+    @Override
+    public boolean worldgenDevtools$isOutdated() {
+        return this.outdated;
+    }
+
 }

@@ -109,6 +109,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
             }
 
             Holder.Reference<T> reference = this.byKey.computeIfAbsent(key, resourceKeyx -> Holder.Reference.createStandAlone(this.holderOwner(), resourceKeyx));
+            ((OutdatedHolder) reference).worldgenDevtools$markOutdated(false);
 
             this.byKey.put(key, reference);
             this.byLocation.put(key.location(), reference);
