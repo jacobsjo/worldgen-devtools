@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import java.util.Locale;
 
 public class ResetChunksCommand {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(

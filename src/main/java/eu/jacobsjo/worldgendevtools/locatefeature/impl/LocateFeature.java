@@ -1,6 +1,7 @@
 package eu.jacobsjo.worldgendevtools.locatefeature.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.logging.LogUtils;
 import eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,8 +29,7 @@ import java.util.stream.Stream;
 
 public class LocateFeature {
     private static final int MAX_RANGE = 10;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger("worldgendevtools");
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public static LiteralArgumentBuilder<CommandSourceStack> addSubcommand(LiteralArgumentBuilder<CommandSourceStack> command){
         return command.then(

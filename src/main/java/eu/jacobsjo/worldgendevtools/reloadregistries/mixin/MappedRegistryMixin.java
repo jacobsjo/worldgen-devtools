@@ -3,6 +3,7 @@ package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.OutdatedHolder;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
+import eu.jacobsjo.worldgendevtools.reloadregistries.impl.RegistryReloader;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.Util;
@@ -10,7 +11,6 @@ import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,7 +37,8 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow public abstract int getId(@Nullable T value);
     @Shadow private @Nullable Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
     @Shadow @Final ResourceKey<? extends Registry<T>> key;
-    @Shadow @Final private static Logger LOGGER;
+
+
 
     @Shadow public abstract HolderOwner<T> holderOwner();
 
@@ -77,7 +78,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     public void freeze(CallbackInfoReturnable<Registry<T>> cir){
         if (this.reloading){
             this.outdatedKeys.forEach(key -> {
-                LOGGER.info("Outdated element {} remains in registry", key);
+                RegistryReloader.LOGGER.info("Outdated element {} remains in registry", key);
                 Holder.Reference<T> holder = this.getHolder(key).orElseThrow();
                 ((OutdatedHolder) holder).worldgenDevtools$markOutdated(true);
             });
