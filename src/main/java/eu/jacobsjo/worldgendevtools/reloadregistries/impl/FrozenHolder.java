@@ -52,10 +52,7 @@ public class FrozenHolder<T> implements Holder<T> {
         return wrapping.is(tagKey);
     }
 
-    /**
-     * @deprecated
-     */
-    @Override
+    @Override @Deprecated
     public boolean is(Holder<T> holder) {
         return wrapping.is(holder);
     }

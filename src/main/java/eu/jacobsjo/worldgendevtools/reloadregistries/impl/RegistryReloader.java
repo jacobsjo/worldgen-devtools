@@ -10,6 +10,8 @@ import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -73,15 +75,17 @@ public class RegistryReloader {
         RegistryOps.RegistryInfoLookup worldgenLookup = getRegistrtyInfoLookup(worldgenContextLayer, worldgenNewLayer, true);
 
         RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> loadData(worldgenLookup, resourceManager, data, worldgenNewLayer, exceptionMap));
+
+        if (!exceptionMap.isEmpty()) {
+            logErrors(exceptionMap);
+            throw new ComponentFormattedException(formatErrors(exceptionMap));
+        }
+
         RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
             Registry<?> registry = worldgenNewLayer.registry(data.key()).orElseThrow();
             registry.freeze();
         });
 
-        if (!exceptionMap.isEmpty()) {
-            logErrors(exceptionMap);
-            throw new IllegalStateException("Failed to load registries due to above errors");
-        }
 
         // Reload Dimension registry
         MappedRegistry<LevelStem> levelStemRegistry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable());
@@ -224,4 +228,21 @@ public class RegistryReloader {
         LOGGER.error("Registry loading errors:\n{}", stringWriter);
     }
 
+    public static int REGISTRY_COLOR = 0x80FF80;
+    public static int ELEMENT_COLOR = 0x8080FF;
+    public static int ERROR_COLOR = 0xFF8080;
+
+    private static Component formatErrors(Map<ResourceKey<?>, Exception> map){
+        MutableComponent component = Component.empty();
+
+        Map<ResourceLocation, Map<ResourceLocation, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).location(), Map.Entry::getValue)));
+        map2.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
+            component.append(Component.literal("> Errors in registry " + entry.getKey() + ":\n").withColor(REGISTRY_COLOR));
+            (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {
+                component.append(Component.literal(">> Errors in element" + entryx.getKey() + ":\n").withColor(ELEMENT_COLOR));
+                component.append(Component.literal(entryx.getValue().getCause().getMessage() + "\n").withColor(ERROR_COLOR));
+            });
+        });
+        return component;
+    }
 }
