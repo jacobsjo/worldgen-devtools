@@ -6,7 +6,7 @@ This is a mod that provides tools simlifying the creation of worldgen datapacks 
 
 *Needs be enabled per world using the `reloadRegistries` gamerule.*
 
-**Warning: Which this should be fairly stable, this tool can probably still corrupt your worlds. So only enable in testing worlds**
+**Warning: While this should be fairly stable, this tool can probably still corrupt your worlds. So only enable in testing worlds**
 
 Allows the reloading of registry content (such as all worldgen data) using the `/reload` command, or when enabling or
 disabling a datapack using the `/datapack` command. Without this mod, the world needs to be reopened for changes to take
@@ -69,7 +69,7 @@ to `0`.
 
 ![Locating huge red mushrooms](docs/images/locate_feature.png)
 
-Use `/locate featrue <placed_feature>` to locate a configured feature nearby. If the current chunk contains the feature
+Use `/locate featrue <configured_feature>` to locate a configured feature nearby. If the current chunk contains the feature
 multiple times, it will list the up to 5 closest positions. This only works if the chunk is generated while this mod is
 installed.
 
@@ -93,4 +93,5 @@ Gamerules added by this mod:
 | `keepJigsaws`           | Should the jigsaw blocks be kept after structure generation?                                                                                                                                                                                                                                       |
 | `reloadRegistries`      | Should the `/reload` command also reload registries?                                                                                                                                                                                                                                               |
 | `syncClients`           | Should all clients be resend the registry content after reloading?                                                                                                                                                                                                                                 |
+| `saveChunks`            | Should chunks be saves? Old chunks are not deleted when disabling.                                                                                                                                                                                                                                 |
 
