@@ -24,6 +24,8 @@ and biome effects need to be synconized. This causes the client to redraw all ch
 it can be disabled using the `syncClients` gamerule.
 
 ## Reset Chunks
+![Resetting chunks to NOISE_ONLY](docs/images/noise_only.png)
+
 
 The `/resetchunks [<range>]` command resets the chunks surrounding the player in the specified range - regenerating it with the current worldgen data and settings. Defaults to `0` (i.e. only the current chunk). If you want to reset a structure, you need to reset the chunk of the structure start.
 
@@ -64,6 +66,8 @@ the `/chunkprofiling <range>` command. Range controlls the amount of chunks to a
 to `0`.
 
 ## Locate Feature
+
+![Locating huge red mushrooms](docs/images/locate_feature.png)
 
 Use `/locate featrue <placed_feature>` to locate a configured feature nearby. If the current chunk contains the feature
 multiple times, it will list the up to 5 closest positions. This only works if the chunk is generated while this mod is
