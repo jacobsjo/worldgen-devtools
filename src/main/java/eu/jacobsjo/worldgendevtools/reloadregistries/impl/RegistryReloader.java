@@ -41,10 +41,7 @@ import org.slf4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +59,6 @@ public class RegistryReloader {
 
         CloseableResourceManager resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, resources);
 
-        // Store old dimensions
         RegistryAccess.Frozen dimensionsContextLayer = registries.getAccessForLoading(RegistryLayer.DIMENSIONS);
         RegistryAccess.Frozen dimensionsNewLayer = registries.getLayer(RegistryLayer.DIMENSIONS);
         RegistryOps.RegistryInfoLookup dimensionsLookup = getRegistrtyInfoLookup(dimensionsContextLayer, dimensionsNewLayer, false);
@@ -76,16 +72,26 @@ public class RegistryReloader {
 
         RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> loadData(worldgenLookup, resourceManager, data, worldgenNewLayer, exceptionMap));
 
+        List<IllegalStateException> freezingExceptions = new ArrayList<>();
+        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
+            try {
+                Registry<?> registry = worldgenNewLayer.registry(data.key()).orElseThrow();
+                registry.freeze();
+            } catch (IllegalStateException e){
+                freezingExceptions.add(e);
+            }
+        });
+
         if (!exceptionMap.isEmpty()) {
             logErrors(exceptionMap);
+            resourceManager.close();
             throw new ComponentFormattedException(formatErrors(exceptionMap));
         }
 
-        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
-            Registry<?> registry = worldgenNewLayer.registry(data.key()).orElseThrow();
-            registry.freeze();
-        });
-
+        if (!freezingExceptions.isEmpty()){
+            resourceManager.close();
+            throw freezingExceptions.getFirst();
+        }
 
         // Reload Dimension registry
         MappedRegistry<LevelStem> levelStemRegistry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable());
@@ -101,14 +107,14 @@ public class RegistryReloader {
             LOGGER.info("Reloading dimension: {}", key);
 
             ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key.location()));
-            if (level == null){
+            if (level == null) {
                 LOGGER.warn("adding new dimension not supported; trying to add {}", key);
                 return;
             }
 
             LevelStem levelStem = levelStemRegistry.getOptional(key).or(() -> normalDimensions.get(key)).orElseThrow();
 
-            if (level.dimensionType().minY() != levelStem.type().value().minY() || level.dimensionType().height() != levelStem.type().value().height()){
+            if (level.dimensionType().minY() != levelStem.type().value().minY() || level.dimensionType().height() != levelStem.type().value().height()) {
                 throw new IllegalStateException("Can't change world height of dimension " + key + ". Requires reloading the world.");
             }
 
@@ -117,9 +123,9 @@ public class RegistryReloader {
             ChunkGenerator chunkGenerator = levelStem.generator();
             ChunkMap chunkMap = level.getChunkSource().chunkMap;
             // Verify this generator change isn't going to cause lots of crashes
-            if (chunkMap.generator() instanceof  NoiseBasedChunkGenerator oldNoiseGenerator){
-                if (chunkGenerator instanceof NoiseBasedChunkGenerator newNoiseGenerator){
-                    if (!oldNoiseGenerator.generatorSettings().value().noiseSettings().equals(newNoiseGenerator.generatorSettings().value().noiseSettings())){
+            if (chunkMap.generator() instanceof NoiseBasedChunkGenerator oldNoiseGenerator) {
+                if (chunkGenerator instanceof NoiseBasedChunkGenerator newNoiseGenerator) {
+                    if (!oldNoiseGenerator.generatorSettings().value().noiseSettings().equals(newNoiseGenerator.generatorSettings().value().noiseSettings())) {
                         throw new IllegalStateException("Can't change generator of dimension " + key + ": Uses different generation shapes in noise settings. Requires reloading the world.");
                     }
                 }

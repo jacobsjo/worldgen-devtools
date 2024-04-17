@@ -11,6 +11,7 @@ import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,10 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Mixin(MappedRegistry.class)
@@ -51,6 +49,10 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
     @Shadow public abstract ResourceKey<? extends Registry<T>> key();
 
+    @Shadow @Final private static Logger LOGGER;
+
+    @Shadow public abstract Set<Map.Entry<ResourceKey<T>, T>> entrySet();
+
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys = new HashSet<>();
     @Unique private Set<ResourceKey<T>> requiredNewKeys = new HashSet<>();
@@ -64,6 +66,9 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
             throw new IllegalStateException("Trying to reload registry " + key.toString() + " which has intrusive holders.");
         }
 
+        // remove unbound keys, they remained from last failed reload, but shouldn't cause this one to fail.
+        this.byKey.entrySet().removeIf(entry -> !entry.getValue().isBound());
+
         this.outdatedKeys = new HashSet<>(this.byKey.keySet());
         this.requiredNewKeys.clear();
 
@@ -74,18 +79,19 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     /**
      * when refreezing a reloading registry, remove all keys that are still outdated.
      */
-    @Inject(method = "freeze", at = @At("HEAD"))
+    @Inject(method = "freeze", at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V", shift = At.Shift.AFTER))
     public void freeze(CallbackInfoReturnable<Registry<T>> cir){
         if (this.reloading){
+            this.reloading = false;
+
             this.outdatedKeys.forEach(key -> {
                 RegistryReloader.LOGGER.info("Outdated element {} remains in registry", key);
                 Holder.Reference<T> holder = this.getHolder(key).orElseThrow();
                 ((OutdatedHolder) holder).worldgenDevtools$markOutdated(true);
             });
             if (!this.requiredNewKeys.isEmpty()){
-                throw new IllegalStateException("References remain to newly removed keys from registry " + this.key() + ": " + this.requiredNewKeys);
+                throw new IllegalStateException("References remain to outdated keys from registry " + this.key() + ": " + this.requiredNewKeys);
             }
-            this.reloading = false;
         }
     }
 
