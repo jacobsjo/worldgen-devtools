@@ -90,7 +90,7 @@ public class RegistryReloader {
 
         if (!freezingExceptions.isEmpty()){
             resourceManager.close();
-            throw freezingExceptions.getFirst();
+            throw new ComponentFormattedException(formatFreezingErrors(freezingExceptions));
         }
 
         // Reload Dimension registry
@@ -251,4 +251,12 @@ public class RegistryReloader {
         });
         return component;
     }
+
+    private static Component formatFreezingErrors(List<IllegalStateException> list){
+        MutableComponent component = Component.empty();
+
+        list.forEach(e -> component.append(Component.literal(e.getMessage() + "\n").withColor(ERROR_COLOR)));
+        return component;
+    }
+
 }
