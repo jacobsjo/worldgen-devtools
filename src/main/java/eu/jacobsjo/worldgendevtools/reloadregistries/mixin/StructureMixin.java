@@ -27,9 +27,13 @@ public abstract class StructureMixin {
     /**
      * Calls {@link HolderStructureStart#worldgenDevtools$setHolder} after creation of a {@link StructureStart}. See {@link StructureStartMixin}.
      */
-    @Inject(method = "generate", at = @At("RETURN"))
+    @Inject(method = "generate", at = @At("RETURN"), cancellable = true)
     public void generate(RegistryAccess registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkPos chunkPos, int i, LevelHeightAccessor levelHeightAccessor, Predicate<Holder<Biome>> predicate, CallbackInfoReturnable<StructureStart> cir) {
-        Registry<Structure> registry = registryAccess.registry(Registries.STRUCTURE).orElseThrow();
-        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getHolderOrThrow(registry.getResourceKey((Structure) (Object) this).orElseThrow()));
+        try {
+            Registry<Structure> registry = registryAccess.registry(Registries.STRUCTURE).orElseThrow();
+            ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getHolderOrThrow(registry.getResourceKey((Structure) (Object) this).orElseThrow()));
+        } catch(Exception e)  {
+            cir.setReturnValue(StructureStart.INVALID_START);
+        }
     }
 }

@@ -31,6 +31,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import org.jetbrains.annotations.NotNull;
@@ -94,8 +95,6 @@ public class RegistryReloader {
         //for each found dimension, create a generator and set it for the dimension, if one exists. Adding new dimensions isn't supported.
         dimensionKeys.forEach(key -> {
             LOGGER.info("Reloading dimension: {}", key);
-            LevelStem levelStem = levelStemRegistry.getOptional(key).or(() -> normalDimensions.get(key)).orElseThrow();  // TODO replace throw with dummy generator
-            ChunkGenerator chunkGenerator = levelStem.generator();
 
             ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key.location()));
             if (level == null){
@@ -103,10 +102,28 @@ public class RegistryReloader {
                 return;
             }
 
-            ChunkMap chunkMap = level.getChunkSource().chunkMap;
-            ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
+            LevelStem levelStem = levelStemRegistry.getOptional(key).or(() -> normalDimensions.get(key)).orElseThrow();
 
-            level.dimensionTypeRegistration = levelStem.type();
+            if (level.dimensionType().minY() != levelStem.type().value().minY() || level.dimensionType().height() != levelStem.type().value().height()){
+                throw new IllegalStateException("Can't change world height of dimension " + key + ". Requires reloading the world.");
+            }
+
+            level.dimensionTypeRegistration = new FrozenHolder<>(levelStem.type());
+
+            ChunkGenerator chunkGenerator = levelStem.generator();
+            ChunkMap chunkMap = level.getChunkSource().chunkMap;
+            // Verify this generator change isn't going to cause lots of crashes
+            if (chunkMap.generator() instanceof  NoiseBasedChunkGenerator oldNoiseGenerator){
+                if (chunkGenerator instanceof NoiseBasedChunkGenerator newNoiseGenerator){
+                    if (!oldNoiseGenerator.generatorSettings().value().noiseSettings().equals(newNoiseGenerator.generatorSettings().value().noiseSettings())){
+                        throw new IllegalStateException("Can't change generator of dimension " + key + ": Uses different generation shapes in noise settings. Requires reloading the world.");
+                    }
+                }
+            } else if (chunkGenerator instanceof NoiseBasedChunkGenerator) {
+                throw new IllegalStateException("Can't change generator of dimension " + key + ": should now be NoiseBasedChunkGenerator. Requires reloading the world.");
+            }
+
+            ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
         });
     }
 
@@ -206,6 +223,5 @@ public class RegistryReloader {
         printWriter.flush();
         LOGGER.error("Registry loading errors:\n{}", stringWriter);
     }
-
 
 }

@@ -23,6 +23,8 @@
   "item.minecraft.jigsaw.target_name_tooltip": "Target Name: %s",
   "item.minecraft.jigsaw.target_pool_tooltip": "Target Pool: %s",
 
+  "worldgendevtools.reloadregistries.failure": "Failed to reload registires. Registries are in indeterminate state. A world reload is needed.",
+
   "worldgendevtools.profiling.command.no_information": "No chunks have profiling information saved",
   "worldgendevtools.profiling.command.header": "Profiling of %d chunks:",
   "worldgendevtools.profiling.command.header.one": "Profiling of chunk %d:",
