@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -110,7 +111,13 @@ public class ChunkAccessMixin {
     @Inject(method = "getAllReferences", at=@At("HEAD"), cancellable = true)
     public void getAllReferences(CallbackInfoReturnable<Map<Structure, LongSet>> cir) {
         if (registryAccess == null) return;
-        cir.setReturnValue(Collections.unmodifiableMap(this.structuresRefencesByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(registryAccess.registryOrThrow(Registries.STRUCTURE).get(e.getKey()), e.getValue()), HashMap::putAll)));
+        cir.setReturnValue(Collections.unmodifiableMap(
+                this.structuresRefencesByLocation
+                        .entrySet()
+                        .stream()
+                        .map(e -> new AbstractMap.SimpleEntry<>(registryAccess.registryOrThrow(Registries.STRUCTURE).get(e.getKey()), e.getValue()))
+                        .filter(e -> e.getKey() != null)
+                        .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll)));
         cir.cancel();
     }
 
