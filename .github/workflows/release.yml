@@ -22,9 +22,18 @@ jobs:
         run: chmod +x ./gradlew
       - name: build
         run: ./gradlew build
-      - uses: Kir-Antipov/mc-publish@v3.3
+      - name: get Minecraft version
+        uses: BrycensRanch/read-properties-action@v1
+        id: minecraft_version
+        with:
+          file: gradle.properties
+          property: minecraft_version
+      - name: Publish
+        uses: Kir-Antipov/mc-publish@v3.3
         with:
           files: build/libs/!(*-@(dev|sources|javadoc)).jar
+          game-versions: ${{ steps.minecraft_version.outputs.minecraft_version }}
+          game-version-filter: none
           modrinth-id: EyDzmyQr
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
