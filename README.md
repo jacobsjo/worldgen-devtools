@@ -69,7 +69,7 @@ to `0`.
 
 ![Locating huge red mushrooms](docs/images/locate_feature.png)
 
-Use `/locate featrue <configured_feature>` to locate a configured feature nearby. If the current chunk contains the feature
+Use `/locate feature <configured_feature>` to locate a configured feature nearby. If the current chunk contains the feature
 multiple times, it will list the up to 5 closest positions. This only works if the chunk is generated while this mod is
 installed.
 
