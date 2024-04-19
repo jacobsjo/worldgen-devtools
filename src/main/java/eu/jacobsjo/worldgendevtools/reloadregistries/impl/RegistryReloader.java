@@ -1,7 +1,9 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.impl;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.SwitchToConfigurationCallback;
@@ -34,8 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.WorldDimensions;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -62,6 +62,10 @@ public class RegistryReloader {
         RegistryAccess.Frozen dimensionsContextLayer = registries.getAccessForLoading(RegistryLayer.DIMENSIONS);
         RegistryAccess.Frozen dimensionsNewLayer = registries.getLayer(RegistryLayer.DIMENSIONS);
         RegistryOps.RegistryInfoLookup dimensionsLookup = getRegistrtyInfoLookup(dimensionsContextLayer, dimensionsNewLayer, false);
+
+        // Store old dimensions
+        Map<ResourceLocation, JsonElement> generators = new HashMap<>();
+        levels.forEach((key, level) -> generators.put(key.location(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow()));
 
         // Reload Worldgen registries
         Map<ResourceKey<?>, Exception> exceptionMap = new HashMap<>();
@@ -97,30 +101,33 @@ public class RegistryReloader {
         MappedRegistry<LevelStem> levelStemRegistry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable());
         RegistryDataLoader.loadContentsFromManager(resourceManager, dimensionsLookup, levelStemRegistry, LevelStem.CODEC, exceptionMap);
 
-        WorldDimensions normalDimensions = WorldPresets.createNormalWorldDimensions(dimensionsContextLayer);
-
         // combine dimensions loaded from datapack with already existing dimensions (prioritize new)
-        Stream<ResourceKey<LevelStem>> dimensionKeys = Stream.concat(levelStemRegistry.registryKeySet().stream(), normalDimensions.dimensions().keySet().stream()).distinct();
+        Stream<ResourceLocation> dimensionKeys = Stream.concat(levelStemRegistry.registryKeySet().stream().map(ResourceKey::location), generators.keySet().stream()).distinct();
 
         //for each found dimension, create a generator and set it for the dimension, if one exists. Adding new dimensions isn't supported.
         dimensionKeys.forEach(key -> {
             LOGGER.info("Reloading dimension: {}", key);
 
-            ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key.location()));
+            ServerLevel level = levels.get(ResourceKey.create(Registries.DIMENSION, key));
             if (level == null) {
                 LOGGER.warn("adding new dimension not supported; trying to add {}", key);
                 return;
             }
 
-            LevelStem levelStem = levelStemRegistry.getOptional(key).or(() -> normalDimensions.get(key)).orElseThrow();
+            Optional<LevelStem> levelStem = levelStemRegistry.getOptional(key);
 
-            if (level.dimensionType().minY() != levelStem.type().value().minY() || level.dimensionType().height() != levelStem.type().value().height()) {
-                throw new IllegalStateException("Can't change world height of dimension " + key + ". Requires reloading the world.");
+            ChunkGenerator chunkGenerator;
+            if (levelStem.isPresent()) {
+                if (level.dimensionType().minY() != levelStem.get().type().value().minY() || level.dimensionType().height() != levelStem.get().type().value().height()) {
+                    throw new IllegalStateException("Can't change world height of dimension " + key + ". Requires reloading the world.");
+                }
+
+                level.dimensionTypeRegistration = new FrozenHolder<>(levelStem.get().type());
+                chunkGenerator = levelStem.get().generator();
+            } else {
+                chunkGenerator = ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), generators.get(key)).result().orElseThrow();
             }
 
-            level.dimensionTypeRegistration = new FrozenHolder<>(levelStem.type());
-
-            ChunkGenerator chunkGenerator = levelStem.generator();
             ChunkMap chunkMap = level.getChunkSource().chunkMap;
             // Verify this generator change isn't going to cause lots of crashes
             if (chunkMap.generator() instanceof NoiseBasedChunkGenerator oldNoiseGenerator) {
