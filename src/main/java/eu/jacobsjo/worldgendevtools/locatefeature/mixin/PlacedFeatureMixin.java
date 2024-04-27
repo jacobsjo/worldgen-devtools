@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+@SuppressWarnings("UnstableApiUsage")
 @Mixin(PlacedFeature.class)
 public class PlacedFeatureMixin {
 

@@ -8,8 +8,6 @@ public class DfCommandInit implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
-            DfCommand.register(dispatcher);
-        }));
+        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> DfCommand.register(dispatcher)));
     }
 }

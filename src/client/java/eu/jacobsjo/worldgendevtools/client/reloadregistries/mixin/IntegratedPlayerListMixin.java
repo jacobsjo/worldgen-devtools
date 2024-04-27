@@ -8,6 +8,7 @@ import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.level.storage.PlayerDataStorage;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -27,6 +28,7 @@ public class IntegratedPlayerListMixin extends PlayerList {
      * Fixes a vanilla bug when sending the singleplay owner back to configuration phase
      */
     @Override
+    @NotNull
     public Optional<CompoundTag> load(ServerPlayer player) {
         if (this.getServer().isSingleplayerOwner(player.getGameProfile()) && this.playerData != null) {
             player.load(this.playerData);

@@ -30,10 +30,6 @@ public class ChunkgenProfilingInformation {
         this.statusDurations = new HashMap<>();
     }
 
-    public Duration getStatusDuration(ChunkStatus status){
-        return this.getStatusDuration(BuiltInRegistries.CHUNK_STATUS.getKey(status));
-    }
-
     public Duration getStatusDuration(ResourceLocation status) {
         Duration duration = this.statusDurations.get(status);
         if (duration == null){

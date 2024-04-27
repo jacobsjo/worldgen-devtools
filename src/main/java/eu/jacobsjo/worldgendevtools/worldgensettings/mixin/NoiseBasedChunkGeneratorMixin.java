@@ -24,7 +24,7 @@ public class NoiseBasedChunkGeneratorMixin {
     public void buildSurface(WorldGenRegion level, StructureManager structureManager, RandomState random, ChunkAccess chunk, CallbackInfo ci){
         if (!level.getLevelData().getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().surface){
             ci.cancel();
-        };
+        }
     }
 
     /**
@@ -34,7 +34,7 @@ public class NoiseBasedChunkGeneratorMixin {
     public void applyCarvers(WorldGenRegion level, long seed, RandomState random, BiomeManager biomeManager, StructureManager structureManager, ChunkAccess chunk, GenerationStep.Carving step, CallbackInfo ci) {
         if (!level.getLevelData().getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().carvers){
             ci.cancel();
-        };
+        }
     }
 
 }

@@ -11,7 +11,6 @@ import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,8 +19,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Mixin(MappedRegistry.class)
 public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
@@ -35,27 +36,17 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow public abstract int getId(@Nullable T value);
     @Shadow private @Nullable Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
     @Shadow @Final ResourceKey<? extends Registry<T>> key;
-
-
-
     @Shadow public abstract HolderOwner<T> holderOwner();
-
     @Shadow private Lifecycle registryLifecycle;
     @Shadow @Final private Map<ResourceKey<T>, RegistrationInfo> registrationInfos;
-
-    @Shadow public abstract Stream<Holder.Reference<T>> holders();
 
     @Shadow public abstract Optional<Holder.Reference<T>> getHolder(ResourceKey<T> key);
 
     @Shadow public abstract ResourceKey<? extends Registry<T>> key();
 
-    @Shadow @Final private static Logger LOGGER;
-
-    @Shadow public abstract Set<Map.Entry<ResourceKey<T>, T>> entrySet();
-
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys = new HashSet<>();
-    @Unique private Set<ResourceKey<T>> requiredNewKeys = new HashSet<>();
+    @Unique private final Set<ResourceKey<T>> requiredNewKeys = new HashSet<>();
 
     /**
      * configures the registry for reloading and marks all current keys as outdated.

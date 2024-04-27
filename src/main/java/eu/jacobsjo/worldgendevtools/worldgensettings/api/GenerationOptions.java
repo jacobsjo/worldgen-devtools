@@ -1,11 +1,9 @@
 package eu.jacobsjo.worldgendevtools.worldgensettings.api;
 
+@SuppressWarnings("unused")
 public enum GenerationOptions {
-    @SuppressWarnings("unused")
     NOISE_ONLY(false, false, false),
-    @SuppressWarnings("unused")
     SURFACE(true, false, false),
-    @SuppressWarnings("unused")
     SURFACE_AND_CARVERS(true, true, false),
     ALL(true, true,true);
 

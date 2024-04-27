@@ -18,12 +18,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@SuppressWarnings("UnstableApiUsage")
 public class ChunkProfilingCommand {
 
-    public static int HEADER_COLOR = 0x80FF80;
-    public static int KEY_COLOR = 0x8080FF;
-    public static int NUMBER_COLOR = 0xFFFFFF;
-    public static int TEXT_COLOR = 0xA0A0A0;
+    public static final int HEADER_COLOR = 0x80FF80;
+    public static final int KEY_COLOR = 0x8080FF;
+    public static final int NUMBER_COLOR = 0xFFFFFF;
+    public static final int TEXT_COLOR = 0xA0A0A0;
 
 
     public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher) {
@@ -51,7 +52,7 @@ public class ChunkProfilingCommand {
             }
         }
 
-        if (informations.size() == 0) {
+        if (informations.isEmpty()) {
             source.sendFailure(Component.translatable ("worldgendevtools.profiling.command.no_information"));
             return 0;
         } else {

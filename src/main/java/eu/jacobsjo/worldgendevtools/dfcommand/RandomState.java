@@ -30,11 +30,11 @@ public final class RandomState {
     private RandomState(NoiseGeneratorSettings noiseGeneratorSettings, HolderGetter<NormalNoise.NoiseParameters> holderGetter, final long l) {
         this.random = noiseGeneratorSettings.getRandomSource().newInstance(l).forkPositional();
         this.noises = holderGetter;
-        this.noiseIntances = new ConcurrentHashMap();
+        this.noiseIntances = new ConcurrentHashMap<>();
         final boolean bl = noiseGeneratorSettings.useLegacyRandomSource();
 
         class NoiseWiringHelper implements DensityFunction.Visitor {
-            private final Map<DensityFunction, DensityFunction> wrapped = new HashMap();
+            private final Map<DensityFunction, DensityFunction> wrapped = new HashMap<>();
 
             NoiseWiringHelper() {
             }
@@ -43,6 +43,7 @@ public final class RandomState {
                 return new LegacyRandomSource(l + lx);
             }
 
+            @SuppressWarnings("deprecation")
             public DensityFunction.NoiseHolder visitNoise(DensityFunction.NoiseHolder noiseHolder) {
                 Holder<NormalNoise.NoiseParameters> holder = noiseHolder.noiseData();
                 NormalNoise normalNoise;
@@ -85,9 +86,7 @@ public final class RandomState {
     }
 
     public NormalNoise getOrCreateNoise(ResourceKey<NormalNoise.NoiseParameters> resourceKey) {
-        return (NormalNoise)this.noiseIntances.computeIfAbsent(resourceKey, (resourceKey2) -> {
-            return Noises.instantiate(this.noises, this.random, resourceKey);
-        });
+        return this.noiseIntances.computeIfAbsent(resourceKey, (resourceKey2) -> Noises.instantiate(this.noises, this.random, resourceKey));
     }
 
     public DensityFunction.Visitor getVisitor(){

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+@SuppressWarnings("UnstableApiUsage")
 public class LocateFeature {
     private static final int MAX_RANGE = 10;
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -57,7 +58,7 @@ public class LocateFeature {
 
             List<BlockPos> positions = featurePositions.getPositions(feature);
 
-            if (positions.size() == 0) {
+            if (positions.isEmpty()) {
                 return locateNearbyFeature(source, feature, sourcePos, chunk.getPos());
             } else {
                 return showListResult(source, feature.location(), positions, sourcePos);
@@ -110,7 +111,7 @@ public class LocateFeature {
 
         source.sendSuccess(() -> Component.translatable("worldgendevtools.locatefeature.command.success." + translationKey, location.toString(), positions.size(), positionsComponent, positions.size() - 5), true);
 
-        return (int) Math.round(Math.sqrt(sortedPositions.get(0).distSqr(sourcePos)));
+        return (int) Math.round(Math.sqrt(sortedPositions.getFirst().distSqr(sourcePos)));
     }
 
     private static int showLocateResult(

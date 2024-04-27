@@ -24,7 +24,6 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseRouter;
-import net.minecraft.world.phys.Vec3;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -33,17 +32,11 @@ import java.util.Optional;
 
 public final class DfCommand{
 
-    private static final DynamicCommandExceptionType ERROR_INVALID_DENSITY_FUNCTION = new DynamicCommandExceptionType((object) -> {
-        return Component.translatable("commands.jacobsjo.getdensity.density_function.invalid", object);
-    });
+    private static final DynamicCommandExceptionType ERROR_INVALID_DENSITY_FUNCTION = new DynamicCommandExceptionType((object) -> Component.translatable("commands.jacobsjo.getdensity.density_function.invalid", object));
 
-    private static final DynamicCommandExceptionType ERROR_INVALID_NOISE_ROUTER = new DynamicCommandExceptionType((object) -> {
-        return Component.translatable("commands.jacobsjo.getdensity.noise_router.invalid", object);
-    });
+    private static final DynamicCommandExceptionType ERROR_INVALID_NOISE_ROUTER = new DynamicCommandExceptionType((object) -> Component.translatable("commands.jacobsjo.getdensity.noise_router.invalid", object));
 
-    private static final DynamicCommandExceptionType ERROR_NO_NOISE_ROUTER = new DynamicCommandExceptionType((objcet) -> {
-        return Component.translatable("commands.jacobsjo.getdensity.noise_router.no");
-    });
+    private static final DynamicCommandExceptionType ERROR_NO_NOISE_ROUTER = new DynamicCommandExceptionType((objcet) -> Component.translatable("commands.jacobsjo.getdensity.noise_router.no"));
 
     private static final Collection<String> NOISE_ROUTER_VALUES = Arrays.asList(
             "barrier",
@@ -69,13 +62,9 @@ public final class DfCommand{
 
         for (String value : NOISE_ROUTER_VALUES){
             noiseRouterArgument = noiseRouterArgument.then(Commands.literal(value)
-                    .executes((commandContext)->{
-                        return getDensity(commandContext.getSource(), value, BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel());
-                    })
+                    .executes((commandContext)-> getDensity(commandContext.getSource(), value, BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel()))
                     .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                            .executes((commandContext)-> {
-                                return getDensity(commandContext.getSource(), value, BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel());
-                            })
+                            .executes((commandContext)-> getDensity(commandContext.getSource(), value, BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel()))
                     ));
         }
 
@@ -83,14 +72,9 @@ public final class DfCommand{
             Commands.literal("getdensity")
                     .then(Commands.literal("density_function")
                         .then(Commands.argument("density_function", ResourceKeyArgument.key(Registries.DENSITY_FUNCTION))
-                            .executes((commandContext)->{
-                                Vec3 pos = commandContext.getSource().getPosition();
-                                return getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel());
-                            })
+                            .executes((commandContext)-> getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel()))
                             .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                                .executes((commandContext)->{
-                                    return getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel());
-                                }))
+                                .executes((commandContext)-> getDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel())))
                         )
                     )
                     .then(noiseRouterArgument)
@@ -144,28 +128,23 @@ public final class DfCommand{
 
         DecimalFormat format = new DecimalFormat("0.000");
 
-        commandSourceStack.sendSuccess(() -> {
-            return Component.translatable("commands.jacobsjo.getdensity.result", format.format(value));
-        }, true);
+        commandSourceStack.sendSuccess(() -> Component.translatable("commands.jacobsjo.getdensity.result", format.format(value)), true);
         return (int) (value * 1000);
     }
 
     private static <T> ResourceKey<T> getRegistryType(CommandContext<CommandSourceStack> commandContext, String string, ResourceKey<Registry<T>> resourceKey, DynamicCommandExceptionType dynamicCommandExceptionType) throws CommandSyntaxException {
         ResourceKey<?> resourceKey2 = commandContext.getArgument(string, ResourceKey.class);
         Optional<ResourceKey<T>> optional = resourceKey2.cast(resourceKey);
-        return optional.orElseThrow(() -> {
-            return dynamicCommandExceptionType.create(resourceKey2);
-        });
+        return optional.orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2));
     }
 
     private static <T> Registry<T> getRegistry(CommandContext<CommandSourceStack> commandContext, ResourceKey<? extends Registry<T>> resourceKey) {
-        return ((CommandSourceStack)commandContext.getSource()).getServer().registryAccess().registryOrThrow(resourceKey);
+        return commandContext.getSource().getServer().registryAccess().registryOrThrow(resourceKey);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static <T> Holder<T> getRegistryKeyType(CommandContext<CommandSourceStack> commandContext, String string, ResourceKey<Registry<T>> resourceKey, DynamicCommandExceptionType dynamicCommandExceptionType) throws CommandSyntaxException {
         ResourceKey<T> resourceKey2 = getRegistryType(commandContext, string, resourceKey, dynamicCommandExceptionType);
-        return getRegistry(commandContext, resourceKey).getHolder(resourceKey2).orElseThrow(() -> {
-            return dynamicCommandExceptionType.create(resourceKey2.location());
-        });
+        return getRegistry(commandContext, resourceKey).getHolder(resourceKey2).orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2.location()));
     }
 }

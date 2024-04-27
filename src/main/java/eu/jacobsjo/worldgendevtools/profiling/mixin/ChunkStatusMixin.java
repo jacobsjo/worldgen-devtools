@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+@SuppressWarnings("UnstableApiUsage")
 @Mixin(ChunkStatus.class)
 public class ChunkStatusMixin {
 

@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Vanilla uses {@link ChunkAccess#structureStarts} and {@link ChunkAccess#structuresRefences} to map structures to
+ * Vanilla uses {@code ChunkAccess.structureStarts} and {@code ChunkAccess.structuresRefences} to map structures to
  * structure starts and references. This mixin changes it to use {@link #structureStartsByLocation} and
  * {@link #structuresRefencesByLocation} which use {@link ResourceLocation}s instead. This change is only done on the
  * logical server.

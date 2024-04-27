@@ -3,7 +3,7 @@ package eu.jacobsjo.worldgendevtools.reloadregistries.impl;
 import net.minecraft.network.chat.Component;
 
 public class ComponentFormattedException extends IllegalStateException{
-    Component message;
+    private final Component message;
     public ComponentFormattedException(Component message){
         super(message.getString());
 

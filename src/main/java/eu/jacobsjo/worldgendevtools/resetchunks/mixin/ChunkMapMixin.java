@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Mixin(ChunkMap.class)
 public abstract class ChunkMapMixin extends ChunkStorage implements ResettableChunkMap {
+    @SuppressWarnings("unused")
     public ChunkMapMixin(RegionStorageInfo regionStorageInfo, Path path, DataFixer dataFixer, boolean bl) {
         super(regionStorageInfo, path, dataFixer, bl);
     }
@@ -37,6 +38,7 @@ public abstract class ChunkMapMixin extends ChunkStorage implements ResettableCh
     @Inject(method="save", at=@At("HEAD"), cancellable = true)
     private void save(ChunkAccess chunk, CallbackInfoReturnable<Boolean> cir){
         if (!this.level.getGameRules().getBoolean(WorldgenSettingsInit.SAVE_CHUNKS)){
+            cir.setReturnValue(false);
             cir.cancel();
         }
     }
@@ -53,7 +55,7 @@ public abstract class ChunkMapMixin extends ChunkStorage implements ResettableCh
         try {
             ResetChunksCommand.LOGGER.debug("Removing chunk {} with tickets {}", chunkPos, this.getTicketDebugString(chunkPos.toLong()));
 
-            // this forces the chunk to be unloaded, without regard to its saving status. But that doesn't matter, since we are resetting it anyways.
+            // this forces the chunk to be unloaded, without regard to its saving status. But that doesn't matter, since we are resetting it anyway.
             this.updatingChunkMap.remove(chunkPos.toLong());
             distanceManager.tickets.remove(chunkPos.toLong()); // deletes tickets from unloaded chunks, to make sure they are reloaded before usage.
 

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 @Mixin(WolfVariants.class)
 public class WolfVariantsMixin {
 
-    // Don't spawn wolfs with outdated variant
+    // Don't spawn wolves with outdated variant
     @ModifyExpressionValue(method = "getSpawnVariant", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Registry;holders()Ljava/util/stream/Stream;"))
     private static Stream<Holder.Reference<WolfVariant>> filterSpawnVariantHolders(Stream<Holder.Reference<WolfVariant>> original){
         return original.filter(holder -> !((OutdatedHolder) holder).worldgenDevtools$isOutdated());

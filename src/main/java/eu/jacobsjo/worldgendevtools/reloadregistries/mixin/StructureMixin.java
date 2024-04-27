@@ -27,6 +27,7 @@ public abstract class StructureMixin {
     /**
      * Calls {@link HolderStructureStart#worldgenDevtools$setHolder} after creation of a {@link StructureStart}. See {@link StructureStartMixin}.
      */
+    @SuppressWarnings("DataFlowIssue")
     @Inject(method = "generate", at = @At("RETURN"), cancellable = true)
     public void generate(RegistryAccess registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkPos chunkPos, int i, LevelHeightAccessor levelHeightAccessor, Predicate<Holder<Biome>> predicate, CallbackInfoReturnable<StructureStart> cir) {
         try {

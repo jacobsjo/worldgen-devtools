@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class FrozenHolder<T> implements Holder<T> {
-    Holder<T> wrapping;
+    private final Holder<T> wrapping;
     T value = null;
 
     public FrozenHolder(Holder<T> wrapping){

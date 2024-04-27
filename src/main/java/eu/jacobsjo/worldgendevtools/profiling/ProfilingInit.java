@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.resources.ResourceLocation;
 
+@SuppressWarnings("UnstableApiUsage")
 public class ProfilingInit implements ModInitializer {
     public static final AttachmentType<ChunkgenProfilingInformation> PROFILING_ATTACHMENT = AttachmentRegistry.<ChunkgenProfilingInformation>builder()
             .initializer(ChunkgenProfilingInformation::new)
@@ -16,9 +17,7 @@ public class ProfilingInit implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            ChunkProfilingCommand.register(dispatcher);
-        });
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> ChunkProfilingCommand.register(dispatcher));
 
     }
 }

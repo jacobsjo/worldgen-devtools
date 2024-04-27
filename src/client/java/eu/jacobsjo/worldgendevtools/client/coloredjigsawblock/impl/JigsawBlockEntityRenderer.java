@@ -18,16 +18,11 @@ import org.joml.Quaternionf;
 public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBlockEntity> {
     private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation("worldgendevtools","textures/entity/jigsaw.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucentCull(TEXTURE_LOCATION);
-
     private static final float OFFSET = 0.001f;
-
     private static final ResourceLocation EMPTY_RESOURCE_LOCATION = new ResourceLocation("empty");
-    BlockEntityRendererProvider.Context context;
 
     private static final ModelPart modelPart = new MeshDefinition().getRoot().addOrReplaceChild("cube", CubeListBuilder.create().texOffs(0, 0).addBox(0f, 0f, 0f, 16f, 16f, 16f), PartPose.ZERO).bake(64, 64);
-    public JigsawBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        this.context = context;
-    }
+    public JigsawBlockEntityRenderer(@SuppressWarnings("unused") BlockEntityRendererProvider.Context conext) { }
 
     @Override
     public void render(JigsawBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {

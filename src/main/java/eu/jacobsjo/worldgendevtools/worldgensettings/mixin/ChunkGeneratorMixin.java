@@ -20,7 +20,7 @@ public class ChunkGeneratorMixin {
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager, CallbackInfo ci) {
         if (!level.getLevelData().getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().features){
             ci.cancel();
-        };
+        }
     }
 
 }

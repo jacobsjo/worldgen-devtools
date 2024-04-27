@@ -10,8 +10,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.network.chat.Component;
-import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -27,6 +29,7 @@ import java.util.stream.Stream;
 @Environment(EnvType.CLIENT)
 public abstract class PackSelectionScreenMixin extends Screen {
 
+    @SuppressWarnings("SameReturnValue")
     @Shadow
     private static Stream<String> extractPackNames(Collection<Path> paths) {
         return null;
@@ -34,14 +37,14 @@ public abstract class PackSelectionScreenMixin extends Screen {
 
     @Shadow protected abstract void method_29676(List<Path> par1, boolean par2);
 
-    @Shadow @Final private static Logger LOGGER;
-
+    @SuppressWarnings("EmptyMethod")
     @Shadow
     protected static void copyPacks(Minecraft minecraft, List<Path> packs, Path outDir) {
     }
 
     @Unique private boolean shouldSymlink = false;
 
+    @SuppressWarnings("unused")
     protected PackSelectionScreenMixin(Component title) {
         super(title);
     }
@@ -50,6 +53,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
      * @author eu.jacobsjo.worldgendevtools
      * @reason setting different screen bacially changes whole method anyway, the inner lambda is still called
      */
+    @SuppressWarnings("DataFlowIssue")
     @Overwrite
     public void onFilesDrop(List<Path> packs) {
         String datapacks = extractPackNames(packs).collect(Collectors.joining(", "));
@@ -59,6 +63,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         }));
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Inject(method = "method_29676", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/packs/PackSelectionScreen;copyPacks(Lnet/minecraft/client/Minecraft;Ljava/util/List;Ljava/nio/file/Path;)V"))
     public void beforeCopyPacks(List<Path> packs, boolean bl, CallbackInfo ci, @Local(ordinal = 1) List<Path> list2) {
         if (shouldSymlink) {

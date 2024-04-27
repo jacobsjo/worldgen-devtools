@@ -158,9 +158,7 @@ public class RegistryReloader {
                     if (listener instanceof ServerConfigurationPacketListenerImpl impl2) {
                         LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess = serverConnection.getServer().registries();
 
-                        List<KnownPack> list = serverConnection.getServer().getResourceManager().listPacks().flatMap((packResources) -> {
-                            return packResources.location().knownPackInfo().stream();
-                        }).toList();
+                        List<KnownPack> list = serverConnection.getServer().getResourceManager().listPacks().flatMap((packResources) -> packResources.location().knownPackInfo().stream()).toList();
 
                         impl2.synchronizeRegistriesTask = new SynchronizeRegistriesTask(list, layeredRegistryAccess);
                         impl2.configurationTasks.add(impl2.synchronizeRegistriesTask);
@@ -219,6 +217,7 @@ public class RegistryReloader {
         });
 
         return new RegistryOps.RegistryInfoLookup() {
+            @SuppressWarnings("unchecked")
             public <E> @NotNull Optional<RegistryOps.RegistryInfo<E>> lookup(ResourceKey<? extends Registry<? extends E>> resourceKey) {
                 return Optional.ofNullable((RegistryOps.RegistryInfo<E>) lookupMap.get(resourceKey));
             }
@@ -241,9 +240,9 @@ public class RegistryReloader {
         LOGGER.error("Registry loading errors:\n{}", stringWriter);
     }
 
-    public static int REGISTRY_COLOR = 0x80FF80;
-    public static int ELEMENT_COLOR = 0x8080FF;
-    public static int ERROR_COLOR = 0xFF8080;
+    public static final int REGISTRY_COLOR = 0x80FF80;
+    public static final int ELEMENT_COLOR = 0x8080FF;
+    public static final int ERROR_COLOR = 0xFF8080;
 
     private static Component formatErrors(Map<ResourceKey<?>, Exception> map){
         MutableComponent component = Component.empty();
