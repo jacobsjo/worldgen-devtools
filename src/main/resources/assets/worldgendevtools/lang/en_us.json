@@ -3,7 +3,6 @@
   "commands.jacobsjo.getdensity.density_function.invalid": "Invalid density_function %s",
   "commands.jacobsjo.getdensity.noise_router.invalid": "Invalid noise router entry %s",
   "commands.jacobsjo.getdensity.noise_router.no": "This dimension has no noise router",
-
   "gamerule.reloadRegistries": "Reload registries",
   "gamerule.reloadRegistries.description": "Worldgen Devtools: Extend the /reload and /datapack enable|disable commands to reload all registries, such as worldgen definitions.",
   "gamerule.syncAfterRegistryReload": "Syncronize after registry reload",
@@ -18,25 +17,26 @@
   "gamerule.applyGravityProcessor.description": "Worldgen Devtools: Apply the gravity processor to terrain matching jigsaw structure pieces.",
   "gamerule.saveChunks": "Save any chunks to disk",
   "gamerule.saveChunks.description": "Worldgen Devtools: Turning this OFF will disable any world saving, so that reloading the world will regenerate it. Already saved chunks are not deleted.",
-
   "item.minecraft.jigsaw.name_tooltip": "Name: %s",
   "item.minecraft.jigsaw.target_name_tooltip": "Target Name: %s",
   "item.minecraft.jigsaw.target_pool_tooltip": "Target Pool: %s",
-
   "worldgendevtools.reloadregistries.failure": "Failed to reload registires. Registries are in indeterminate state. A world reload is needed.",
-
   "worldgendevtools.profiling.command.no_information": "No chunks have profiling information saved",
   "worldgendevtools.profiling.command.header": "Profiling of %d chunks:",
   "worldgendevtools.profiling.command.header.one": "Profiling of chunk %d:",
   "worldgendevtools.profiling.command.entry.key": "[%s]: ",
   "worldgendevtools.profiling.command.entry.value": "%sms/chunk (total: %sms)",
   "worldgendevtools.profiling.command.entry.value.single": "%sms",
-
   "worldgendevtools.locatefeature.command.success.single": "Found %s 1 time in chunk at %3$s",
   "worldgendevtools.locatefeature.command.success.multiple": "Found %s %s times in chunk at %s",
   "worldgendevtools.locatefeature.command.success.many": "Found %s %s times in chunk at %s ... (%s more)",
   "worldgendevtools.locatefeature.command.success.nearby": "The nearest %s is at %s (%s blocks away)",
-
   "worldgendevtools.locatefeature.command.failure.no_attachment": "The feature positions are not saved in this chunk",
-  "worldgendevtools.locatefeature.command.failure.not_nearby": "Could not find a feature of type \"%s\" within reasonable distance"
+  "worldgendevtools.locatefeature.command.failure.not_nearby": "Could not find a feature of type \"%s\" within reasonable distance",
+
+  "worldgendevtools.datapackadding.gui.title": "How do you want to add the following packs to Minecraft?",
+  "worldgendevtools.datapackadding.gui.cancel": "Cancel",
+  "worldgendevtools.datapackadding.gui.copy": "Copy",
+  "worldgendevtools.datapackadding.gui.symlink": "Create Symlink",
+  "worldgendevtools.datapackadding.gui.symlink.add_allowed": "Added allowed symlink:"
 }

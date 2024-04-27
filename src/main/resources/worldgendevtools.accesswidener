@@ -15,3 +15,6 @@ accessible method net/minecraft/server/network/ServerConfigurationPacketListener
 
 accessible field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/minecraft/core/Holder;
 mutable field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/minecraft/core/Holder;
+
+accessible field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
+mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;

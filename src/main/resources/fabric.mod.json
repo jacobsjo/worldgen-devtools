@@ -31,11 +31,12 @@
     "worldgendevtools.resetchunks.mixins.json",
     "worldgendevtools.loggingimprovements.mixins.json",
     "worldgendevtools.profiling.mixins.json",
-    "worldgendevtools.locatefeature.mixins.json"
+    "worldgendevtools.locatefeature.mixins.json",
+    "worldgendevtools.datapackadding.mixins.json"
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
-    "fabricloader": ">=${loader_version}",
+    "fabricloader": "*",
     "fabric-api": "*",
     "minecraft": ">=1.20.5- <1.20.7-",
     "java": ">=21"
