@@ -1,7 +1,7 @@
-package eu.jacobsjo.worldgendevtools.coloredjigsawblock.mixin.client;
+package eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.mixin;
 
 import com.mojang.serialization.DataResult;
-import eu.jacobsjo.worldgendevtools.coloredjigsawblock.impl.JigsawBlockData;
+import eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl.JigsawBlockData;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.network.chat.Component;

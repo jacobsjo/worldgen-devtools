@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.coloredjigsawblock.impl;
+package eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

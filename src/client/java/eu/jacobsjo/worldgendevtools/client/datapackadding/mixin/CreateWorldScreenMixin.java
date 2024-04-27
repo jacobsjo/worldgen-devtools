@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.datapackadding.mixin.client;
+package eu.jacobsjo.worldgendevtools.client.datapackadding.mixin;
 
 
 import net.fabricmc.api.EnvType;

@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.coloredjigsawblock.mixin.client;
+package eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;

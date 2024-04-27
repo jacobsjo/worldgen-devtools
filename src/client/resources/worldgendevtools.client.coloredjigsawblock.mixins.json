@@ -1,13 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "eu.jacobsjo.worldgendevtools.coloredjigsawblock.mixin",
+  "package": "eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
   "client": [
-    "client.GameMasterBlockItemMixin",
-    "client.ItemRendererMixin"
+    "GameMasterBlockItemMixin",
+    "ItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

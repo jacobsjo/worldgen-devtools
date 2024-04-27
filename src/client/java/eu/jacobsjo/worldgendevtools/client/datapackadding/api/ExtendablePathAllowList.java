@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.datapackadding.api.client;
+package eu.jacobsjo.worldgendevtools.client.datapackadding.api;
 
 import net.minecraft.world.level.validation.PathAllowList;
 

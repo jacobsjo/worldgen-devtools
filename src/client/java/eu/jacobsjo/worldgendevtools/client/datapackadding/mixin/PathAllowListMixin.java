@@ -1,7 +1,7 @@
-    package eu.jacobsjo.worldgendevtools.datapackadding.mixin.client;
+    package eu.jacobsjo.worldgendevtools.client.datapackadding.mixin;
 
 
-import eu.jacobsjo.worldgendevtools.datapackadding.api.client.ExtendablePathAllowList;
+import eu.jacobsjo.worldgendevtools.client.datapackadding.api.ExtendablePathAllowList;
 import net.minecraft.world.level.validation.PathAllowList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

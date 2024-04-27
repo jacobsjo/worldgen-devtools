@@ -1,9 +1,9 @@
-package eu.jacobsjo.worldgendevtools.datapackadding.mixin.client;
+package eu.jacobsjo.worldgendevtools.client.datapackadding.mixin;
 
 
 import com.llamalad7.mixinextras.sugar.Local;
-import eu.jacobsjo.worldgendevtools.datapackadding.impl.client.PackDropScreen;
-import eu.jacobsjo.worldgendevtools.datapackadding.impl.client.SymlinkUtil;
+import eu.jacobsjo.worldgendevtools.client.datapackadding.impl.PackDropScreen;
+import eu.jacobsjo.worldgendevtools.client.datapackadding.impl.SymlinkUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;

@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.coloredjigsawblock;
+package eu.jacobsjo.worldgendevtools.client.coloredjigsawblock;
 
 import net.fabricmc.api.ModInitializer;
 

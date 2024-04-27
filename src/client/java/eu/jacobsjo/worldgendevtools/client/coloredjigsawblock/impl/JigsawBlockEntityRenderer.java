@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.coloredjigsawblock.client;
+package eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;

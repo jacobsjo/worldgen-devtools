@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.reloadregistries.mixin.client;
+package eu.jacobsjo.worldgendevtools.client.reloadregistries.mixin;
 
 import net.minecraft.client.server.IntegratedPlayerList;
 import net.minecraft.core.LayeredRegistryAccess;

@@ -1,7 +1,7 @@
-package eu.jacobsjo.worldgendevtools.datapackadding.impl.client;
+package eu.jacobsjo.worldgendevtools.client.datapackadding.impl;
 
 import com.mojang.logging.LogUtils;
-import eu.jacobsjo.worldgendevtools.datapackadding.api.client.ExtendablePathAllowList;
+import eu.jacobsjo.worldgendevtools.client.datapackadding.api.ExtendablePathAllowList;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;

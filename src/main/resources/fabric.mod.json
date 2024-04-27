@@ -11,14 +11,14 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "eu.jacobsjo.worldgendevtools.coloredjigsawblock.client.JigsawBlockEntityRenderingClientInit"
+      "eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl.JigsawBlockEntityRenderingClientInit"
     ],
     "main": [
       "eu.jacobsjo.worldgendevtools.vanillacommands.VanillaCommandsInit",
       "eu.jacobsjo.worldgendevtools.dfcommand.DfCommandInit",
       "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
       "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit",
-      "eu.jacobsjo.worldgendevtools.coloredjigsawblock.JigsawBlockEntityRenderingInit",
+      "eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.JigsawBlockEntityRenderingInit",
       "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit",
       "eu.jacobsjo.worldgendevtools.profiling.ProfilingInit",
       "eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit"
@@ -27,12 +27,22 @@
   "mixins": [
     "worldgendevtools.reloadregistries.mixins.json",
     "worldgendevtools.worldgensettings.mixins.json",
-    "worldgendevtools.coloredjigsawblock.mixins.json",
     "worldgendevtools.resetchunks.mixins.json",
     "worldgendevtools.loggingimprovements.mixins.json",
     "worldgendevtools.profiling.mixins.json",
     "worldgendevtools.locatefeature.mixins.json",
-    "worldgendevtools.datapackadding.mixins.json"
+    {
+      "config": "worldgendevtools.client.reloadregistries.mixins.json",
+      "environment": "client"
+    },
+    {
+      "config": "worldgendevtools.client.coloredjigsawblock.mixins.json",
+      "environment": "client"
+    },
+    {
+      "config": "worldgendevtools.client.datapackadding.mixins.json",
+      "environment": "client"
+    }
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {

@@ -1,8 +1,7 @@
-package eu.jacobsjo.worldgendevtools.coloredjigsawblock.client;
+package eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.DataResult;
-import eu.jacobsjo.worldgendevtools.coloredjigsawblock.impl.JigsawBlockData;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.FrontAndTop;
