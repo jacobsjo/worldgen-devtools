@@ -1,5 +1,6 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 
+import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit;
 import eu.jacobsjo.worldgendevtools.reloadregistries.impl.ComponentFormattedException;
 import net.minecraft.commands.CommandSourceStack;
@@ -21,7 +22,7 @@ public class ReloadCommandMixin {
         }
 
         if (source.getServer().getGameRules().getRule(ReloadRegistriesInit.RELOAD_REGISTIRES).get()){
-            source.sendFailure(Component.translatableWithFallback("worldgendevtools.reloadregistries.failure", "Failed to reload registires. Registries are in indeterminate state. Fix the errors and reload again or reopen the world!"));
+            source.sendFailure(TextUtil.translatable("worldgendevtools.reloadregistries.failure"));
         }
     }
 }

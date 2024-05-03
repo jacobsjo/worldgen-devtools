@@ -54,7 +54,7 @@ public class ChunkProfilingCommand {
         }
 
         if (informations.isEmpty()) {
-            source.sendFailure(Component.translatable ("worldgendevtools.profiling.command.no_information"));
+            source.sendFailure(TextUtil.translatable("worldgendevtools.profiling.command.no_information"));
             return 0;
         } else {
             ChunkgenProfilingInformation sum = ChunkgenProfilingInformation.sum(informations);

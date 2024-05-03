@@ -1,5 +1,6 @@
 package eu.jacobsjo.worldgendevtools.worldgensettings;
 
+import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.worldgensettings.api.GenerationOptions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -22,7 +23,7 @@ public class WorldgenSettingsInit implements ModInitializer {
     public static GameRules.Key<GameRules.BooleanValue> APPLY_GRAVITY_PROCESSOR;
     public static GameRules.Key<GameRules.BooleanValue> SAVE_CHUNKS;
 
-    public static final Component NO_SAVE_WARNING = Component.translatableWithFallback("worldgendevtools.worldgensettings.no_save_warning", "Chunk saving is disabled").withStyle(ChatFormatting.RED);
+    public static final Component NO_SAVE_WARNING = TextUtil.translatable("worldgendevtools.worldgensettings.no_save_warning").withStyle(ChatFormatting.RED);
 
     @Override
     public void onInitialize() {
