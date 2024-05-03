@@ -3,9 +3,13 @@
   "id": "worldgendevtools",
   "version": "${version}",
   "name": "Worldgen Devtools",
-  "description": "Tools to simplify the creation of worldgen datapacks.",
+  "description": "A mod that aids in the development of world generation data packs and mods. Allows reloading worldgen data packs in-game and resetting chunks. Colors jigsaw blocks by name and target.",
   "authors": ["jacobsjo"],
-  "contact": {},
+  "contact": {
+    "homepage": "https://modrinth.com/mod/worldgen-devtools",
+    "issues": "https://github.com/jacobsjo/worldgen-devtools/issues",
+    "sources": "https://github.com/jacobsjo/worldgen-devtools"
+  },
   "license": "MIT",
   "icon": "assets/worldgendevtools/icon.png",
   "environment": "*",
