@@ -38,5 +38,7 @@
   "worldgendevtools.datapackadding.gui.cancel": "Cancel",
   "worldgendevtools.datapackadding.gui.copy": "Copy",
   "worldgendevtools.datapackadding.gui.symlink": "Create Symlink",
-  "worldgendevtools.datapackadding.gui.symlink.add_allowed": "Added allowed symlink:"
+  "worldgendevtools.datapackadding.gui.symlink.add_allowed": "Added allowed symlink:",
+
+  "worldgendevtools.worldgensettings.no_save_warning": "Chunk saving is disabled"
 }
