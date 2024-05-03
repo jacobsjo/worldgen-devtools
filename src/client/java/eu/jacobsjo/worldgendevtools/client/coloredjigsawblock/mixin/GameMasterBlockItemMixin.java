@@ -41,15 +41,15 @@ public class GameMasterBlockItemMixin extends BlockItem {
             return;
 
         if (!data.result().get().targetPool().equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_pool_tooltip", data.result().get().targetPool().toString()));
+            tooltipComponents.add(Component.translatable("worldgendevtools.coloredjigsawblock.target_pool_tooltip", data.result().get().targetPool().toString()));
         }
 
         if (!data.result().get().name().equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.name_tooltip", data.result().get().name().toString()));
+            tooltipComponents.add(Component.translatable("worldgendevtools.coloredjigsawblock.name_tooltip", data.result().get().name().toString()));
         }
 
         if (!data.result().get().target().equals(EMPTY_RESOURCE_LOCATION)){
-            tooltipComponents.add(Component.translatable("item.minecraft.jigsaw.target_name_tooltip", data.result().get().target().toString()));
+            tooltipComponents.add(Component.translatable("worldgendevtools.coloredjigsawblock.target_name_tooltip", data.result().get().target().toString()));
         }
     }
 }

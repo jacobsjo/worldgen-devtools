@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
+import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.SwitchToConfigurationCallback;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.UpdatableGeneratorChunkMap;
@@ -249,9 +250,9 @@ public class RegistryReloader {
 
         Map<ResourceLocation, Map<ResourceLocation, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).location(), Map.Entry::getValue)));
         map2.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
-            component.append(Component.literal("> Errors in registry " + entry.getKey() + ":\n").withColor(REGISTRY_COLOR));
+            component.append(TextUtil.translatable("worldgendevtools.reloadregistries.error.registry", entry.getKey()).withColor(REGISTRY_COLOR));
             (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {
-                component.append(Component.literal(">> Errors in element" + entryx.getKey() + ":\n").withColor(ELEMENT_COLOR));
+                component.append(TextUtil.translatable("worldgendevtools.reloadregistries.error.element", entryx.getKey()).withColor(ELEMENT_COLOR));
                 component.append(Component.literal(entryx.getValue().getCause().getMessage() + "\n").withColor(ERROR_COLOR));
             });
         });

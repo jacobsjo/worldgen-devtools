@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.dfcommand.RandomState;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -16,7 +17,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -32,11 +32,11 @@ import java.util.Optional;
 
 public final class DfCommand{
 
-    private static final DynamicCommandExceptionType ERROR_INVALID_DENSITY_FUNCTION = new DynamicCommandExceptionType((object) -> Component.translatable("commands.jacobsjo.getdensity.density_function.invalid", object));
+    private static final DynamicCommandExceptionType ERROR_INVALID_DENSITY_FUNCTION = new DynamicCommandExceptionType((object) -> TextUtil.translatable("worldgendevtools.dfcommand.density_function.invalid", object));
 
-    private static final DynamicCommandExceptionType ERROR_INVALID_NOISE_ROUTER = new DynamicCommandExceptionType((object) -> Component.translatable("commands.jacobsjo.getdensity.noise_router.invalid", object));
+    private static final DynamicCommandExceptionType ERROR_INVALID_NOISE_ROUTER = new DynamicCommandExceptionType((object) -> TextUtil.translatable("worldgendevtools.dfcommand.noise_router.invalid", object));
 
-    private static final DynamicCommandExceptionType ERROR_NO_NOISE_ROUTER = new DynamicCommandExceptionType((objcet) -> Component.translatable("commands.jacobsjo.getdensity.noise_router.no"));
+    private static final DynamicCommandExceptionType ERROR_NO_NOISE_ROUTER = new DynamicCommandExceptionType((objcet) -> TextUtil.translatable("worldgendevtools.dfcommand.noise_router.no"));
 
     private static final Collection<String> NOISE_ROUTER_VALUES = Arrays.asList(
             "barrier",
@@ -128,7 +128,7 @@ public final class DfCommand{
 
         DecimalFormat format = new DecimalFormat("0.000");
 
-        commandSourceStack.sendSuccess(() -> Component.translatable("commands.jacobsjo.getdensity.result", format.format(value)), true);
+        commandSourceStack.sendSuccess(() -> TextUtil.translatable("worldgendevtools.dfcommand.result", format.format(value)), true);
         return (int) (value * 1000);
     }
 

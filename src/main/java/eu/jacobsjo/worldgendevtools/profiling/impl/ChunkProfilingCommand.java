@@ -2,6 +2,7 @@ package eu.jacobsjo.worldgendevtools.profiling.impl;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.profiling.ProfilingInit;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -62,9 +63,9 @@ public class ChunkProfilingCommand {
 
             int chunkCount = informations.size();
             if (chunkCount == 1) {
-                message.append(Component.translatable("worldgendevtools.profiling.command.header.one", centerChunkPos.toString()).withColor(HEADER_COLOR));
+                message.append(TextUtil.translatable("worldgendevtools.profiling.command.header.one", centerChunkPos.toString()).withColor(HEADER_COLOR));
             } else {
-                message.append(Component.translatable("worldgendevtools.profiling.command.header", chunkCount).withColor(HEADER_COLOR));
+                message.append(TextUtil.translatable("worldgendevtools.profiling.command.header", chunkCount).withColor(HEADER_COLOR));
             }
 
             BuiltInRegistries.CHUNK_STATUS
@@ -77,15 +78,15 @@ public class ChunkProfilingCommand {
                         Duration duration = sum.getStatusDuration(loc);
                         Duration average = duration.dividedBy(informations.size());
                         message.append("\n");
-                        message.append(Component.translatable("worldgendevtools.profiling.command.entry.key",
+                        message.append(TextUtil.translatable("worldgendevtools.profiling.command.entry.key",
                                 loc.getPath()
                         ).withColor(KEY_COLOR));
                         if (chunkCount == 1){
-                            message.append(Component.translatable("worldgendevtools.profiling.command.entry.value.single",
+                            message.append(TextUtil.translatable("worldgendevtools.profiling.command.entry.value.single",
                                     Component.literal(String.format("%.2f", duration.toNanos() * 1e-6)).withColor(NUMBER_COLOR)
                             ).withColor(TEXT_COLOR));
                         } else {
-                            message.append(Component.translatable("worldgendevtools.profiling.command.entry.value",
+                            message.append(TextUtil.translatable("worldgendevtools.profiling.command.entry.value",
                                     Component.literal(String.format("%.2f", average.toNanos() * 1e-6)).withColor(NUMBER_COLOR),
                                     Component.literal(String.format("%.2f", duration.toNanos() * 1e-6)).withColor(NUMBER_COLOR)
                             ).withColor(TEXT_COLOR));

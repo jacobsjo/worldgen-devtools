@@ -2,6 +2,7 @@ package eu.jacobsjo.worldgendevtools.locatefeature.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.logging.LogUtils;
+import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -52,7 +53,7 @@ public class LocateFeature {
             ChunkAccess chunk = source.getLevel().getChunk(sourcePos);
             FeaturePositions featurePositions = chunk.getAttached(LocateFeatureInit.FEATURE_POSITION_ATTACHMENT);
             if (featurePositions == null) {
-                source.sendFailure(Component.translatable("worldgendevtools.locatefeature.command.failure.no_attachment"));
+                source.sendFailure(TextUtil.translatable("worldgendevtools.locatefeature.command.failure.no_attachment"));
                 return 0;
             }
 
@@ -89,7 +90,7 @@ public class LocateFeature {
                 return showLocateResult(source, feature.location(), minPos.get(), sourcePos);
             }
         }
-        source.sendFailure(Component.translatable("worldgendevtools.locatefeature.command.failure.not_nearby", feature.location().toString()));
+        source.sendFailure(TextUtil.translatable("worldgendevtools.locatefeature.command.failure.not_nearby", feature.location().toString()));
         return -1;
     }
 
@@ -109,7 +110,7 @@ public class LocateFeature {
 
         String translationKey = (positions.size() == 1 ? "single" : (positions.size() <= 5) ? "multiple" : "many");
 
-        source.sendSuccess(() -> Component.translatable("worldgendevtools.locatefeature.command.success." + translationKey, location.toString(), positions.size(), positionsComponent, positions.size() - 5), true);
+        source.sendSuccess(() -> TextUtil.translatable("worldgendevtools.locatefeature.command.success." + translationKey, location.toString(), positions.size(), positionsComponent, positions.size() - 5), true);
 
         return (int) Math.round(Math.sqrt(sortedPositions.getFirst().distSqr(sourcePos)));
     }
@@ -127,7 +128,7 @@ public class LocateFeature {
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + position.getX() + " " + position.getY() + " " + position.getZ()))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
                 );
-        source.sendSuccess(() -> Component.translatable("worldgendevtools.locatefeature.command.success.nearby", location.toString(), component, dist), false);
+        source.sendSuccess(() -> TextUtil.translatable("worldgendevtools.locatefeature.command.success.nearby", location.toString(), component, dist), false);
         return dist;
     }
 }
