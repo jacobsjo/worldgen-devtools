@@ -1,4 +1,8 @@
 {
+  "modmenu.nameTranslation.worldgendevtools": "Worldgen Devtools",
+  "modmenu.descriptionTranslation.worldgendevtools": "A mod that aids in the development of world generation data packs and mods. Allows reloading worldgen data packs in-game and resetting chunks. Colors jigsaw blocks by name and target.",
+  "modmenu.summaryTranslation.worldgendevtools": "A mod that aids in the development of world generation data packs and mods.",
+
   "gamerule.reloadRegistries": "Reload registries",
   "gamerule.reloadRegistries.description": "Worldgen Devtools: Extend the /reload and /datapack enable|disable commands to reload all registries, such as worldgen definitions.",
   "gamerule.syncAfterRegistryReload": "Syncronize after registry reload",

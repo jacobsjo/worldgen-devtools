@@ -10,6 +10,13 @@
     "issues": "https://github.com/jacobsjo/worldgen-devtools/issues",
     "sources": "https://github.com/jacobsjo/worldgen-devtools"
   },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.github_sponsors": "https://github.com/sponsors/jacobsjo/"
+      }
+    }
+  },
   "license": "MIT",
   "icon": "assets/worldgendevtools/icon.png",
   "environment": "*",
