@@ -26,7 +26,6 @@
 
   "worldgendevtools.dfcommand.result": "Density: %s",
   "worldgendevtools.dfcommand.density_function.invalid": "Invalid density_function %s",
-  "worldgendevtools.dfcommand.noise_router.invalid": "Invalid noise router entry %s",
   "worldgendevtools.dfcommand.noise_router.no": "This dimension has no noise router",
 
   "worldgendevtools.locatefeature.command.success.single": "Found %s 1 time in chunk at %3$s",
@@ -38,14 +37,14 @@
 
   "worldgendevtools.profiling.command.no_information": "No chunks have profiling information saved",
   "worldgendevtools.profiling.command.header": "Profiling of %d chunks:",
-  "worldgendevtools.profiling.command.header.one": "Profiling of chunk %d:",
+  "worldgendevtools.profiling.command.header.one": "Profiling of chunk %s:",
   "worldgendevtools.profiling.command.entry.key": "[%s]: ",
   "worldgendevtools.profiling.command.entry.value": "%sms/chunk (total: %sms)",
   "worldgendevtools.profiling.command.entry.value.single": "%sms",
 
   "worldgendevtools.reloadregistries.failure": "Failed to reload registires. Registries are in indeterminate state. A world reload is needed.",
   "worldgendevtools.reloadregistries.error.registry": "> Errors in registry %s:\n",
-  "worldgendevtools.reloadregistries.error.element": "> Errors in element %s:\n",
+  "worldgendevtools.reloadregistries.error.element": ">> Errors in element %s:\n",
 
   "worldgendevtools.resetchunks.failed": "Failed to reset chunk %s",
   "worldgendevtools.resetchunks.success": "Marked %s chunks for reset",

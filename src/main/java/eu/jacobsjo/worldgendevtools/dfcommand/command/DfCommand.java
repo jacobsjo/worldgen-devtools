@@ -20,10 +20,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.NoiseRouter;
+import net.minecraft.world.level.levelgen.*;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -31,13 +28,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 public final class DfCommand{
-
     private static final DynamicCommandExceptionType ERROR_INVALID_DENSITY_FUNCTION = new DynamicCommandExceptionType((object) -> TextUtil.translatable("worldgendevtools.dfcommand.density_function.invalid", object));
-
-    private static final DynamicCommandExceptionType ERROR_INVALID_NOISE_ROUTER = new DynamicCommandExceptionType((object) -> TextUtil.translatable("worldgendevtools.dfcommand.noise_router.invalid", object));
-
     private static final DynamicCommandExceptionType ERROR_NO_NOISE_ROUTER = new DynamicCommandExceptionType((objcet) -> TextUtil.translatable("worldgendevtools.dfcommand.noise_router.no"));
-
     private static final Collection<String> NOISE_ROUTER_VALUES = Arrays.asList(
             "barrier",
             "fluid_level_floodedness",
@@ -101,7 +93,7 @@ public final class DfCommand{
                 case "vein_toggle" -> router.veinToggle();
                 case "vein_ridged" -> router.veinRidged();
                 case "vein_gap" -> router.veinGap();
-                default -> throw ERROR_INVALID_NOISE_ROUTER.create(routerDensityFunction);
+                default -> DensityFunctions.zero(); // this case should never happen.
             };
 
             return getDensity(commandSourceStack, densityFunction, pos, noiseBasedChunkGenerator.generatorSettings().value(), level);
@@ -145,6 +137,6 @@ public final class DfCommand{
     @SuppressWarnings("SameParameterValue")
     private static <T> Holder<T> getRegistryKeyType(CommandContext<CommandSourceStack> commandContext, String string, ResourceKey<Registry<T>> resourceKey, DynamicCommandExceptionType dynamicCommandExceptionType) throws CommandSyntaxException {
         ResourceKey<T> resourceKey2 = getRegistryType(commandContext, string, resourceKey, dynamicCommandExceptionType);
-        return getRegistry(commandContext, resourceKey).getHolder(resourceKey2).orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2.location()));
+        return getRegistry(commandContext, resourceKey).getHolder(resourceKey2).orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2.location().toString()));
     }
 }
