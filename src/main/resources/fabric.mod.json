@@ -18,7 +18,6 @@
       "eu.jacobsjo.worldgendevtools.dfcommand.DfCommandInit",
       "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
       "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit",
-      "eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.JigsawBlockEntityRenderingInit",
       "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit",
       "eu.jacobsjo.worldgendevtools.profiling.ProfilingInit",
       "eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit"
