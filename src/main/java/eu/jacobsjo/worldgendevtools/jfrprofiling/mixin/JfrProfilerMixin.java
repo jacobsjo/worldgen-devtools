@@ -1,28 +1,19 @@
 package eu.jacobsjo.worldgendevtools.jfrprofiling.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import eu.jacobsjo.worldgendevtools.jfrprofiling.api.FeatureGenerationEvent;
 import jdk.jfr.Event;
 import net.minecraft.util.profiling.jfr.JfrProfiler;
-import net.minecraft.util.profiling.jfr.event.*;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Mixin(JfrProfiler.class)
 public class JfrProfilerMixin {
-
-    @Shadow
-    @Final
-    @Mutable
-    private static final List<Class<? extends Event>> CUSTOM_EVENTS = List.of(
-            ChunkGenerationEvent.class,
-            ChunkRegionReadEvent.class,
-            ChunkRegionWriteEvent.class,
-            PacketReceivedEvent.class,
-            PacketSentEvent.class,
-            NetworkSummaryEvent.class,
-            ServerTickTimeEvent.class,
-            WorldLoadFinishedEvent.class,
-            FeatureGenerationEvent.class
-    );
+    @ModifyExpressionValue(method = "<clinit>", at = @At(value = "INVOKE", target = "Ljava/util/List;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;"))
+    private static List<Class<? extends Event>> addEvent(List<Class<? extends Event>> original){
+        return Stream.concat(original.stream(), Stream.of(FeatureGenerationEvent.class)).toList();
+    }
 }
