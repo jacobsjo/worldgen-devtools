@@ -22,28 +22,25 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ChunkMap.class)
 public abstract class ChunkMapMixin implements UpdatableGeneratorChunkMap {
 
-    @Shadow private ChunkGenerator generator;
-
     @Mutable @Shadow @Final private ChunkGeneratorStructureState chunkGeneratorState;
 
     @Mutable @Shadow @Final private RandomState randomState;
 
     @Shadow @Final ServerLevel level;
 
-    @Shadow private WorldGenContext worldGenContext;
+    @Mutable @Shadow @Final private WorldGenContext worldGenContext;
 
     @Override
     public void worldgenDevtools$setGenerator(ChunkGenerator generator) {
         RegistryAccess registryAccess = this.level.registryAccess();
 
-        this.generator = generator;
         long seed = this.level.getSeed();
         if (generator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
             this.randomState = RandomState.create((noiseBasedChunkGenerator.generatorSettings().value()), registryAccess.lookupOrThrow(Registries.NOISE), seed);
         } else {
             this.randomState = RandomState.create(NoiseGeneratorSettings.dummy(), registryAccess.lookupOrThrow(Registries.NOISE), seed);
         }
-        this.chunkGeneratorState = this.generator.createState(registryAccess.lookupOrThrow(Registries.STRUCTURE_SET), this.randomState, seed);
-        this.worldGenContext = new WorldGenContext(this.worldGenContext.level(), generator, this.worldGenContext.structureManager(), this.worldGenContext.lightEngine());
+        this.chunkGeneratorState = generator.createState(registryAccess.lookupOrThrow(Registries.STRUCTURE_SET), this.randomState, seed);
+        this.worldGenContext = new WorldGenContext(this.worldGenContext.level(), generator, this.worldGenContext.structureManager(), this.worldGenContext.lightEngine(), this.worldGenContext.mainThreadMailBox());
     }
 }
