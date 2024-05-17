@@ -5,6 +5,7 @@
   "name": "Worldgen Devtools",
   "description": "A mod that aids in the development of world generation data packs and mods. Allows reloading worldgen data packs in-game and resetting chunks. Colors jigsaw blocks by name and target.",
   "authors": ["jacobsjo"],
+  "contributors": ["Misode"],
   "contact": {
     "homepage": "https://modrinth.com/mod/worldgen-devtools",
     "issues": "https://github.com/jacobsjo/worldgen-devtools/issues",
@@ -41,6 +42,7 @@
     "worldgendevtools.loggingimprovements.mixins.json",
     "worldgendevtools.profiling.mixins.json",
     "worldgendevtools.locatefeature.mixins.json",
+    "worldgendevtools.jfrprofiling.mixins.json",
     {
       "config": "worldgendevtools.client.reloadregistries.mixins.json",
       "environment": "client"
