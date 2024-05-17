@@ -41,6 +41,7 @@
     "worldgendevtools.loggingimprovements.mixins.json",
     "worldgendevtools.profiling.mixins.json",
     "worldgendevtools.locatefeature.mixins.json",
+    "worldgendevtools.jfrprofiling.mixins.json",
     {
       "config": "worldgendevtools.client.reloadregistries.mixins.json",
       "environment": "client"
