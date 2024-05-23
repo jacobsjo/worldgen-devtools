@@ -16,10 +16,10 @@ import net.minecraft.world.level.block.entity.JigsawBlockEntity;
 import org.joml.Quaternionf;
 
 public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBlockEntity> {
-    private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation("worldgendevtools","textures/entity/jigsaw.png");
+    private static final ResourceLocation TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath("worldgendevtools","textures/entity/jigsaw.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucentCull(TEXTURE_LOCATION);
     private static final float OFFSET = 0.001f;
-    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = new ResourceLocation("empty");
+    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = ResourceLocation.withDefaultNamespace("empty");
 
     private static final ModelPart modelPart = new MeshDefinition().getRoot().addOrReplaceChild("cube", CubeListBuilder.create().texOffs(0, 0).addBox(0f, 0f, 0f, 16f, 16f, 16f), PartPose.ZERO).bake(64, 64);
     public JigsawBlockEntityRenderer(@SuppressWarnings("unused") BlockEntityRendererProvider.Context conext) { }
@@ -35,25 +35,25 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
 
         if (location.equals(EMPTY_RESOURCE_LOCATION)) {
             if (renderEmpty){
-                render(0.843f, 0.761f, 0.843f, orientation, poseStack, buffer, packedOverlay);
+                render( 0xFFD7ACD7, orientation, poseStack, buffer, packedOverlay);
             }
             return;
         }
 
         int hash = location.toString().hashCode();
-        float r = ((float) (hash & 0xFF)) / 0xFF;
-        float g = ((float) (hash >> 8 & 0xFF)) / 0xFF;
-        float b = ((float) (hash >> 16 & 0xFF)) / 0xFF;
+        int r = hash & 0xFF;
+        int g = hash >> 8 & 0xFF;
+        int b = hash >> 16 & 0xFF;
 
-        render(r, g, b, orientation, poseStack, buffer, packedOverlay);
+        render(0xFF000000 | r << 16 | g << 8 | b, orientation, poseStack, buffer, packedOverlay);
     }
 
-    public static void render(float r, float g, float b, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay){
+    public static void render(int argb, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay){
         poseStack.pushPose();
         poseStack.scale(1 + OFFSET * 2, 1 + OFFSET * 2, 1 + OFFSET * 2);
         poseStack.translate(-OFFSET, -OFFSET, -OFFSET);
         poseStack.rotateAround(getRotation(orientation), 0.5f, 0.5f, 0.5f);
-        modelPart.render(poseStack, buffer.getBuffer(RENDER_TYPE), 0xF000F0, packedOverlay, r, g, b, 1.0f);
+        modelPart.render(poseStack, buffer.getBuffer(RENDER_TYPE), 0xF000F0, packedOverlay, argb);
         poseStack.popPose();
     }
 

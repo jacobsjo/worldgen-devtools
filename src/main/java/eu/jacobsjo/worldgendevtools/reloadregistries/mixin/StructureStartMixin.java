@@ -46,7 +46,7 @@ public class StructureStartMixin implements HolderStructureStart {
     @Inject(method = "loadStaticStart", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
     private static void loadStaticStart(StructurePieceSerializationContext structurePieceSerializationContext, CompoundTag compoundTag, long l, CallbackInfoReturnable<StructureStart> cir, String string){
         Registry<Structure> registry = structurePieceSerializationContext.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getHolderOrThrow(ResourceKey.create(Registries.STRUCTURE, new ResourceLocation(string))));
+        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getHolderOrThrow(ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(string))));
     }
 
     /**

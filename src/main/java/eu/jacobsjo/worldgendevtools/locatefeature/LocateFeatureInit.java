@@ -11,7 +11,7 @@ public class LocateFeatureInit implements ModInitializer {
     public static final AttachmentType<FeaturePositions> FEATURE_POSITION_ATTACHMENT = AttachmentRegistry.<FeaturePositions>builder()
             .initializer(FeaturePositions::new)
             .persistent(FeaturePositions.CODEC)
-            .buildAndRegister(new ResourceLocation("worldgendevtools", "feature_positions"));
+            .buildAndRegister(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "feature_positions"));
 
     @Override
     public void onInitialize() {

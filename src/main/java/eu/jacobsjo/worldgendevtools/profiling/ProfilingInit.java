@@ -13,7 +13,7 @@ public class ProfilingInit implements ModInitializer {
     public static final AttachmentType<ChunkgenProfilingInformation> PROFILING_ATTACHMENT = AttachmentRegistry.<ChunkgenProfilingInformation>builder()
             .initializer(ChunkgenProfilingInformation::new)
             .persistent(ChunkgenProfilingInformation.CODEC)
-            .buildAndRegister(new ResourceLocation("worldgendevtools", "profiling"));
+            .buildAndRegister(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "profiling"));
 
     @Override
     public void onInitialize() {

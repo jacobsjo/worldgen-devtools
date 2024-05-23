@@ -70,7 +70,7 @@ public final class RandomState {
 
             private DensityFunction wrapNew(DensityFunction densityFunction) {
                 if (densityFunction instanceof BlendedNoise blendedNoise) {
-                    RandomSource randomSource = bl ? this.newLegacyInstance(0L) : RandomState.this.random.fromHashOf(new ResourceLocation("terrain"));
+                    RandomSource randomSource = bl ? this.newLegacyInstance(0L) : RandomState.this.random.fromHashOf(ResourceLocation.withDefaultNamespace("terrain"));
                     return blendedNoise.withNewRandom(randomSource);
                 } else {
                     return (densityFunction instanceof DensityFunctions.EndIslandDensityFunction ? DensityFunctions.endIslands(l) : densityFunction);

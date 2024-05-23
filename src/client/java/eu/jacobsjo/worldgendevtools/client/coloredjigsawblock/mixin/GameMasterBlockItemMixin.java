@@ -18,7 +18,7 @@ import java.util.List;
 public class GameMasterBlockItemMixin extends BlockItem {
 
     @Unique
-    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = new ResourceLocation("empty");
+    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = ResourceLocation.withDefaultNamespace("empty");
 
     public GameMasterBlockItemMixin(Block block, Properties properties) {
         super(block, properties);

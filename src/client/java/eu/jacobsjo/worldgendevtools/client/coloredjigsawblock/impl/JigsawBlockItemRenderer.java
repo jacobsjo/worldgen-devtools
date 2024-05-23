@@ -14,7 +14,7 @@ import net.minecraft.world.item.component.CustomData;
 
 public class JigsawBlockItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
 
-    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = new ResourceLocation("empty");
+    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = ResourceLocation.withDefaultNamespace("empty");
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack poseStack, MultiBufferSource buffer, int light, int overlay) {
         TypedDataComponent<CustomData> blockEntityData = stack.getComponents().getTyped(DataComponents.BLOCK_ENTITY_DATA);
