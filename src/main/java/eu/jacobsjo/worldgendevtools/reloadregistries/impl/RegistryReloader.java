@@ -198,7 +198,7 @@ public class RegistryReloader {
     }
 
     private static <T> RegistryOps.RegistryInfo<T> createInfoForContextRegistry(Registry<T> registry) {
-        return new RegistryOps.RegistryInfo<>(registry.asLookup(), registry.asTagAddingLookup(), registry.registryLifecycle());
+        return new RegistryOps.RegistryInfo<>(registry.asLookup(), registry.asLookup(), registry.registryLifecycle());
     }
 
     private static RegistryOps.RegistryInfoLookup getRegistrtyInfoLookup(RegistryAccess.Frozen contextLayer, RegistryAccess.Frozen newLayer, boolean reset){
