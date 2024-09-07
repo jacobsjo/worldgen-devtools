@@ -60,7 +60,7 @@ public abstract class ChunkMapMixin extends ChunkStorage implements ResettableCh
             distanceManager.tickets.remove(chunkPos.toLong()); // deletes tickets from unloaded chunks, to make sure they are reloaded before usage.
 
             // this removes the chunks from disk, so they are regenerated when reloading the chunk
-            this.write(chunkPos, null);
+            this.write(chunkPos, () -> null);
 
             // this makes the playerTicketManager readd the player tickets we just deleted, so the chunk gets reloaded and sent to the client.
             int level = distanceManager.playerTicketManager.getLevel(chunkPos.toLong());
