@@ -43,6 +43,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
     @Shadow public abstract ResourceKey<? extends Registry<T>> key();
 
+    @Shadow private MappedRegistry.TagSet<T> allTags;
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys = new HashSet<>();
     @Unique private final Set<ResourceKey<T>> requiredNewKeys = new HashSet<>();
@@ -64,6 +65,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
         this.frozen = false;
         this.reloading = true;
+        this.allTags = MappedRegistry.TagSet.unbound();
     }
 
     /**

@@ -8,6 +8,7 @@ accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker
 accessible method net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker getLevel (J)I
 accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker haveTicketFor (I)Z
 accessible method net/minecraft/server/level/ChunkMap generator ()Lnet/minecraft/world/level/chunk/ChunkGenerator;
+accessible class net/minecraft/core/MappedRegistry$TagSet
 
 accessible field net/minecraft/server/network/ServerConfigurationPacketListenerImpl synchronizeRegistriesTask Lnet/minecraft/server/network/config/SynchronizeRegistriesTask;
 accessible field net/minecraft/server/network/ServerConfigurationPacketListenerImpl configurationTasks Ljava/util/Queue;
