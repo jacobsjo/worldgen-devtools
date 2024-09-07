@@ -80,7 +80,7 @@ public class RegistryReloader {
         List<IllegalStateException> freezingExceptions = new ArrayList<>();
         RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
             try {
-                Registry<?> registry = worldgenNewLayer.registry(data.key()).orElseThrow();
+                Registry<?> registry = worldgenNewLayer.lookupOrThrow(data.key());
                 registry.freeze();
             } catch (IllegalStateException e){
                 freezingExceptions.add(e);
@@ -179,7 +179,7 @@ public class RegistryReloader {
             RegistryAccess.Frozen layer,
             Map<ResourceKey<?>, Exception> exceptionMap
     ){
-        Optional<Registry<T>> registry = layer.registry(data.key());
+        Optional<Registry<T>> registry = layer.lookup(data.key());
         if (registry.isEmpty()){
             exceptionMap.put(data.key(), new Exception("Registry doesn't exist"));
             return;
@@ -194,11 +194,11 @@ public class RegistryReloader {
     }
 
     private static <T> RegistryOps.RegistryInfo<T> createInfoForNewRegistry(WritableRegistry<T> writableRegistry) {
-        return new RegistryOps.RegistryInfo<>(writableRegistry.asLookup(), writableRegistry.createRegistrationLookup(), writableRegistry.registryLifecycle());
+        return new RegistryOps.RegistryInfo<>(writableRegistry, writableRegistry.createRegistrationLookup(), writableRegistry.registryLifecycle());
     }
 
     private static <T> RegistryOps.RegistryInfo<T> createInfoForContextRegistry(Registry<T> registry) {
-        return new RegistryOps.RegistryInfo<>(registry.asLookup(), registry.asLookup(), registry.registryLifecycle());
+        return new RegistryOps.RegistryInfo<>(registry, registry, registry.registryLifecycle());
     }
 
     private static RegistryOps.RegistryInfoLookup getRegistrtyInfoLookup(RegistryAccess.Frozen contextLayer, RegistryAccess.Frozen newLayer, boolean reset){

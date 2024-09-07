@@ -32,15 +32,14 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     @Shadow @Final private Map<ResourceKey<T>, Holder.Reference<T>> byKey;
     @Shadow @Final private Map<T, Holder.Reference<T>> byValue;
     @Shadow private boolean frozen;
-    @Shadow public abstract @Nullable T get(@Nullable ResourceKey<T> key);
+    @Shadow public abstract @Nullable T getValue(@Nullable ResourceKey<T> key);
     @Shadow public abstract int getId(@Nullable T value);
     @Shadow private @Nullable Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
-    @Shadow @Final ResourceKey<? extends Registry<T>> key;
-    @Shadow public abstract HolderOwner<T> holderOwner();
+    @Shadow @Final private ResourceKey<? extends Registry<T>> key;
     @Shadow private Lifecycle registryLifecycle;
     @Shadow @Final private Map<ResourceKey<T>, RegistrationInfo> registrationInfos;
 
-    @Shadow public abstract Optional<Holder.Reference<T>> getHolder(ResourceKey<T> key);
+    @Shadow public abstract Optional<Holder.Reference<T>> get(ResourceKey<T> key);
 
     @Shadow public abstract ResourceKey<? extends Registry<T>> key();
 
@@ -77,7 +76,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
             this.outdatedKeys.forEach(key -> {
                 RegistryReloader.LOGGER.info("Outdated element {} remains in registry", key);
-                Holder.Reference<T> holder = this.getHolder(key).orElseThrow();
+                Holder.Reference<T> holder = this.get(key).orElseThrow();
                 ((OutdatedHolder) holder).worldgenDevtools$markOutdated(true);
             });
             if (!this.requiredNewKeys.isEmpty()){
@@ -95,7 +94,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
             // existing element that is changed
             this.outdatedKeys.remove(key);
             this.requiredNewKeys.remove(key);
-            T oldValue = this.get(key);
+            T oldValue = this.getValue(key);
             int id = this.getId(oldValue);
 
             this.toId.remove(oldValue, id);
@@ -106,7 +105,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
                 Util.pauseInIde(new IllegalStateException("Adding duplicate value '" + value + "' to registry"));
             }
 
-            Holder.Reference<T> reference = this.byKey.computeIfAbsent(key, resourceKeyx -> Holder.Reference.createStandAlone(this.holderOwner(), resourceKeyx));
+            Holder.Reference<T> reference = this.byKey.computeIfAbsent(key, resourceKeyx -> Holder.Reference.createStandAlone((MappedRegistry<T>) (Object) this, resourceKeyx));
             ((OutdatedHolder) reference).worldgenDevtools$markOutdated(false);
 
             this.byKey.put(key, reference);

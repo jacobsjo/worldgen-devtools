@@ -25,10 +25,10 @@ public class ItemRendererMixin {
     /**
      * Hack to allow the Jigsaw items to render both the normal model and the registered DynamicItemRenderer.
      */
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V", shift = At.Shift.AFTER))
-    public void render(ItemStack itemStack, ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model, CallbackInfo ci){
+    @Inject(method = "renderItem", at = @At("HEAD"))
+    public void renderSimpleItemModel(ItemStack itemStack, ItemDisplayContext itemDisplayContext, PoseStack poseStack, MultiBufferSource multiBufferSource, int combinedLight, int combinedOverlay, BakedModel bakedModel, boolean bl, CallbackInfo ci){
         if (itemStack.getItem().equals(Items.JIGSAW)){
-            this.blockEntityRenderer.renderByItem(itemStack, displayContext, poseStack, buffer, combinedLight, combinedOverlay);
+            this.blockEntityRenderer.renderByItem(itemStack, itemDisplayContext, poseStack, multiBufferSource, combinedLight, combinedOverlay);
         }
     }
 

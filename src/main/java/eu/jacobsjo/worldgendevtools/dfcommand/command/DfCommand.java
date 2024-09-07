@@ -113,7 +113,7 @@ public final class DfCommand{
     }
 
     public static int getDensity(CommandSourceStack commandSourceStack, DensityFunction densityFunction, BlockPos pos, NoiseGeneratorSettings generatorSettings, ServerLevel level){
-        HolderGetter.Provider registryAccess = level.registryAccess().asGetterLookup();
+        HolderGetter.Provider registryAccess = level.registryAccess();
         RandomState randomState = RandomState.create(generatorSettings, registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed());
 
         double value = densityFunction.mapAll(randomState.getVisitor()).compute( new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
@@ -131,12 +131,12 @@ public final class DfCommand{
     }
 
     private static <T> Registry<T> getRegistry(CommandContext<CommandSourceStack> commandContext, ResourceKey<? extends Registry<T>> resourceKey) {
-        return commandContext.getSource().getServer().registryAccess().registryOrThrow(resourceKey);
+        return commandContext.getSource().getServer().registryAccess().lookupOrThrow(resourceKey);
     }
 
     @SuppressWarnings("SameParameterValue")
     private static <T> Holder<T> getRegistryKeyType(CommandContext<CommandSourceStack> commandContext, String string, ResourceKey<Registry<T>> resourceKey, DynamicCommandExceptionType dynamicCommandExceptionType) throws CommandSyntaxException {
         ResourceKey<T> resourceKey2 = getRegistryType(commandContext, string, resourceKey, dynamicCommandExceptionType);
-        return getRegistry(commandContext, resourceKey).getHolder(resourceKey2).orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2.location().toString()));
+        return getRegistry(commandContext, resourceKey).get(resourceKey2).orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2.location().toString()));
     }
 }

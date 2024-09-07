@@ -1,5 +1,6 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.HolderStructureStart;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -21,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 /**
  * In vanilla, {@link StructureStart} uses direct references to {@link Structure}s. This is problematic when reloading the
@@ -43,10 +43,10 @@ public class StructureStartMixin implements HolderStructureStart {
     /**
      * calls {@link #worldgenDevtools$setHolder} after creation from loading.
      */
-    @Inject(method = "loadStaticStart", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void loadStaticStart(StructurePieceSerializationContext structurePieceSerializationContext, CompoundTag compoundTag, long l, CallbackInfoReturnable<StructureStart> cir, String string){
-        Registry<Structure> registry = structurePieceSerializationContext.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getHolderOrThrow(ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(string))));
+    @Inject(method = "loadStaticStart", at = @At("RETURN"))
+    private static void loadStaticStart(StructurePieceSerializationContext structurePieceSerializationContext, CompoundTag compoundTag, long l, CallbackInfoReturnable<StructureStart> cir, @Local String string){
+        Registry<Structure> registry = structurePieceSerializationContext.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getOrThrow(ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(string))));
     }
 
     /**

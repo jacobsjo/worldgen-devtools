@@ -39,7 +39,7 @@ public class ResetChunksCommand {
         // discard entities in affected chunks
         ChunkPos minChunkPos = new ChunkPos(centerChunkPos.x - range, centerChunkPos.z - range);
         ChunkPos maxChunkPos = new ChunkPos(centerChunkPos.x + range, centerChunkPos.z + range);
-        AABB aabb = new AABB(minChunkPos.getMinBlockX(), level.getMinBuildHeight(), minChunkPos.getMinBlockZ(), maxChunkPos.getMaxBlockX(), level.getMaxBuildHeight(), maxChunkPos.getMaxBlockZ());
+        AABB aabb = new AABB(minChunkPos.getMinBlockX(), level.getMinY(), minChunkPos.getMinBlockZ(), maxChunkPos.getMaxBlockX(), level.getMaxY(), maxChunkPos.getMaxBlockZ());
         level.getEntitiesOfClass(Entity.class, aabb, entity -> !(entity instanceof Player)).forEach(Entity::discard);
 
         // reset chunks

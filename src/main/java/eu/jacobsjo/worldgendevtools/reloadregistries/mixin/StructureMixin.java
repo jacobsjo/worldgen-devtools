@@ -31,8 +31,8 @@ public abstract class StructureMixin {
     @Inject(method = "generate", at = @At("RETURN"), cancellable = true)
     public void generate(RegistryAccess registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkPos chunkPos, int i, LevelHeightAccessor levelHeightAccessor, Predicate<Holder<Biome>> predicate, CallbackInfoReturnable<StructureStart> cir) {
         try {
-            Registry<Structure> registry = registryAccess.registry(Registries.STRUCTURE).orElseThrow();
-            ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getHolderOrThrow(registry.getResourceKey((Structure) (Object) this).orElseThrow()));
+            Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
+            ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.get(registry.getResourceKey((Structure) (Object) this).orElseThrow()).orElseThrow());
         } catch(Exception e)  {
             cir.setReturnValue(StructureStart.INVALID_START);
         }

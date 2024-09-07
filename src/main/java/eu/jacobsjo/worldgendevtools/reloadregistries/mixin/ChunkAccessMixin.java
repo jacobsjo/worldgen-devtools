@@ -65,14 +65,14 @@ public class ChunkAccessMixin {
     @Inject(method = "getStartForStructure", at=@At("HEAD"), cancellable = true)
     public void getStartForStructure(Structure structure, CallbackInfoReturnable<StructureStart> cir) {
         if (registryAccess == null) return;
-        cir.setReturnValue(this.structureStartsByLocation.get(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure)));
+        cir.setReturnValue(this.structureStartsByLocation.get(registryAccess.lookupOrThrow(Registries.STRUCTURE).getKey(structure)));
         cir.cancel();
     }
 
     @Inject(method = "setStartForStructure", at=@At("HEAD"), cancellable = true)
     public void setStartForStructure(Structure structure, StructureStart structureStart, CallbackInfo ci) {
         if (registryAccess == null) return;
-        this.structureStartsByLocation.put(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), structureStart);
+        this.structureStartsByLocation.put(registryAccess.lookupOrThrow(Registries.STRUCTURE).getKey(structure), structureStart);
         this.unsaved = true;
         ci.cancel();
     }
@@ -80,7 +80,7 @@ public class ChunkAccessMixin {
     @Inject(method = "getAllStarts", at=@At("HEAD"), cancellable = true)
     public void getAllStarts(CallbackInfoReturnable<Map<Structure, StructureStart>> cir) {
         if (registryAccess == null) return;
-        cir.setReturnValue(Collections.unmodifiableMap(this.structureStartsByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(registryAccess.registryOrThrow(Registries.STRUCTURE).get(e.getKey()), e.getValue()), HashMap::putAll)));
+        cir.setReturnValue(Collections.unmodifiableMap(this.structureStartsByLocation.entrySet().stream().collect(HashMap::new, (m, e) -> m.put(registryAccess.lookupOrThrow(Registries.STRUCTURE).getValue(e.getKey()), e.getValue()), HashMap::putAll)));
         cir.cancel();
     }
 
@@ -88,7 +88,7 @@ public class ChunkAccessMixin {
     public void setAllStarts(Map<Structure, StructureStart> structureStarts, CallbackInfo ci) {
         if (registryAccess == null) return;
         this.structureStartsByLocation.clear();
-        structureStarts.forEach((structure, structureStart) -> this.structureStartsByLocation.put(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), structureStart));
+        structureStarts.forEach((structure, structureStart) -> this.structureStartsByLocation.put(registryAccess.lookupOrThrow(Registries.STRUCTURE).getKey(structure), structureStart));
         this.unsaved = true;
         ci.cancel();
     }
@@ -96,14 +96,14 @@ public class ChunkAccessMixin {
     @Inject(method = "getReferencesForStructure", at=@At("HEAD"), cancellable = true)
     public void getReferencesForStructure(Structure structure, CallbackInfoReturnable<LongSet> cir) {
         if (registryAccess == null) return;
-        cir.setReturnValue(this.structuresRefencesByLocation.getOrDefault(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), EMPTY_REFERENCE_SET));
+        cir.setReturnValue(this.structuresRefencesByLocation.getOrDefault(registryAccess.lookupOrThrow(Registries.STRUCTURE).getKey(structure), EMPTY_REFERENCE_SET));
         cir.cancel();
     }
 
     @Inject(method = "addReferenceForStructure", at=@At("HEAD"), cancellable = true)
     public void addReferenceForStructure(Structure structure, long reference, CallbackInfo ci) {
         if (registryAccess == null) return;
-        (this.structuresRefencesByLocation.computeIfAbsent(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), (structurex) -> new LongOpenHashSet())).add(reference);
+        (this.structuresRefencesByLocation.computeIfAbsent(registryAccess.lookupOrThrow(Registries.STRUCTURE).getKey(structure), (structurex) -> new LongOpenHashSet())).add(reference);
         this.unsaved = true;
         ci.cancel();
     }
@@ -115,7 +115,7 @@ public class ChunkAccessMixin {
                 this.structuresRefencesByLocation
                         .entrySet()
                         .stream()
-                        .map(e -> new AbstractMap.SimpleEntry<>(registryAccess.registryOrThrow(Registries.STRUCTURE).get(e.getKey()), e.getValue()))
+                        .map(e -> new AbstractMap.SimpleEntry<>(registryAccess.lookupOrThrow(Registries.STRUCTURE).getValue(e.getKey()), e.getValue()))
                         .filter(e -> e.getKey() != null)
                         .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll)));
         cir.cancel();
@@ -125,7 +125,7 @@ public class ChunkAccessMixin {
     public void setAllReferences(Map<Structure, LongSet> structureReferencesMap, CallbackInfo ci) {
         if (registryAccess == null) return;
         this.structuresRefencesByLocation.clear();
-        structureReferencesMap.forEach((structure, reference) -> this.structuresRefencesByLocation.put(registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure), reference));
+        structureReferencesMap.forEach((structure, reference) -> this.structuresRefencesByLocation.put(registryAccess.lookupOrThrow(Registries.STRUCTURE).getKey(structure), reference));
         this.unsaved = true;
         ci.cancel();
     }

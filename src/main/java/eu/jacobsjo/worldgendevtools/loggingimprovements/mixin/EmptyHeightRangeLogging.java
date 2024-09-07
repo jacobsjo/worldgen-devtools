@@ -38,7 +38,7 @@ public class EmptyHeightRangeLogging {
     private void logFeature(RandomSource random, WorldGenerationContext context, CallbackInfoReturnable<Integer> cir){
         if (context instanceof PlacementContext placementContext){
             Optional<PlacedFeature> topFeature = placementContext.topFeature();
-            Registry<PlacedFeature> registry = placementContext.getLevel().registryAccess().registry(Registries.PLACED_FEATURE).orElseThrow();
+            Registry<PlacedFeature> registry = placementContext.getLevel().registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
             if (topFeature.isPresent()){
                 ResourceLocation key = registry.getKey(topFeature.get());
                 if (key != null) {
