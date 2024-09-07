@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Mixin(MappedRegistry.class)
-public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
+public abstract class MappedRegistryMixin<T> implements ReloadableRegistry  {
     @Shadow @Final private ObjectList<Holder.Reference<T>> byId;
     @Shadow @Final private Reference2IntMap<T> toId;
     @Shadow @Final private Map<ResourceLocation, Holder.Reference<T>> byLocation;
@@ -43,7 +43,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
 
     @Shadow public abstract ResourceKey<? extends Registry<T>> key();
 
-    @Shadow private MappedRegistry.TagSet<T> allTags;
+    @Shadow MappedRegistry.TagSet<T> allTags;
     @Unique private boolean reloading = false;
     @Unique private Set<ResourceKey<T>> outdatedKeys = new HashSet<>();
     @Unique private final Set<ResourceKey<T>> requiredNewKeys = new HashSet<>();
@@ -90,6 +90,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry {
     /**
      * when registering into a reloading registry, override existing ResourceLocations and unmark key as outdated.
      */
+    @SuppressWarnings("unchecked")
     @Inject(method = "register", at = @At("HEAD"), cancellable = true)
     public void register(ResourceKey<T> key, T value, RegistrationInfo registrationInfo, CallbackInfoReturnable<Holder.Reference<T>> cir) {
         if (this.reloading && this.byLocation.containsKey(key.location())){
