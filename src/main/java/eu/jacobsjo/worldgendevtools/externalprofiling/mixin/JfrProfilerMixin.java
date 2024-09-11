@@ -1,7 +1,7 @@
-package eu.jacobsjo.worldgendevtools.jfrprofiling.mixin;
+package eu.jacobsjo.worldgendevtools.externalprofiling.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import eu.jacobsjo.worldgendevtools.jfrprofiling.api.FeatureGenerationEvent;
+import eu.jacobsjo.worldgendevtools.externalprofiling.api.FeatureGenerationEvent;
 import jdk.jfr.Event;
 import net.minecraft.util.profiling.jfr.JfrProfiler;
 import org.spongepowered.asm.mixin.Mixin;

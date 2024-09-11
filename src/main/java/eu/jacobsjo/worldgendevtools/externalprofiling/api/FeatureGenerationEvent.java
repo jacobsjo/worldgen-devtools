@@ -1,4 +1,4 @@
-package eu.jacobsjo.worldgendevtools.jfrprofiling.api;
+package eu.jacobsjo.worldgendevtools.externalprofiling.api;
 
 import jdk.jfr.*;
 import net.minecraft.resources.ResourceKey;

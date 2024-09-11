@@ -6,6 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
@@ -45,12 +47,18 @@ public class PlacedFeatureMixin {
 
         MutableBoolean mutableBoolean = new MutableBoolean();
         stream.forEach(blockPos -> {
-            if (configuredFeature.place(context.getLevel(), context.generator(), source, blockPos)) {
-                mutableBoolean.setTrue();
+            try (Zone zone =  Profiler.get().zone("configuredFeature")) {
+                key.ifPresent(configuredFeatureResourceKey -> zone.addText(configuredFeatureResourceKey.location().toString()));
 
-                if (key.isPresent()){
-                    FeaturePositions positions = context.getLevel().getChunk(blockPos).getAttachedOrCreate(LocateFeatureInit.FEATURE_POSITION_ATTACHMENT);
-                    positions.getPositions(key.get()).add(blockPos);
+                if (configuredFeature.place(context.getLevel(), context.generator(), source, blockPos)) {
+                    mutableBoolean.setTrue();
+
+                    if (key.isPresent()) {
+                        FeaturePositions positions = context.getLevel().getChunk(blockPos).getAttachedOrCreate(LocateFeatureInit.FEATURE_POSITION_ATTACHMENT);
+                        positions.getPositions(key.get()).add(blockPos);
+                    }
+                } else {
+                    zone.addText("(not placed)");
                 }
             }
         });
