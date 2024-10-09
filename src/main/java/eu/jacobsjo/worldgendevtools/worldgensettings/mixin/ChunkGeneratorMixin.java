@@ -6,6 +6,7 @@ import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.storage.ServerLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,7 +19,7 @@ public class ChunkGeneratorMixin {
      */
     @Inject(method= "applyBiomeDecoration", at=@At("HEAD"), cancellable = true)
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager, CallbackInfo ci) {
-        if (!level.getLevelData().getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().features){
+        if (!((ServerLevelData) level.getLevelData()).getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().features){
             ci.cancel();
         }
     }

@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.gamerule.v1.rule.EnumRule;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -34,13 +35,13 @@ public class WorldgenSettingsInit implements ModInitializer {
         SAVE_CHUNKS = GameRuleRegistry.register("saveChunks", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
 
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
-            if (!world.getGameRules().getRule(SAVE_CHUNKS).get()){
+            if (!((ServerLevel) world).getGameRules().getRule(SAVE_CHUNKS).get()){
                 showWarning(player);
             }
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (!player.isSpectator() && !world.getGameRules().getRule(SAVE_CHUNKS).get()){
+            if (!player.isSpectator() && world instanceof ServerLevel && !((ServerLevel) world).getGameRules().getRule(SAVE_CHUNKS).get()){
                 showWarning(player);
             }
             return InteractionResult.PASS;
