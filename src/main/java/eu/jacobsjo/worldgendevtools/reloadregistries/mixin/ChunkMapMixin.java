@@ -41,6 +41,6 @@ public abstract class ChunkMapMixin implements UpdatableGeneratorChunkMap {
             this.randomState = RandomState.create(NoiseGeneratorSettings.dummy(), registryAccess.lookupOrThrow(Registries.NOISE), seed);
         }
         this.chunkGeneratorState = generator.createState(registryAccess.lookupOrThrow(Registries.STRUCTURE_SET), this.randomState, seed);
-        this.worldGenContext = new WorldGenContext(this.worldGenContext.level(), generator, this.worldGenContext.structureManager(), this.worldGenContext.lightEngine(), this.worldGenContext.mainThreadExecutor());
+        this.worldGenContext = new WorldGenContext(this.worldGenContext.level(), generator, this.worldGenContext.structureManager(), this.worldGenContext.lightEngine(), this.worldGenContext.mainThreadExecutor(), this.worldGenContext.unsavedListener());
     }
 }
