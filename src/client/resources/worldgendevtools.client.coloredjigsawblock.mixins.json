@@ -6,8 +6,7 @@
   "mixins": [
   ],
   "client": [
-    "GameMasterBlockItemMixin",
-    "ItemRendererMixin"
+    "GameMasterBlockItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

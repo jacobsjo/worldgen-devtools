@@ -1,0 +1,21 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "minecraft:block/jigsaw"
+      },
+      {
+        "type": "minecraft:model",
+        "model": "worldgendevtools:item/jigsaw_overlay",
+        "tints": [
+          {
+            "type": "worldgendevtools:jigsaw",
+            "default": 14134487
+          }
+        ]
+      }
+    ]
+  }
+}

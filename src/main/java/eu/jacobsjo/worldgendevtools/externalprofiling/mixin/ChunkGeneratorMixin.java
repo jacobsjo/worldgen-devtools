@@ -9,10 +9,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -47,10 +49,10 @@ public class ChunkGeneratorMixin {
     @WrapMethod(
             method = "tryGenerateStructure"
     )
-    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos, Operation<Boolean> original){
+    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, Operation<Boolean> original){
         try (Zone zone = Profiler.get().zone("structure")) {
             zone.addText(structureSelectionEntry.structure().getRegisteredName());
-            boolean result = original.call(structureSelectionEntry, structureManager, registryAccess, random, structureTemplateManager, seed, chunk, chunkPos, sectionPos);
+            boolean result = original.call(structureSelectionEntry, structureManager, registryAccess, random, structureTemplateManager, seed, chunk, chunkPos, sectionPos, resourceKey);
             if (!result) {
                 zone.addText("(not placed)");
             }

@@ -27,16 +27,13 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     @Override
     public void render(JigsawBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
 
-        JigsawBlockEntityRenderer.render(blockEntity.getName(), blockEntity.getTarget(), blockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION), poseStack, buffer, packedOverlay, false);
+        JigsawBlockEntityRenderer.render(blockEntity.getName(), blockEntity.getTarget(), blockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION), poseStack, buffer, packedOverlay);
     }
 
-    public static void render(ResourceLocation name, ResourceLocation target, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay, boolean renderEmpty) {
+    public static void render(ResourceLocation name, ResourceLocation target, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay) {
         ResourceLocation location = name.equals(EMPTY_RESOURCE_LOCATION) ? target : name;
 
         if (location.equals(EMPTY_RESOURCE_LOCATION)) {
-            if (renderEmpty){
-                render( 0xFFD7ACD7, orientation, poseStack, buffer, packedOverlay);
-            }
             return;
         }
 

@@ -1,0 +1,53 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "side": "worldgendevtools:block/jigsaw_side_overlay",
+    "top": "worldgendevtools:block/jigsaw_top_overlay",
+    "lock": "worldgendevtools:block/jigsaw_lock_overlay"
+  },
+  "elements": [
+    {
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "down":  { "texture": "#side", "cullface": "down", "rotation":  180, "tintindex": 0 },
+        "up":    { "texture": "#lock", "cullface": "up", "tintindex": 0 },
+        "north": { "texture": "#top", "cullface": "north", "tintindex": 0 },
+        "west":  { "texture": "#side", "cullface": "west", "rotation":  270, "tintindex": 0 },
+        "east":  { "texture": "#side", "cullface": "east", "rotation":  90, "tintindex": 0 }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [ 30, 225, 0 ],
+      "translation": [ 0, 0, 0],
+      "scale":[ 0.626, 0.626, 0.626 ]
+    },
+    "ground": {
+      "rotation": [ 0, 0, 0 ],
+      "translation": [ 0, 3, 0],
+      "scale":[ 0.251, 0.251, 0.251 ]
+    },
+    "fixed": {
+      "rotation": [ 0, 0, 0 ],
+      "translation": [ 0, 0, 0],
+      "scale":[ 0.501, 0.501, 0.501 ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [ 75, 45, 0 ],
+      "translation": [ 0, 2.5, 0],
+      "scale": [ 0.376, 0.376, 0.376 ]
+    },
+    "firstperson_righthand": {
+      "rotation": [ 0, 45, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 0.401, 0.401, 0.401 ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [ 0, 225, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 0.401, 0.401, 0.401 ]
+    }
+  }
+}
