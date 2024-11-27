@@ -6,13 +6,16 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.color.item.ItemTintSource;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public record JigsawTintSource(int defaultColor) implements ItemTintSource {
@@ -23,7 +26,7 @@ public record JigsawTintSource(int defaultColor) implements ItemTintSource {
     );
 
     @Override
-    public int calculate(ItemStack stack) {
+    public int calculate(ItemStack stack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity) {
         TypedDataComponent<CustomData> blockEntityData = stack.getComponents().getTyped(DataComponents.BLOCK_ENTITY_DATA);
         if (blockEntityData == null)
             return this.defaultColor;

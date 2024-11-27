@@ -19,5 +19,3 @@ mutable field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/min
 
 accessible field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
 mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
-
-accessible field net/minecraft/client/color/item/ItemTintSources ID_MAPPER Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;
