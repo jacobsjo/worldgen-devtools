@@ -16,8 +16,7 @@ public class ColorUtil {
             case 2 -> new RGB(p, value, t);
             case 3 -> new RGB(p, q, value);
             case 4 -> new RGB(t, p, value);
-            case 5 -> new RGB(value, p, q);
-            default -> throw new RuntimeException("Can't convert hsv to rgb");
+            default -> new RGB(value, p, q);
         };
     }
 
