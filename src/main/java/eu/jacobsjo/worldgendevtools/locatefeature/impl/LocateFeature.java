@@ -10,10 +10,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -57,7 +54,7 @@ public class LocateFeature {
                 return 0;
             }
 
-            List<BlockPos> positions = featurePositions.getPositions(feature);
+            List<FeaturePositions.PosAndCount> positions = featurePositions.getPositions(feature);
 
             if (positions.isEmpty()) {
                 return locateNearbyFeature(source, feature, sourcePos, chunk.getPos());
@@ -72,7 +69,7 @@ public class LocateFeature {
 
     public static int locateNearbyFeature(CommandSourceStack source, ResourceKey<ConfiguredFeature<?, ?>> feature, BlockPos sourcePos, ChunkPos centerChunkPos ){
         for (int range = 1 ; range <= MAX_RANGE ; range++){
-            Stream<BlockPos> foundPositions = Stream.empty();
+            Stream<FeaturePositions.PosAndCount> foundPositions = Stream.empty();
             for (int x = -range ; x <= range ; x++){
                 for (int z = -range ; z <= range ; z++) {
                     if (Math.abs(x) < range && Math.abs(z) < range) continue;
@@ -85,26 +82,36 @@ public class LocateFeature {
 
                 }
             }
-            Optional<BlockPos> minPos = foundPositions.min(Comparator.comparingDouble(pos -> pos.distSqr(sourcePos)));
+            Optional<FeaturePositions.PosAndCount> minPos = foundPositions.min(Comparator.comparingDouble(pos -> pos.pos().distSqr(sourcePos)));
             if (minPos.isPresent()){
-                return showLocateResult(source, feature.location(), minPos.get(), sourcePos);
+                return showLocateResult(source, feature.location(), minPos.get().pos(), sourcePos);
             }
         }
         source.sendFailure(TextUtil.translatable("worldgendevtools.locatefeature.command.failure.not_nearby", feature.location().toString()));
         return -1;
     }
 
-    private static int showListResult(CommandSourceStack source, ResourceLocation location, List<BlockPos> positions, BlockPos sourcePos){
+    private static int showListResult(CommandSourceStack source, ResourceLocation location, List<FeaturePositions.PosAndCount> positions, BlockPos sourcePos){
 
-        List<BlockPos> sortedPositions = positions.stream().sorted(Comparator.comparingDouble(pos -> pos.distSqr(sourcePos))).limit(5).toList();
+        List<FeaturePositions.PosAndCount> sortedPositions = positions.stream().sorted(Comparator.comparingDouble(pos -> pos.pos().distSqr(sourcePos))).limit(5).toList();
 
         Component positionsComponent = ComponentUtils.formatList(
-                sortedPositions.stream().map(pos -> ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ()))
-                        .withStyle(
-                                style -> style.withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
-                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
-                        )).toList(),
+                sortedPositions.stream().map(pos -> {
+                    MutableComponent coordComponent = Component.empty().append(ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.coordinates", pos.pos().getX(), pos.pos().getY(), pos.pos().getZ()))
+                            .withStyle(
+                                    style -> style.withColor(ChatFormatting.GREEN)
+                                            .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.pos().getX() + " " + pos.pos().getY() + " " + pos.pos().getZ()))
+                                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
+                            )
+                    );
+                    if (pos.count() > 1) {
+                        coordComponent = coordComponent.append(
+                                TextUtil.translatable("worldgendevtools.multipe", pos.count())
+                                        .withStyle(ChatFormatting.GRAY)
+                        );
+                    }
+                    return coordComponent;
+                }).toList(),
                 Component.literal(", ")
         );
 
@@ -112,7 +119,7 @@ public class LocateFeature {
 
         source.sendSuccess(() -> TextUtil.translatable("worldgendevtools.locatefeature.command.success." + translationKey, location.toString(), positions.size(), positionsComponent, positions.size() - 5), true);
 
-        return (int) Math.round(Math.sqrt(sortedPositions.getFirst().distSqr(sourcePos)));
+        return (int) Math.round(Math.sqrt(sortedPositions.getFirst().pos().distSqr(sourcePos)));
     }
 
     private static int showLocateResult(

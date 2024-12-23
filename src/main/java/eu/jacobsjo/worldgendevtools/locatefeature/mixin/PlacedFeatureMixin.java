@@ -55,7 +55,7 @@ public class PlacedFeatureMixin {
 
                     if (key.isPresent()) {
                         FeaturePositions positions = context.getLevel().getChunk(blockPos).getAttachedOrCreate(LocateFeatureInit.FEATURE_POSITION_ATTACHMENT);
-                        positions.getPositions(key.get()).add(blockPos);
+                        positions.addPosiition(key.get(),blockPos);
                     }
                 } else {
                     zone.addText("(not placed)");

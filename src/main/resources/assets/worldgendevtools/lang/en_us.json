@@ -18,6 +18,8 @@
   "gamerule.saveChunks": "Save any chunks to disk",
   "gamerule.saveChunks.description": "Worldgen Devtools: Turning this OFF will disable any world saving, so that reloading the world will regenerate it. Already saved chunks are not deleted.",
 
+  "worldgendevtools.multipe": "x%s",
+
   "worldgendevtools.coloredjigsawblock.name_tooltip": "Name: %s",
   "worldgendevtools.coloredjigsawblock.target_name_tooltip": "Target Name: %s",
   "worldgendevtools.coloredjigsawblock.target_pool_tooltip": "Target Pool: %s",
@@ -32,12 +34,14 @@
   "worldgendevtools.dfcommand.density_function.invalid": "Invalid density_function %s",
   "worldgendevtools.dfcommand.noise_router.no": "This dimension has no noise router",
 
-  "worldgendevtools.locatefeature.command.success.single": "Found %s 1 time in chunk at %3$s",
-  "worldgendevtools.locatefeature.command.success.multiple": "Found %s %s times in chunk at %s",
-  "worldgendevtools.locatefeature.command.success.many": "Found %s %s times in chunk at %s ... (%s more)",
+  "worldgendevtools.locatefeature.command.success.single": "Found %s at 1 position in chunk at %3$s",
+  "worldgendevtools.locatefeature.command.success.multiple": "Found %s at %s positions in chunk at %s",
+  "worldgendevtools.locatefeature.command.success.many": "Found %s at %s positions in chunk at %s ... (%s more)",
   "worldgendevtools.locatefeature.command.success.nearby": "The nearest %s is at %s (%s blocks away)",
   "worldgendevtools.locatefeature.command.failure.no_attachment": "The feature positions are not saved in this chunk",
   "worldgendevtools.locatefeature.command.failure.not_nearby": "Could not find a feature of type \"%s\" within reasonable distance",
+  "worldgendevtools.locatefeature.renderer.on": "Feature locations: shown",
+  "worldgendevtools.locatefeature.renderer.off": "Feature locations: hidden",
 
   "worldgendevtools.profiling.command.no_information": "No chunks have profiling information saved",
   "worldgendevtools.profiling.command.header": "Profiling of %d chunks:",

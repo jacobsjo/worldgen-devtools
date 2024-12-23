@@ -23,7 +23,8 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl.JigsawBlockEntityRenderingClientInit"
+      "eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl.JigsawBlockEntityRenderingClientInit",
+      "eu.jacobsjo.worldgendevtools.client.locatefeature.LocateFeatureClientInit"
     ],
     "main": [
       "eu.jacobsjo.worldgendevtools.vanillacommands.VanillaCommandsInit",
@@ -54,7 +55,12 @@
     {
       "config": "worldgendevtools.client.datapackadding.mixins.json",
       "environment": "client"
+    },
+    {
+      "config": "worldgendevtools.client.locatefeature.mixins.json",
+      "environment": "client"
     }
+
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
