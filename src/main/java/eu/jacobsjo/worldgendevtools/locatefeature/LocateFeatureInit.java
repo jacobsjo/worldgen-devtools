@@ -8,10 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 
 @SuppressWarnings("UnstableApiUsage")
 public class LocateFeatureInit implements ModInitializer {
-    public static final AttachmentType<FeaturePositions> FEATURE_POSITION_ATTACHMENT = AttachmentRegistry.<FeaturePositions>builder()
+    public static final AttachmentType<FeaturePositions> FEATURE_POSITION_ATTACHMENT = AttachmentRegistry.<FeaturePositions>create(
+        ResourceLocation.fromNamespaceAndPath("worldgendevtools", "feature_positions"),
+        builder -> builder
             .initializer(FeaturePositions::new)
             .persistent(FeaturePositions.CODEC)
-            .buildAndRegister(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "feature_positions"));
+            .syncWith(FeaturePositions.STREAM_CODEC, (attachmentTarget, serverPlayer) -> serverPlayer.hasPermissions(2))
+    );
 
     @Override
     public void onInitialize() {
