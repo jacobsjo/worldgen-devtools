@@ -2,11 +2,13 @@ package eu.jacobsjo.worldgendevtools.locatefeature.mixin;
 
 import eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit;
 import eu.jacobsjo.worldgendevtools.locatefeature.impl.FeaturePositions;
+import me.modmuss50.tracyutils.NameableZone;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.TracyZoneFiller;
 import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -48,7 +50,15 @@ public class PlacedFeatureMixin {
         MutableBoolean mutableBoolean = new MutableBoolean();
         stream.forEach(blockPos -> {
             try (Zone zone =  Profiler.get().zone("configuredFeature")) {
-                key.ifPresent(configuredFeatureResourceKey -> zone.addText(configuredFeatureResourceKey.location().toString()));
+                String perCallZoneName = "<inline configured feature>";
+                if (key.isPresent()){
+                    perCallZoneName = key.get().location().toString();
+                }
+                if (zone.profiler instanceof TracyZoneFiller) {
+                    ((NameableZone) ((TracyZoneFiller) zone.profiler).activeZone()).tracy_utils$setName(perCallZoneName);
+                }
+
+                zone.addText("pos: " + blockPos.toShortString());
 
                 if (configuredFeature.place(context.getLevel(), context.generator(), source, blockPos)) {
                     mutableBoolean.setTrue();
@@ -58,7 +68,7 @@ public class PlacedFeatureMixin {
                         positions.addPosiition(key.get(),blockPos);
                     }
                 } else {
-                    zone.addText("(not placed)");
+                    zone.addText("not placed");
                 }
             }
         });

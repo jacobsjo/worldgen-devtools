@@ -19,3 +19,6 @@ mutable field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/min
 
 accessible field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
 mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
+
+accessible field net/minecraft/util/profiling/Zone profiler Lnet/minecraft/util/profiling/ProfilerFiller;
+accessible method net/minecraft/util/profiling/TracyZoneFiller activeZone ()Lcom/mojang/jtracy/Zone;

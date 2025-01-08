@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import eu.jacobsjo.worldgendevtools.externalprofiling.api.FeatureGenerationEvent;
+import me.modmuss50.tracyutils.NameableZone;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -12,6 +13,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.TracyZoneFiller;
 import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -38,7 +40,9 @@ public class ChunkGeneratorMixin {
         boolean result;
         event.begin();
         try (Zone zone = Profiler.get().zone("placedFeature")) {
-            zone.addText(featureKey);
+            if (zone.profiler instanceof TracyZoneFiller) {
+                ((NameableZone) ((TracyZoneFiller) zone.profiler).activeZone()).tracy_utils$setName(featureKey);
+            }
             result = original.call(placedFeature, level, generator, random, pos);
         }
 
@@ -51,10 +55,13 @@ public class ChunkGeneratorMixin {
     )
     private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, Operation<Boolean> original){
         try (Zone zone = Profiler.get().zone("structure")) {
-            zone.addText(structureSelectionEntry.structure().getRegisteredName());
+            if (zone.profiler instanceof TracyZoneFiller) {
+                ((NameableZone) ((TracyZoneFiller) zone.profiler).activeZone()).tracy_utils$setName(structureSelectionEntry.structure().getRegisteredName());
+            }
+            zone.addText("chunkPos: " + chunkPos);
             boolean result = original.call(structureSelectionEntry, structureManager, registryAccess, random, structureTemplateManager, seed, chunk, chunkPos, sectionPos, resourceKey);
             if (!result) {
-                zone.addText("(not placed)");
+                zone.addText("not placed");
             }
             return result;
         }
