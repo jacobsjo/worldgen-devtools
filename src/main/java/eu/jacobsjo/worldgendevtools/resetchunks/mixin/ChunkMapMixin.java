@@ -2,26 +2,28 @@ package eu.jacobsjo.worldgendevtools.resetchunks.mixin;
 
 
 import com.mojang.datafixers.DataFixer;
+import eu.jacobsjo.worldgendevtools.resetchunks.api.DeactivateableTicketStorage;
 import eu.jacobsjo.worldgendevtools.resetchunks.api.ResettableChunkMap;
 import eu.jacobsjo.worldgendevtools.resetchunks.impl.ResetChunksCommand;
 import eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import net.minecraft.server.level.*;
-import net.minecraft.util.SortedArraySet;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.DistanceManager;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.TicketStorage;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.storage.ChunkStorage;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.nio.file.Path;
-import java.util.stream.Collectors;
 
 @Mixin(ChunkMap.class)
 public abstract class ChunkMapMixin extends ChunkStorage implements ResettableChunkMap {
@@ -34,6 +36,8 @@ public abstract class ChunkMapMixin extends ChunkStorage implements ResettableCh
     @Shadow public abstract DistanceManager getDistanceManager();
 
     @Shadow @Final private Long2ObjectLinkedOpenHashMap<ChunkHolder> updatingChunkMap;
+
+    @Shadow @Final private TicketStorage ticketStorage;
 
     @Inject(method="save", at=@At("HEAD"), cancellable = true)
     private void save(ChunkAccess chunk, CallbackInfoReturnable<Boolean> cir){
@@ -53,18 +57,21 @@ public abstract class ChunkMapMixin extends ChunkStorage implements ResettableCh
         DistanceManager distanceManager = this.getDistanceManager();
 
         try {
-            ResetChunksCommand.LOGGER.debug("Removing chunk {} with tickets {}", chunkPos, this.getTicketDebugString(chunkPos.toLong()));
+            //ResetChunksCommand.LOGGER.debug("Removing chunk {} with tickets {}", chunkPos, this.getTicketDebugString(chunkPos.toLong()));
 
             // this forces the chunk to be unloaded, without regard to its saving status. But that doesn't matter, since we are resetting it anyway.
             this.updatingChunkMap.remove(chunkPos.toLong());
-            distanceManager.tickets.remove(chunkPos.toLong()); // deletes tickets from unloaded chunks, to make sure they are reloaded before usage.
+            ((DeactivateableTicketStorage) this.ticketStorage).worldgenDevtools$deactiveChunk(chunkPos.toLong()); // deactivate tickets from unloaded chunks, to make sure they are reloaded before usage.
 
             // this removes the chunks from disk, so they are regenerated when reloading the chunk
             this.write(chunkPos, () -> null);
 
+            // reactivate all deactivated tickets, so the chunk gets reloaded and sent to the client
+            this.ticketStorage.activateAllDeactivatedTickets();
+
             // this makes the playerTicketManager readd the player tickets we just deleted, so the chunk gets reloaded and sent to the client.
-            int level = distanceManager.playerTicketManager.getLevel(chunkPos.toLong());
-            distanceManager.playerTicketManager.onLevelChange(chunkPos.toLong(), level, false, distanceManager.playerTicketManager.haveTicketFor(level));
+            //int level = distanceManager.playerTicketManager.getLevel(chunkPos.toLong());
+            //distanceManager.playerTicketManager.onLevelChange(chunkPos.toLong(), level, false, distanceManager.playerTicketManager.haveTicketFor(level));
             // other tickets aren't readded, so some chunks (like in spawn-chunks) aren't reloaded after a reset. I don't think this matters though.
 
         } catch (Exception e) {
@@ -75,6 +82,7 @@ public abstract class ChunkMapMixin extends ChunkStorage implements ResettableCh
         return true;
     }
 
+    /*
     @Unique
     private String getTicketDebugString(long chunkPos){
         SortedArraySet<Ticket<?>> tickets = this.getDistanceManager().tickets.get(chunkPos);
@@ -83,4 +91,5 @@ public abstract class ChunkMapMixin extends ChunkStorage implements ResettableCh
         }
         return "[ " + tickets.stream().map(Ticket::toString).collect(Collectors.joining(" | ")) + " ]";
     }
+     */
 }

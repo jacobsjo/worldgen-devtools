@@ -100,8 +100,8 @@ public class LocateFeature {
                     MutableComponent coordComponent = Component.empty().append(ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.coordinates", pos.pos().getX(), pos.pos().getY(), pos.pos().getZ()))
                             .withStyle(
                                     style -> style.withColor(ChatFormatting.GREEN)
-                                            .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.pos().getX() + " " + pos.pos().getY() + " " + pos.pos().getZ()))
-                                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
+                                            .withClickEvent(new ClickEvent.SuggestCommand("/tp @s " + pos.pos().getX() + " " + pos.pos().getY() + " " + pos.pos().getZ()))
+                                            .withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.coordinates.tooltip")))
                             )
                     );
                     if (pos.count() > 1) {
@@ -132,8 +132,8 @@ public class LocateFeature {
         Component component = ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.coordinates", position.getX(), position.getY(), position.getZ()))
                 .withStyle(
                         style -> style.withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + position.getX() + " " + position.getY() + " " + position.getZ()))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
+                                .withClickEvent(new ClickEvent.SuggestCommand("/tp @s " + position.getX() + " " + position.getY() + " " + position.getZ()))
+                                .withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.coordinates.tooltip")))
                 );
         source.sendSuccess(() -> TextUtil.translatable("worldgendevtools.locatefeature.command.success.nearby", location.toString(), component, dist), false);
         return dist;
