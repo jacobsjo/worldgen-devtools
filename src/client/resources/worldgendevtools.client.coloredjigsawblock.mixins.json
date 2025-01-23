@@ -6,7 +6,7 @@
   "mixins": [
   ],
   "client": [
-    "GameMasterBlockItemMixin"
+    "CustomDataMixin"
   ],
   "injectors": {
     "defaultRequire": 1
