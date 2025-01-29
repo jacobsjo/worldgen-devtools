@@ -12,13 +12,14 @@
     "LevelMixin",
     "MappedRegistryMixin",
     "MinecraftServerMixin",
+    "MobVariantsInterfaceMixin",
+    "MobVariantsMixin",
     "NoiseBasedChunkGeneratorMixin",
     "ReloadCommandMixin",
     "ServerGamePacketListenerImplMixin",
     "StructureMixin",
     "StructureStartMixin",
-    "TagLoaderMixin",
-    "WolfVariantsMixin"
+    "TagLoaderMixin"
   ],
   "client": [
   ],
