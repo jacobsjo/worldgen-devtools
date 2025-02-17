@@ -1,5 +1,6 @@
 package eu.jacobsjo.worldgendevtools.client.locatefeature.impl;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -12,12 +13,11 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -32,18 +32,20 @@ import static eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit.FEATU
 public class LocationRenderer {
     private static int RANGE = 2;
 
+    private static final RenderPipeline DEBUG_FILLED_BOX_SEE_THROUGH_PIPELINE = RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
+            .withLocation(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "pipeline/debug_filled_box_see_through"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .build();
+
     private static final RenderType.CompositeRenderType DEBUG_FILLED_BOX_SEE_THROUGH = RenderType.create(
             "debug_filled_box",
-            DefaultVertexFormat.POSITION_COLOR,
-            VertexFormat.Mode.TRIANGLE_STRIP,
             1536,
             false,
             true,
+            DEBUG_FILLED_BOX_SEE_THROUGH_PIPELINE,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderType.POSITION_COLOR_SHADER)
                     .setLayeringState(RenderType.POLYGON_OFFSET_LAYERING)
-                    .setTransparencyState(RenderType.NO_TRANSPARENCY)
-                    .setDepthTestState(RenderType.NO_DEPTH_TEST)
                     .createCompositeState(false)
     );
 
