@@ -6,7 +6,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.entity.animal.ChickenVariants;
 import net.minecraft.world.entity.animal.CowVariants;
 import net.minecraft.world.entity.animal.PigVariants;
-import net.minecraft.world.entity.animal.WolfVariants;
+import net.minecraft.world.entity.animal.wolf.WolfVariants;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 

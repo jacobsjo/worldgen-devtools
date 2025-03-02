@@ -7,14 +7,15 @@ import eu.jacobsjo.worldgendevtools.reloadregistries.impl.RegistryReloader;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.Util;
-import net.minecraft.core.*;
+import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.RegistrationInfo;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -130,5 +131,14 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry  {
             this.outdatedKeys.remove(key);
             this.requiredNewKeys.add(key);
         }
+    }
+
+    /**
+     * @author worldgendevtools
+     * @reason simpe method, changing just byId has bad performance since it would require converting to ObjectList
+     */
+    @Overwrite
+    public Optional<Holder.Reference<T>> getRandom(RandomSource random) {
+        return Util.getRandomSafe(this.byId.stream().filter(holder -> !((OutdatedHolder) holder).worldgenDevtools$isOutdated()).toList(), random);
     }
 }

@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Mixin(CustomData.class)
@@ -34,7 +35,9 @@ public abstract class CustomDataMixin {
 
     @Inject(method = "addToTooltip", at=@At("TAIL"))
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter, CallbackInfo ci){
-        ResourceLocation resourceLocation = ResourceLocation.tryParse(this.tag.getString("id"));
+        Optional<String> id = this.tag.getString("id");
+        if (id.isEmpty()) return;
+        ResourceLocation resourceLocation = ResourceLocation.tryParse(id.get());
         if (JIGSAW_BLOCK_ID.equals(resourceLocation)) {
             DataResult<JigsawBlockData> data = this.read(JigsawBlockData.CODEC);
             if (data.isError() || data.result().isEmpty())

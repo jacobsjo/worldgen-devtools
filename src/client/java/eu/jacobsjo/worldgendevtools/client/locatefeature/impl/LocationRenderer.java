@@ -1,6 +1,7 @@
 package eu.jacobsjo.worldgendevtools.client.locatefeature.impl;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -45,7 +46,7 @@ public class LocationRenderer {
             true,
             DEBUG_FILLED_BOX_SEE_THROUGH_PIPELINE,
             RenderType.CompositeState.builder()
-                    .setLayeringState(RenderType.POLYGON_OFFSET_LAYERING)
+                    .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
                     .createCompositeState(false)
     );
 
