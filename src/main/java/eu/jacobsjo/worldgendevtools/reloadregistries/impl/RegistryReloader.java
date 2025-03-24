@@ -7,8 +7,8 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
-import eu.jacobsjo.worldgendevtools.reloadregistries.api.SwitchToConfigurationCallback;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.UpdatableGeneratorChunkMap;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
@@ -22,14 +22,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.network.config.JoinWorldTask;
-import net.minecraft.server.network.config.SynchronizeRegistriesTask;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -153,21 +149,7 @@ public class RegistryReloader {
         for (Connection connection : serverConnection.getConnections()) {
             PacketListener var5 = connection.getPacketListener();
             if (var5 instanceof ServerGamePacketListenerImpl impl) {
-
-                ((SwitchToConfigurationCallback) impl).worldgenDevtools$onSwitchToConfiguration(() -> {
-                    PacketListener listener = connection.getPacketListener();
-                    if (listener instanceof ServerConfigurationPacketListenerImpl impl2) {
-                        LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess = serverConnection.getServer().registries();
-
-                        List<KnownPack> list = serverConnection.getServer().getResourceManager().listPacks().flatMap((packResources) -> packResources.location().knownPackInfo().stream()).toList();
-
-                        impl2.synchronizeRegistriesTask = new SynchronizeRegistriesTask(list, layeredRegistryAccess);
-                        impl2.configurationTasks.add(impl2.synchronizeRegistriesTask);
-                        impl2.configurationTasks.add(new JoinWorldTask());
-                        impl2.startNextTask();
-                    }
-                });
-                impl.switchToConfig();
+                ServerPlayNetworking.reconfigure(impl);
             }
         }
     }

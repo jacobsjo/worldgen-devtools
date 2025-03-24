@@ -16,7 +16,6 @@
     "MobVariantsMixin",
     "NoiseBasedChunkGeneratorMixin",
     "ReloadCommandMixin",
-    "ServerGamePacketListenerImplMixin",
     "StructureMixin",
     "StructureStartMixin",
     "TagLoaderMixin"
