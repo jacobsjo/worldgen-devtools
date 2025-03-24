@@ -18,7 +18,3 @@ mutable field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/min
 
 accessible field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
 mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
-
-accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder setLayeringState (Lnet/minecraft/client/renderer/RenderStateShard$LayeringStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
-accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder createCompositeState (Z)Lnet/minecraft/client/renderer/RenderType$CompositeState;
-accessible field net/minecraft/client/renderer/RenderPipelines DEBUG_FILLED_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
