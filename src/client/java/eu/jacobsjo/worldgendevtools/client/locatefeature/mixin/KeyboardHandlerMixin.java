@@ -12,7 +12,7 @@ import java.awt.event.KeyEvent;
 
 @Mixin(KeyboardHandler.class)
 public abstract class KeyboardHandlerMixin {
-    @Shadow protected abstract void debugFeedbackTranslated(String message, Object... args);
+    @Shadow protected abstract void debugFeedbackTranslated(String message);
 
     @Inject(method = "handleDebugKeys", at = @At("TAIL"), cancellable = true)
     public void handleDebugKeys(int key, CallbackInfoReturnable<Boolean> cir){
