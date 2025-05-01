@@ -134,7 +134,7 @@ public class LocationRenderer {
             poseStack.scale(scale, -scale, scale);
             float h = bl ? (float) (-font.width(text)) / 2.0F : 0.0F;
             font.drawInBatch(
-                    text, h, yOffset, color, true, poseStack.last().pose(), buffer, transparent ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, 0, 15728880
+                    text, h, yOffset, 0xFF000000 | color, true, poseStack.last().pose(), buffer, transparent ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, 0, 15728880
             );
             poseStack.popPose();
         }

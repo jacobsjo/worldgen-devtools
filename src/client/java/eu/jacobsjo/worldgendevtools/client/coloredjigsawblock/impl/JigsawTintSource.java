@@ -29,18 +29,18 @@ public record JigsawTintSource(int defaultColor) implements ItemTintSource {
     public int calculate(ItemStack stack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity) {
         TypedDataComponent<CustomData> blockEntityData = stack.getComponents().getTyped(DataComponents.BLOCK_ENTITY_DATA);
         if (blockEntityData == null)
-            return this.defaultColor;
+            return 0xFF000000 | this.defaultColor;
 
         DataResult<JigsawBlockData> dataResult = blockEntityData.value().read(JigsawBlockData.CODEC);
         if (dataResult.isError() || dataResult.result().isEmpty())
-            return this.defaultColor;
+            return 0xFF000000 | this.defaultColor;
 
         JigsawBlockData data = dataResult.result().get();
 
         ResourceLocation location = data.name().equals(EMPTY_RESOURCE_LOCATION) ? data.target() : data.name();
 
         if (location.equals(EMPTY_RESOURCE_LOCATION)) {
-            return this.defaultColor;
+            return 0xFF000000 | this.defaultColor;
         }
 
         int hash = location.toString().hashCode();
