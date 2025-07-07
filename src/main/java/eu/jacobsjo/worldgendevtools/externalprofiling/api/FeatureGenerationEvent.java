@@ -46,6 +46,13 @@ public class FeatureGenerationEvent extends Event {
         this.level = level.location().toString();
         this.placedFeature = placedFeature;
         this.step = step;
-        this.stepName = GenerationStep.Decoration.values()[step].name().toLowerCase(Locale.ROOT);
+        this.stepName = getStepName(step);
+    }
+
+    private static String getStepName(int step){
+        if (step >= GenerationStep.Decoration.values().length) {
+            return "step_" + step;
+        }
+        return GenerationStep.Decoration.values()[step].name().toLowerCase(Locale.ROOT);
     }
 }
