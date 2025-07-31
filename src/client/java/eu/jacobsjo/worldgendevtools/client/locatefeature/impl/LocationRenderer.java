@@ -27,6 +27,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
+import static eu.jacobsjo.worldgendevtools.client.locatefeature.LocateFeatureClientInit.FEATURE_POSITIONS_RENDERER;
 import static eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit.FEATURE_POSITION_ATTACHMENT;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -50,15 +51,8 @@ public class LocationRenderer {
                     .createCompositeState(false)
     );
 
-    private static boolean enabled = false;
-
-    public static boolean toggle() {
-        enabled = !enabled;
-        return enabled;
-    }
-
     public static void render(WorldRenderContext context) {
-        if (!enabled) return;
+        if (!Minecraft.getInstance().debugEntries.isCurrentlyEnabled(FEATURE_POSITIONS_RENDERER)) return;
         Entity player = Minecraft.getInstance().getCameraEntity();
         if (player == null) return;
         Vec3 playerPos = player.getPosition(0);

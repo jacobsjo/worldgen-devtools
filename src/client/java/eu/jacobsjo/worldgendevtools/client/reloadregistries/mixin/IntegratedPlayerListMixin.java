@@ -5,12 +5,9 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RegistryLayer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.storage.PlayerDataStorage;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.ValueInput;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,12 +29,10 @@ public class IntegratedPlayerListMixin extends PlayerList {
      */
     @Override
     @NotNull
-    public Optional<ValueInput> load(ServerPlayer player, ProblemReporter problemReporter) {
-        if (this.getServer().isSingleplayerOwner(player.getGameProfile()) && this.playerData != null) {
-            ValueInput valueInput = TagValueInput.create(problemReporter, player.registryAccess(), this.playerData);
-            player.load(valueInput);
-            return Optional.of(valueInput);
+    public Optional<CompoundTag> loadPlayerData(NameAndId nameAndId) {
+        if (this.getServer().isSingleplayerOwner(nameAndId) && this.playerData != null) {
+            return Optional.of(this.playerData);
         }
-        return super.load(player, problemReporter);
+        return super.loadPlayerData(nameAndId);
     }
 }

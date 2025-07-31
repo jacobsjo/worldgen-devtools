@@ -2,18 +2,21 @@ package eu.jacobsjo.worldgendevtools.client.coloredjigsawblock.impl;
 
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapLike;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,15 +30,20 @@ public record JigsawTintSource(int defaultColor) implements ItemTintSource {
 
     @Override
     public int calculate(ItemStack stack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity) {
-        TypedDataComponent<CustomData> blockEntityData = stack.getComponents().getTyped(DataComponents.BLOCK_ENTITY_DATA);
+        TypedEntityData<BlockEntityType<?>> blockEntityData = stack.getComponents().get(DataComponents.BLOCK_ENTITY_DATA);
         if (blockEntityData == null)
             return 0xFF000000 | this.defaultColor;
 
-        DataResult<JigsawBlockData> dataResult = blockEntityData.value().read(JigsawBlockData.CODEC);
+        @SuppressWarnings("deprecation")
+        DataResult<MapLike<Tag>> dataResult = NbtOps.INSTANCE.getMap(blockEntityData.getUnsafe());
         if (dataResult.isError() || dataResult.result().isEmpty())
             return 0xFF000000 | this.defaultColor;
 
-        JigsawBlockData data = dataResult.result().get();
+        DataResult<JigsawBlockData> jigsawDataResult = JigsawBlockData.CODEC.decode(NbtOps.INSTANCE, dataResult.getOrThrow());
+        if (jigsawDataResult.isError() || jigsawDataResult.result().isEmpty())
+            return 0xFF000000 | this.defaultColor;
+
+        JigsawBlockData data = jigsawDataResult.result().get();
 
         ResourceLocation location = data.name().equals(EMPTY_RESOURCE_LOCATION) ? data.target() : data.name();
 

@@ -6,7 +6,8 @@
   "mixins": [
   ],
   "client": [
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "TypedEntityDataMixin"
   ],
   "injectors": {
     "defaultRequire": 1
