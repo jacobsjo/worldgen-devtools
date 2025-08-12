@@ -55,8 +55,8 @@ public class PackDropScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.titleTop(), 16777215);
-        this.display.renderCentered(guiGraphics, this.width / 2, this.messageTop());
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.titleTop(), -1);
+        this.display.render(guiGraphics, MultiLineLabel.Align.CENTER, this.width / 2, this.messageTop(), 9, true, -1);
     }
 
     private int titleTop() {
