@@ -5,15 +5,17 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.core.FrontAndTop;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.JigsawBlock;
 import net.minecraft.world.level.block.entity.JigsawBlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
 public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBlockEntity> {
@@ -26,31 +28,34 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     public JigsawBlockEntityRenderer(@SuppressWarnings("unused") BlockEntityRendererProvider.Context conext) { }
 
     @Override
-    public void render(JigsawBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, Vec3 pos) {
-        JigsawBlockEntityRenderer.render(blockEntity.getName(), blockEntity.getTarget(), blockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION), poseStack, buffer, packedOverlay);
+    public boolean shouldRender(JigsawBlockEntity blockEntity, Vec3 cameraPos) {
+        if (!BlockEntityRenderer.super.shouldRender(blockEntity, cameraPos)) return false;
+
+        return !blockEntity.getName().equals(EMPTY_RESOURCE_LOCATION) || !blockEntity.getTarget().equals(EMPTY_RESOURCE_LOCATION);
     }
 
-    public static void render(ResourceLocation name, ResourceLocation target, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay) {
-        ResourceLocation location = name.equals(EMPTY_RESOURCE_LOCATION) ? target : name;
+    @Override
+    public void submit(JigsawBlockEntity blockEntity, float partialTick, PoseStack poseStack, int packedLight, int packedOverlay, Vec3 pos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, SubmitNodeCollector submitNodeCollector) {
+        JigsawBlockEntityRenderer.submit(blockEntity.getName(), blockEntity.getTarget(), blockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION), poseStack, packedOverlay, submitNodeCollector);
+    }
 
-        if (location.equals(EMPTY_RESOURCE_LOCATION)) {
-            return;
-        }
+    public static void submit(ResourceLocation name, ResourceLocation target, FrontAndTop orientation, PoseStack poseStack, int packedOverlay, SubmitNodeCollector submitNodeCollector) {
+        ResourceLocation location = name.equals(EMPTY_RESOURCE_LOCATION) ? target : name;
 
         int hash = location.toString().hashCode();
         int r = hash & 0xFF;
         int g = hash >> 8 & 0xFF;
         int b = hash >> 16 & 0xFF;
 
-        render(0xFF000000 | r << 16 | g << 8 | b, orientation, poseStack, buffer, packedOverlay);
+        submit(0xFF000000 | r << 16 | g << 8 | b, orientation, poseStack, packedOverlay, submitNodeCollector);
     }
 
-    public static void render(int argb, FrontAndTop orientation, PoseStack poseStack, MultiBufferSource buffer, int packedOverlay){
+    public static void submit(int argb, FrontAndTop orientation, PoseStack poseStack, int packedOverlay, SubmitNodeCollector submitNodeCollector){
         poseStack.pushPose();
         poseStack.scale(1 + OFFSET * 2, 1 + OFFSET * 2, 1 + OFFSET * 2);
         poseStack.translate(-OFFSET, -OFFSET, -OFFSET);
         poseStack.rotateAround(getRotation(orientation), 0.5f, 0.5f, 0.5f);
-        modelPart.render(poseStack, buffer.getBuffer(RENDER_TYPE), 0xF000F0, packedOverlay, argb);
+        submitNodeCollector.submitModelPart(modelPart, poseStack, RENDER_TYPE, 0xF000F0, packedOverlay, null, argb);
         poseStack.popPose();
     }
 
