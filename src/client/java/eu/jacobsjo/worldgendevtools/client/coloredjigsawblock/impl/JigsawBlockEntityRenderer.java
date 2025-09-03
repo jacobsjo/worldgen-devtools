@@ -10,15 +10,18 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.FrontAndTop;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.JigsawBlock;
+import net.minecraft.world.level.block.entity.BedBlockEntity;
 import net.minecraft.world.level.block.entity.JigsawBlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
-public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBlockEntity> {
+public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBlockEntity, JigsawBlockRenderState> {
     private static final ResourceLocation TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath("worldgendevtools","textures/entity/jigsaw.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE_LOCATION);
     private static final float OFFSET = 0.001f;
@@ -35,28 +38,39 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     }
 
     @Override
-    public void submit(JigsawBlockEntity blockEntity, float partialTick, PoseStack poseStack, int packedLight, int packedOverlay, Vec3 pos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, SubmitNodeCollector submitNodeCollector) {
-        JigsawBlockEntityRenderer.submit(blockEntity.getName(), blockEntity.getTarget(), blockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION), poseStack, packedOverlay, submitNodeCollector);
+    public void submit(JigsawBlockRenderState blockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
+        poseStack.pushPose();
+        poseStack.scale(1 + OFFSET * 2, 1 + OFFSET * 2, 1 + OFFSET * 2);
+        poseStack.translate(-OFFSET, -OFFSET, -OFFSET);
+        poseStack.rotateAround(getRotation(blockEntityRenderState.blockState.getValue(JigsawBlock.ORIENTATION)), 0.5f, 0.5f, 0.5f);
+        submitNodeCollector.submitModelPart(
+                modelPart,
+                poseStack,
+                RENDER_TYPE,
+                0xF000F0,
+                OverlayTexture.NO_OVERLAY,
+                null,
+                blockEntityRenderState.argb,
+                blockEntityRenderState.breakProgress);
+        poseStack.popPose();
     }
 
-    public static void submit(ResourceLocation name, ResourceLocation target, FrontAndTop orientation, PoseStack poseStack, int packedOverlay, SubmitNodeCollector submitNodeCollector) {
-        ResourceLocation location = name.equals(EMPTY_RESOURCE_LOCATION) ? target : name;
+    @Override
+    public @NotNull JigsawBlockRenderState createRenderState() {
+        return new JigsawBlockRenderState();
+    }
+
+    @Override
+    public void extractRenderState(JigsawBlockEntity jigsawBlockEntity, JigsawBlockRenderState jigsawBlockRenderState, float f, Vec3 vec3, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        BlockEntityRenderer.super.extractRenderState(jigsawBlockEntity, jigsawBlockRenderState, f, vec3, crumblingOverlay);
+
+        ResourceLocation location = jigsawBlockEntity.getName().equals(EMPTY_RESOURCE_LOCATION) ? jigsawBlockEntity.getTarget() : jigsawBlockEntity.getName();
 
         int hash = location.toString().hashCode();
         int r = hash & 0xFF;
         int g = hash >> 8 & 0xFF;
         int b = hash >> 16 & 0xFF;
-
-        submit(0xFF000000 | r << 16 | g << 8 | b, orientation, poseStack, packedOverlay, submitNodeCollector);
-    }
-
-    public static void submit(int argb, FrontAndTop orientation, PoseStack poseStack, int packedOverlay, SubmitNodeCollector submitNodeCollector){
-        poseStack.pushPose();
-        poseStack.scale(1 + OFFSET * 2, 1 + OFFSET * 2, 1 + OFFSET * 2);
-        poseStack.translate(-OFFSET, -OFFSET, -OFFSET);
-        poseStack.rotateAround(getRotation(orientation), 0.5f, 0.5f, 0.5f);
-        submitNodeCollector.submitModelPart(modelPart, poseStack, RENDER_TYPE, 0xF000F0, packedOverlay, null, argb);
-        poseStack.popPose();
+        jigsawBlockRenderState.argb = 0xFF000000 | r << 16 | g << 8 | b;
     }
 
     @Override

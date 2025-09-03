@@ -5,6 +5,7 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RegistryLayer;
+import net.minecraft.server.notifications.NotificationService;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -20,8 +21,8 @@ public class IntegratedPlayerListMixin extends PlayerList {
     @Shadow
     private CompoundTag playerData;
 
-    public IntegratedPlayerListMixin(MinecraftServer server, LayeredRegistryAccess<RegistryLayer> registries, PlayerDataStorage playerIo, int maxPlayers) {
-        super(server, registries, playerIo, maxPlayers);
+    public IntegratedPlayerListMixin(MinecraftServer server, LayeredRegistryAccess<RegistryLayer> registries, PlayerDataStorage playerIo, NotificationService notificationService) {
+        super(server, registries, playerIo, notificationService);
     }
 
     /**
