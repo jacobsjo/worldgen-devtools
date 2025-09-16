@@ -13,7 +13,6 @@ public class LocateFeatureClientInit implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         FEATURE_POSITIONS_RENDERER = DebugScreenEntries.register(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "feature_positions"), new DebugEntryNoop());
-        WorldRenderEvents.LAST.register(LocationRenderer::render);
     }
 
 

@@ -15,10 +15,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.debug.DebugValueAccess;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -31,8 +34,8 @@ import static eu.jacobsjo.worldgendevtools.client.locatefeature.LocateFeatureCli
 import static eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit.FEATURE_POSITION_ATTACHMENT;
 
 @SuppressWarnings("UnstableApiUsage")
-public class LocationRenderer {
-    private static int RANGE = 2;
+public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
+    private static final int RANGE = 2;
 
     private static final RenderPipeline DEBUG_FILLED_BOX_SEE_THROUGH_PIPELINE = RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "pipeline/debug_filled_box_see_through"))
@@ -51,8 +54,8 @@ public class LocationRenderer {
                     .createCompositeState(false)
     );
 
-    public static void render(WorldRenderContext context) {
-        if (!Minecraft.getInstance().debugEntries.isCurrentlyEnabled(FEATURE_POSITIONS_RENDERER)) return;
+    @Override
+    public void render(PoseStack poseStack, MultiBufferSource buffer, double d, double e, double f, DebugValueAccess debugValueAccess, Frustum frustum) {
         Entity player = Minecraft.getInstance().getCameraEntity();
         if (player == null) return;
         Vec3 playerPos = player.getPosition(0);
@@ -64,12 +67,12 @@ public class LocationRenderer {
         int centerChunkZ = SectionPos.blockToSectionCoord(playerBlockPos.getZ());
         for (int x = centerChunkX - RANGE; x <= centerChunkX + RANGE ; x++){
             for (int z = centerChunkZ - RANGE; z <= centerChunkZ + RANGE ; z++) {
-                renderLocationsInChunk(context, level, x, z, playerPos);
+                renderLocationsInChunk(poseStack, buffer, level, x, z, playerPos);
             }
         }
     }
 
-    private static void renderLocationsInChunk(WorldRenderContext context, ClientLevel level, int chunkX, int chunkZ, Vec3 playerPos){
+    private void renderLocationsInChunk(PoseStack poseStack, MultiBufferSource buffer, ClientLevel level, int chunkX, int chunkZ, Vec3 playerPos){
         ChunkAccess chunk = level.getChunk(chunkX, chunkZ);
         FeaturePositions featurePositions = chunk.getAttached(FEATURE_POSITION_ATTACHMENT);
         if (featurePositions == null) return;
@@ -87,13 +90,13 @@ public class LocationRenderer {
                     int count = posCounts.getOrDefault(pos.pos(), 0);
                     posCounts.put(pos.pos(), count + 1);
                     if (count < 5) {
-                        renderDebugBox(context.matrixStack(), context.consumers(), pos.pos(), color.r(), color.g(), color.b(), count);
+                        renderDebugBox(poseStack, buffer, pos.pos(), color.r(), color.g(), color.b(), count);
                     }
                     if (pos.pos().getCenter().closerThan(playerPos, 8)) {
                         if (count < 6) {
-                            renderFloatingText(context.matrixStack(), context.consumers(), key.location() + (pos.count() > 1 ? " [x" + pos.count() + "]" : ""), pos.pos().getX() + 0.5, pos.pos().getY() + 0.5, pos.pos().getZ() + 0.5, color.asInt(), 0.015F, true,  -20F - count * 10.0F, true);
+                            renderFloatingText(poseStack, buffer, key.location() + (pos.count() > 1 ? " [x" + pos.count() + "]" : ""), pos.pos().getX() + 0.5, pos.pos().getY() + 0.5, pos.pos().getZ() + 0.5, color.asInt(), 0.015F, true,  -20F - count * 10.0F, true);
                         } else if (count == 6){
-                            renderFloatingText(context.matrixStack(), context.consumers(), "[and more]", pos.pos().getX() + 0.5, pos.pos().getY() + 0.5, pos.pos().getZ() + 0.5, 0xD0D0D0, 0.015F, true, -20F - count * 10.0F, true);
+                            renderFloatingText(poseStack, buffer, "[and more]", pos.pos().getX() + 0.5, pos.pos().getY() + 0.5, pos.pos().getZ() + 0.5, 0xD0D0D0, 0.015F, true, -20F - count * 10.0F, true);
                         }
                     }
                 }
@@ -102,7 +105,7 @@ public class LocationRenderer {
 
     }
 
-    private static void renderDebugBox(PoseStack poseStack, MultiBufferSource buffer, BlockPos pos, float red, float green, float blue, int count) {
+    private void renderDebugBox(PoseStack poseStack, MultiBufferSource buffer, BlockPos pos, float red, float green, float blue, int count) {
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         if (camera.isInitialized()) {
             Vec3 vec3 = camera.getPosition().reverse();
