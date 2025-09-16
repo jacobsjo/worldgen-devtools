@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.FrontAndTop;
 import net.minecraft.resources.ResourceLocation;
@@ -38,7 +39,7 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     }
 
     @Override
-    public void submit(JigsawBlockRenderState blockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
+    public void submit(JigsawBlockRenderState blockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
         poseStack.scale(1 + OFFSET * 2, 1 + OFFSET * 2, 1 + OFFSET * 2);
         poseStack.translate(-OFFSET, -OFFSET, -OFFSET);
