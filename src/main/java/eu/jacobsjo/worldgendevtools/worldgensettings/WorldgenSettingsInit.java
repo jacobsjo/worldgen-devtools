@@ -18,11 +18,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 
 public class WorldgenSettingsInit implements ModInitializer {
-    public static GameRules.Key<EnumRule<GenerationOptions>> MAX_CHUNK_STATUS;
+    @Deprecated public static GameRules.Key<EnumRule<GenerationOptions>> MAX_CHUNK_STATUS;
     public static GameRules.Key<GameRules.BooleanValue> APPLY_PROCESSOR_LISTS;
-    public static GameRules.Key<GameRules.BooleanValue> KEEP_JIGSAWS;
+    @Deprecated public static GameRules.Key<GameRules.BooleanValue> KEEP_JIGSAWS;
     public static GameRules.Key<GameRules.BooleanValue> APPLY_GRAVITY_PROCESSOR;
-    public static GameRules.Key<GameRules.BooleanValue> SAVE_CHUNKS;
+    @Deprecated public static GameRules.Key<GameRules.BooleanValue> SAVE_CHUNKS;
 
     public static final Component NO_SAVE_WARNING = TextUtil.translatable("worldgendevtools.worldgensettings.no_save_warning").withStyle(ChatFormatting.RED);
 

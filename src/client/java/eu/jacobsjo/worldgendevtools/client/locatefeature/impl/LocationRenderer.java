@@ -9,7 +9,6 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import eu.jacobsjo.util.ColorUtil;
 import eu.jacobsjo.worldgendevtools.locatefeature.impl.FeaturePositions;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
