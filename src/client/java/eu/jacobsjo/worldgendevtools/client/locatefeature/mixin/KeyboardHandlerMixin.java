@@ -13,7 +13,7 @@ import static eu.jacobsjo.worldgendevtools.client.locatefeature.LocateFeatureCli
 
 @Mixin(KeyboardHandler.class)
 public abstract class KeyboardHandlerMixin {
-    @Shadow protected abstract void debugFeedbackTranslated(String message);
+    @Shadow protected abstract void debugFeedbackTranslated(String message, Object... args);
 
     @Shadow @Final private Minecraft minecraft;
 

@@ -12,6 +12,7 @@ import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,7 +30,7 @@ public abstract class MinecraftServerMixin {
     @Shadow @Final private LayeredRegistryAccess<RegistryLayer> registries;
     @Shadow @Final private Map<ResourceKey<Level>, ServerLevel> levels;
     @Shadow public abstract ServerConnectionListener getConnection();
-    @Shadow public abstract GameRules getGameRules();
+    @Shadow public abstract WorldData getWorldData();
 
     /**
      * This is a lambda in the reloadResources method that gets called with the collected packResources. We add the reloading
@@ -38,7 +39,7 @@ public abstract class MinecraftServerMixin {
      */
     @Inject (method = "method_29437", at = @At("HEAD"))
     private void thenCompose(ImmutableList<PackResources> resources, CallbackInfoReturnable<CompletionStage<?>> cir) {
-        if (this.getGameRules().getBoolean(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
+        if (this.getWorldData().getGameRules().getBoolean(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
             RegistryReloader.reloadRegistries(this.registries, this.levels, resources);
         }
     }
@@ -49,7 +50,7 @@ public abstract class MinecraftServerMixin {
      */
     @Inject(method = "reloadResources", at = @At("RETURN"))
     private void afterReloadResources(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir){
-        if (this.getGameRules().getBoolean(ReloadRegistriesInit.RELOAD_REGISTIRES) && this.getGameRules().getBoolean(ReloadRegistriesInit.SYNC_AFTER_REGISTRY_RELOAD)) {
+        if (this.getWorldData().getGameRules().getBoolean(ReloadRegistriesInit.RELOAD_REGISTIRES) && this.getWorldData().getGameRules().getBoolean(ReloadRegistriesInit.SYNC_AFTER_REGISTRY_RELOAD)) {
             cir.getReturnValue().thenAccept(reloadableResources -> RegistryReloader.syncClient(this.getConnection()));
         }
     }

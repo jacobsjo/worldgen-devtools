@@ -16,14 +16,15 @@ import static eu.jacobsjo.worldgendevtools.client.locatefeature.LocateFeatureCli
 
 @Mixin(DebugRenderer.class)
 public class DebugRendererMixin {
+
     @Shadow
     @Final
-    private List<DebugRenderer.SimpleDebugRenderer> opaqueRenderers;
+    private List<DebugRenderer.SimpleDebugRenderer> renderers;
 
     @Inject(method = "refreshRendererList", at = @At("TAIL"))
     public void refreshRendererList(CallbackInfo ci) {
         if (Minecraft.getInstance().debugEntries.isCurrentlyEnabled(FEATURE_POSITIONS_RENDERER)){
-            this.opaqueRenderers.add(new LocationRenderer());
+            this.renderers.add(new LocationRenderer());
         }
     }
 }

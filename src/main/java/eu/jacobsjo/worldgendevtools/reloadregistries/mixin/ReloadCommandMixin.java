@@ -21,7 +21,7 @@ public class ReloadCommandMixin {
             source.sendFailure(Component.literal(throwable.getMessage()));
         }
 
-        if (source.getServer().getGameRules().getRule(ReloadRegistriesInit.RELOAD_REGISTIRES).get()){
+        if (source.getLevel().getGameRules().getRule(ReloadRegistriesInit.RELOAD_REGISTIRES).get()){
             source.sendFailure(TextUtil.translatable("worldgendevtools.reloadregistries.failure"));
         }
     }

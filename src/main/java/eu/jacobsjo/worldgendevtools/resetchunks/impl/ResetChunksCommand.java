@@ -10,6 +10,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
@@ -22,7 +23,7 @@ public class ResetChunksCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 (Commands.literal("resetchunks")
-                    .requires(commandSourceStack -> commandSourceStack.hasPermission(4)))
+                    .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_OWNER)))
                     .executes(commandContext -> resetChunks(commandContext.getSource(), 0))
                     .then((Commands.argument("range", IntegerArgumentType.integer(0, 8))
                     .executes(commandContext -> resetChunks(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "range")))))

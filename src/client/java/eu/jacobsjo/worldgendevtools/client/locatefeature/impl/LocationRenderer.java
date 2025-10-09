@@ -18,6 +18,10 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.gizmos.CuboidGizmo;
+import net.minecraft.gizmos.GizmoStyle;
+import net.minecraft.gizmos.Gizmos;
+import net.minecraft.gizmos.TextGizmo;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.debug.DebugValueAccess;
@@ -53,8 +57,9 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
                     .createCompositeState(false)
     );
 
+
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, double d, double e, double f, DebugValueAccess debugValueAccess, Frustum frustum) {
+    public void emitGizmos(double d, double e, double f, DebugValueAccess debugValueAccess, Frustum frustum, float g) {
         Entity player = Minecraft.getInstance().getCameraEntity();
         if (player == null) return;
         Vec3 playerPos = player.getPosition(0);
@@ -66,12 +71,12 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
         int centerChunkZ = SectionPos.blockToSectionCoord(playerBlockPos.getZ());
         for (int x = centerChunkX - RANGE; x <= centerChunkX + RANGE ; x++){
             for (int z = centerChunkZ - RANGE; z <= centerChunkZ + RANGE ; z++) {
-                renderLocationsInChunk(poseStack, buffer, level, x, z, playerPos);
+                renderLocationsInChunk(level, x, z, playerPos);
             }
         }
     }
 
-    private void renderLocationsInChunk(PoseStack poseStack, MultiBufferSource buffer, ClientLevel level, int chunkX, int chunkZ, Vec3 playerPos){
+    private void renderLocationsInChunk(ClientLevel level, int chunkX, int chunkZ, Vec3 playerPos){
         ChunkAccess chunk = level.getChunk(chunkX, chunkZ);
         FeaturePositions featurePositions = chunk.getAttached(FEATURE_POSITION_ATTACHMENT);
         if (featurePositions == null) return;
@@ -89,50 +94,24 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
                     int count = posCounts.getOrDefault(pos.pos(), 0);
                     posCounts.put(pos.pos(), count + 1);
                     if (count < 5) {
-                        renderDebugBox(poseStack, buffer, pos.pos(), color.r(), color.g(), color.b(), count);
+                        int alpha = 255/(count + 1);
+                        Gizmos.cuboid(
+                                pos.pos(),
+                                -0.4f,
+                                GizmoStyle.fill((alpha << 24) | color.asInt())
+                        ).setAlwaysOnTop();
                     }
-                    if (pos.pos().getCenter().closerThan(playerPos, 8)) {
-                        if (count < 6) {
-                            renderFloatingText(poseStack, buffer, key.location() + (pos.count() > 1 ? " [x" + pos.count() + "]" : ""), pos.pos().getX() + 0.5, pos.pos().getY() + 0.5, pos.pos().getZ() + 0.5, color.asInt(), 0.015F, true,  -20F - count * 10.0F, true);
-                        } else if (count == 6){
-                            renderFloatingText(poseStack, buffer, "[and more]", pos.pos().getX() + 0.5, pos.pos().getY() + 0.5, pos.pos().getZ() + 0.5, 0xD0D0D0, 0.015F, true, -20F - count * 10.0F, true);
-                        }
+                    if (pos.pos().getCenter().closerThan(playerPos, 8) && count <= 6) {
+                        String text = count == 6 ? "[and more]" : key.location() + (pos.count() > 1 ? " [x" + pos.count() + "]" : "");
+                        Gizmos.billboardText(
+                                text,
+                                pos.pos().getCenter().add(0, 0.28 + 0.13 * count, 0),
+                                TextGizmo.Style.forColorAndCentered(0xFF000000 | color.asInt()).withScale(0.2f)
+                            ).setAlwaysOnTop();
                     }
                 }
             });
         }
 
-    }
-
-    private void renderDebugBox(PoseStack poseStack, MultiBufferSource buffer, BlockPos pos, float red, float green, float blue, int count) {
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        if (camera.isInitialized()) {
-            Vec3 vec3 = camera.getPosition().reverse();
-            AABB aABB = new AABB(pos).move(vec3).inflate(-0.4 - count * 0.02);
-            VertexConsumer vertexConsumer = buffer.getBuffer(DEBUG_FILLED_BOX_SEE_THROUGH);
-            ShapeRenderer.addChainedFilledBoxVertices(poseStack, vertexConsumer, aABB.minX, aABB.minY, aABB.minZ, aABB.maxX, aABB.maxY, aABB.maxZ, red, green, blue, 1.0F);
-        }
-    }
-
-    public static void renderFloatingText(
-            PoseStack poseStack, MultiBufferSource buffer, String text, double x, double y, double z, int color, float scale, boolean bl, float yOffset, boolean transparent
-    ) {
-        Minecraft minecraft = Minecraft.getInstance();
-        Camera camera = minecraft.gameRenderer.getMainCamera();
-        if (camera.isInitialized()) {
-            Font font = minecraft.font;
-            double d = camera.getPosition().x;
-            double e = camera.getPosition().y;
-            double g = camera.getPosition().z;
-            poseStack.pushPose();
-            poseStack.translate((float) (x - d), (float) (y - e) + 0.07F, (float) (z - g));
-            poseStack.mulPose(camera.rotation());
-            poseStack.scale(scale, -scale, scale);
-            float h = bl ? (float) (-font.width(text)) / 2.0F : 0.0F;
-            font.drawInBatch(
-                    text, h, yOffset, 0xFF000000 | color, true, poseStack.last().pose(), buffer, transparent ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, 0, 15728880
-            );
-            poseStack.popPose();
-        }
     }
 }
