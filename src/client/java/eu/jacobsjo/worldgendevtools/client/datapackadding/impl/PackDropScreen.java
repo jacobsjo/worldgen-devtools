@@ -3,6 +3,7 @@ package eu.jacobsjo.worldgendevtools.client.datapackadding.impl;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
@@ -57,7 +58,7 @@ public class PackDropScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.titleTop(), -1);
-        this.display.render(guiGraphics, MultiLineLabel.Align.CENTER, this.width / 2, this.messageTop(), 9, true, -1);
+        this.display.visitLines(TextAlignment.CENTER, this.width / 2, this.messageTop(), 9, guiGraphics.textRenderer());
     }
 
     private int titleTop() {
