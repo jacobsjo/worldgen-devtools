@@ -11,11 +11,12 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.DistanceManager;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.TicketStorage;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.storage.ChunkStorage;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
+import net.minecraft.world.level.chunk.storage.SimpleRegionStorage;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,11 +27,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.nio.file.Path;
 
 @Mixin(ChunkMap.class)
-public abstract class ChunkMapMixin extends ChunkStorage implements ResettableChunkMap {
-    @SuppressWarnings("unused")
-    public ChunkMapMixin(RegionStorageInfo regionStorageInfo, Path path, DataFixer dataFixer, boolean bl) {
-        super(regionStorageInfo, path, dataFixer, bl);
+public abstract class ChunkMapMixin extends SimpleRegionStorage implements ResettableChunkMap {
+    public ChunkMapMixin(RegionStorageInfo regionStorageInfo, Path path, DataFixer dataFixer, boolean bl, DataFixTypes dataFixTypes) {
+        super(regionStorageInfo, path, dataFixer, bl, dataFixTypes);
     }
+
     @Shadow @Final ServerLevel level;
 
     @Shadow public abstract DistanceManager getDistanceManager();

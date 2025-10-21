@@ -40,24 +40,6 @@ import static eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit.FEATU
 public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
     private static final int RANGE = 2;
 
-    private static final RenderPipeline DEBUG_FILLED_BOX_SEE_THROUGH_PIPELINE = RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-            .withLocation(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "pipeline/debug_filled_box_see_through"))
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build();
-
-    private static final RenderType.CompositeRenderType DEBUG_FILLED_BOX_SEE_THROUGH = RenderType.create(
-            "debug_filled_box",
-            1536,
-            false,
-            true,
-            DEBUG_FILLED_BOX_SEE_THROUGH_PIPELINE,
-            RenderType.CompositeState.builder()
-                    .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
-                    .createCompositeState(false)
-    );
-
-
     @Override
     public void emitGizmos(double d, double e, double f, DebugValueAccess debugValueAccess, Frustum frustum, float g) {
         Entity player = Minecraft.getInstance().getCameraEntity();
