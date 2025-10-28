@@ -45,7 +45,7 @@ public abstract class SinglePoolElementMixin {
      */
     @ModifyVariable(method = "getSettings", at=@At("HEAD"), ordinal = 0, argsOnly = true)
     public boolean getSettings(boolean keepJigsaws){
-        if (((ServerLevelData) level.getLevelData()).getGameRules().getBoolean(WorldgenSettingsInit.KEEP_JIGSAWS)){
+        if (((ServerLevelData) level.getLevelData()).getGameRules().get(WorldgenSettingsInit.KEEP_JIGSAWS)){
             return true;
         }
         return keepJigsaws;
@@ -56,7 +56,7 @@ public abstract class SinglePoolElementMixin {
      */
     @Redirect(method = "getSettings", at= @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureProcessorList;list()Ljava/util/List;"))
     public List<StructureProcessor> getProcessorList(StructureProcessorList processorList) {
-        if (!((ServerLevelData) level.getLevelData()).getGameRules().getBoolean(WorldgenSettingsInit.APPLY_PROCESSOR_LISTS)) {
+        if (!((ServerLevelData) level.getLevelData()).getGameRules().get(WorldgenSettingsInit.APPLY_PROCESSOR_LISTS)) {
             return ImmutableList.of();
         }
         return processorList.list();
@@ -67,7 +67,7 @@ public abstract class SinglePoolElementMixin {
      */
     @Redirect(method = "getSettings", at= @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool$Projection;getProcessors()Lcom/google/common/collect/ImmutableList;"))
     public ImmutableList<StructureProcessor> getProcessors(StructureTemplatePool.Projection projection){
-        if (!((ServerLevelData) level.getLevelData()).getGameRules().getBoolean(WorldgenSettingsInit.APPLY_GRAVITY_PROCESSOR)) {
+        if (!((ServerLevelData) level.getLevelData()).getGameRules().get(WorldgenSettingsInit.APPLY_GRAVITY_PROCESSOR)) {
             return ImmutableList.of();
         }
         return projection.getProcessors();

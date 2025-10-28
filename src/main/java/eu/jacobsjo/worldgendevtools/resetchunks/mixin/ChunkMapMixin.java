@@ -42,7 +42,7 @@ public abstract class ChunkMapMixin extends SimpleRegionStorage implements Reset
 
     @Inject(method="save", at=@At("HEAD"), cancellable = true)
     private void save(ChunkAccess chunk, CallbackInfoReturnable<Boolean> cir){
-        if (!this.level.getGameRules().getBoolean(WorldgenSettingsInit.SAVE_CHUNKS)){
+        if (!this.level.getGameRules().get(WorldgenSettingsInit.SAVE_CHUNKS)){
             cir.setReturnValue(false);
             cir.cancel();
         }

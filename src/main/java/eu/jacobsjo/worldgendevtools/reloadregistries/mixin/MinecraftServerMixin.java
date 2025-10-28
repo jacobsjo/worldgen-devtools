@@ -10,7 +10,6 @@ import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.packs.PackResources;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Final;
@@ -39,7 +38,7 @@ public abstract class MinecraftServerMixin {
      */
     @Inject (method = "method_29437", at = @At("HEAD"))
     private void thenCompose(ImmutableList<PackResources> resources, CallbackInfoReturnable<CompletionStage<?>> cir) {
-        if (this.getWorldData().getGameRules().getBoolean(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
+        if (this.getWorldData().getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
             RegistryReloader.reloadRegistries(this.registries, this.levels, resources);
         }
     }
@@ -50,7 +49,7 @@ public abstract class MinecraftServerMixin {
      */
     @Inject(method = "reloadResources", at = @At("RETURN"))
     private void afterReloadResources(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir){
-        if (this.getWorldData().getGameRules().getBoolean(ReloadRegistriesInit.RELOAD_REGISTIRES) && this.getWorldData().getGameRules().getBoolean(ReloadRegistriesInit.SYNC_AFTER_REGISTRY_RELOAD)) {
+        if (this.getWorldData().getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES) && this.getWorldData().getGameRules().get(ReloadRegistriesInit.SYNC_AFTER_REGISTRY_RELOAD)) {
             cir.getReturnValue().thenAccept(reloadableResources -> RegistryReloader.syncClient(this.getConnection()));
         }
     }

@@ -1,51 +1,55 @@
 package eu.jacobsjo.worldgendevtools.worldgensettings;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.serialization.Codec;
 import eu.jacobsjo.util.TextUtil;
-import eu.jacobsjo.worldgendevtools.worldgensettings.api.GenerationOptions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
-import net.fabricmc.fabric.api.gamerule.v1.rule.EnumRule;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRuleCategory;
+import net.minecraft.world.level.gamerules.GameRuleType;
+import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
 
 public class WorldgenSettingsInit implements ModInitializer {
-    @Deprecated public static GameRules.Key<EnumRule<GenerationOptions>> MAX_CHUNK_STATUS;
-    public static GameRules.Key<GameRules.BooleanValue> APPLY_PROCESSOR_LISTS;
-    @Deprecated public static GameRules.Key<GameRules.BooleanValue> KEEP_JIGSAWS;
-    public static GameRules.Key<GameRules.BooleanValue> APPLY_GRAVITY_PROCESSOR;
-    @Deprecated public static GameRules.Key<GameRules.BooleanValue> SAVE_CHUNKS;
+    //@Deprecated public static GameRules.Key<EnumRule<GenerationOptions>> MAX_CHUNK_STATUS = GameRuleRegistry.register("maxChunkStatus", GameRuleCategory.MISC, GameRuleFactory.createEnumRule(GenerationOptions.ALL));
+    public static GameRule<Boolean> APPLY_PROCESSOR_LISTS = registrBoolean("apply_processor_lists", GameRuleCategory.MISC, true);;
+    @Deprecated public static GameRule<Boolean> KEEP_JIGSAWS = registrBoolean("keep_jigsaws", GameRuleCategory.MISC, false);
+    public static GameRule<Boolean> APPLY_GRAVITY_PROCESSOR = registrBoolean("apply_gravity_processor", GameRuleCategory.MISC, true);
+    @Deprecated public static GameRule<Boolean> SAVE_CHUNKS = registrBoolean("save_chunks", GameRuleCategory.MISC, true);
 
     public static final Component NO_SAVE_WARNING = TextUtil.translatable("worldgendevtools.worldgensettings.no_save_warning").withStyle(ChatFormatting.RED);
 
     @Override
     public void onInitialize() {
-        MAX_CHUNK_STATUS = GameRuleRegistry.register("maxChunkStatus", GameRules.Category.MISC, GameRuleFactory.createEnumRule(GenerationOptions.ALL));
-        APPLY_PROCESSOR_LISTS = GameRuleRegistry.register("applyProcessorLists", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-        KEEP_JIGSAWS = GameRuleRegistry.register("keepJigsaws", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
-        APPLY_GRAVITY_PROCESSOR = GameRuleRegistry.register("applyGravityProcessor", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-        SAVE_CHUNKS = GameRuleRegistry.register("saveChunks", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
-            if (!((ServerLevel) world).getGameRules().getRule(SAVE_CHUNKS).get()){
+            if (!((ServerLevel) world).getGameRules().get(SAVE_CHUNKS)){
                 showWarning(player);
             }
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (!player.isSpectator() && world instanceof ServerLevel && !((ServerLevel) world).getGameRules().getRule(SAVE_CHUNKS).get()){
+            if (!player.isSpectator() && world instanceof ServerLevel && !((ServerLevel) world).getGameRules().get(SAVE_CHUNKS)){
                 showWarning(player);
             }
             return InteractionResult.PASS;
         });
+    }
+
+    public static GameRule<Boolean> registrBoolean(String id, GameRuleCategory category, boolean default_value){
+        GameRule<Boolean> gameRule = new GameRule<>(category, GameRuleType.BOOL, BoolArgumentType.bool(), GameRuleTypeVisitor::visitBoolean, Codec.BOOL, b -> b ? 1 : 0, default_value, FeatureFlagSet.of());
+        return Registry.register(BuiltInRegistries.GAME_RULE, ResourceLocation.withDefaultNamespace(id), gameRule); // Using minecraft namespace here as other namespaces are horrible UX
     }
 
     private void showWarning(Player player){

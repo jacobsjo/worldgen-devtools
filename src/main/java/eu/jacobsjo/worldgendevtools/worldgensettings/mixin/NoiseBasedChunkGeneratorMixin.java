@@ -22,9 +22,9 @@ public class NoiseBasedChunkGeneratorMixin {
      */
     @Inject(method="buildSurface(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/chunk/ChunkAccess;)V", at=@At("HEAD"), cancellable = true)
     public void buildSurface(WorldGenRegion level, StructureManager structureManager, RandomState random, ChunkAccess chunk, CallbackInfo ci){
-        if (!((ServerLevelData) level.getLevelData()).getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().surface){
-            ci.cancel();
-        }
+        //if (!((ServerLevelData) level.getLevelData()).getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().surface){
+        //    ci.cancel();
+        //}
     }
 
     /**
@@ -32,9 +32,9 @@ public class NoiseBasedChunkGeneratorMixin {
      */
     @Inject(method= "applyCarvers", at=@At("HEAD"), cancellable = true)
     public void applyCarvers(WorldGenRegion level, long seed, RandomState random, BiomeManager biomeManager, StructureManager structureManager, ChunkAccess chunk, CallbackInfo ci) {
-        if (!((ServerLevelData) level.getLevelData()).getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().carvers){
-            ci.cancel();
-        }
+        //if (!((ServerLevelData) level.getLevelData()).getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().carvers){
+        //    ci.cancel();
+        //}
     }
 
 }

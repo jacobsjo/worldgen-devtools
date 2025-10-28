@@ -21,7 +21,7 @@ public class EntityStorageMixin {
 
     @Inject(method="storeEntities", at=@At("HEAD"), cancellable = true)
     private void save(ChunkEntities<Entity> entities, CallbackInfo ci){
-        if (!this.level.getGameRules().getBoolean(WorldgenSettingsInit.SAVE_CHUNKS)){
+        if (!this.level.getGameRules().get(WorldgenSettingsInit.SAVE_CHUNKS)){
             ci.cancel();
         }
     }

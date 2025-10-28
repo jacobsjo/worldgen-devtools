@@ -19,9 +19,9 @@ public class ChunkGeneratorMixin {
      */
     @Inject(method= "applyBiomeDecoration", at=@At("HEAD"), cancellable = true)
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager, CallbackInfo ci) {
-        if (!((ServerLevelData) level.getLevelData()).getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().features){
-            ci.cancel();
-        }
+        //if (!((ServerLevelData) level.getLevelData()).getGameRules().getRule(WorldgenSettingsInit.MAX_CHUNK_STATUS).get().features){
+        //    ci.cancel();
+        //}
     }
 
 }
