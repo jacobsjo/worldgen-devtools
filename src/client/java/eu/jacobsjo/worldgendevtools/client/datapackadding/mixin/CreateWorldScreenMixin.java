@@ -16,7 +16,7 @@ import java.nio.file.Path;
 @Mixin(CreateWorldScreen.class)
 @Environment(EnvType.CLIENT)
 public class CreateWorldScreenMixin {
-    @Redirect(method = "copyBetweenDirs", at = @At(value = "INVOKE", target = "Lnet/minecraft/Util;copyBetweenDirs(Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/nio/file/Path;)V"))
+    @Redirect(method = "copyBetweenDirs", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Util;copyBetweenDirs(Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/nio/file/Path;)V"))
     private static void copyBetweenDirs(Path fromDirectory, Path toDirectory, Path filePath) throws IOException {
         Path path = fromDirectory.relativize(filePath);
         Path path2 = toDirectory.resolve(path);

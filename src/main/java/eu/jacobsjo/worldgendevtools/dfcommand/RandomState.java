@@ -3,7 +3,7 @@ package eu.jacobsjo.worldgendevtools.dfcommand;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.synth.BlendedNoise;
@@ -59,7 +59,7 @@ public final class RandomState {
                     }
 
                     if (Objects.equals(holder.unwrapKey(), Optional.of(Noises.SHIFT))) {
-                        normalNoise = NormalNoise.create(RandomState.this.random.fromHashOf(Noises.SHIFT.location()), new NormalNoise.NoiseParameters(0, 0.0));
+                        normalNoise = NormalNoise.create(RandomState.this.random.fromHashOf(Noises.SHIFT.identifier()), new NormalNoise.NoiseParameters(0, 0.0));
                         return new DensityFunction.NoiseHolder(holder, normalNoise);
                     }
                 }
@@ -70,7 +70,7 @@ public final class RandomState {
 
             private DensityFunction wrapNew(DensityFunction densityFunction) {
                 if (densityFunction instanceof BlendedNoise blendedNoise) {
-                    RandomSource randomSource = bl ? this.newLegacyInstance(0L) : RandomState.this.random.fromHashOf(ResourceLocation.withDefaultNamespace("terrain"));
+                    RandomSource randomSource = bl ? this.newLegacyInstance(0L) : RandomState.this.random.fromHashOf(Identifier.withDefaultNamespace("terrain"));
                     return blendedNoise.withNewRandom(randomSource);
                 } else {
                     return (densityFunction instanceof DensityFunctions.EndIslandDensityFunction ? DensityFunctions.endIslands(l) : densityFunction);

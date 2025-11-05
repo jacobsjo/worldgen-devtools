@@ -11,7 +11,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public record JigsawTintSource(int defaultColor) implements ItemTintSource {
-    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = ResourceLocation.withDefaultNamespace("empty");
+    private static final Identifier EMPTY_RESOURCE_LOCATION = Identifier.withDefaultNamespace("empty");
 
     public static final MapCodec<JigsawTintSource> MAP_CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(ExtraCodecs.RGB_COLOR_CODEC.fieldOf("default").forGetter(JigsawTintSource::defaultColor)).apply(instance, JigsawTintSource::new)
@@ -45,7 +45,7 @@ public record JigsawTintSource(int defaultColor) implements ItemTintSource {
 
         JigsawBlockData data = jigsawDataResult.result().get();
 
-        ResourceLocation location = data.name().equals(EMPTY_RESOURCE_LOCATION) ? data.target() : data.name();
+        Identifier location = data.name().equals(EMPTY_RESOURCE_LOCATION) ? data.target() : data.name();
 
         if (location.equals(EMPTY_RESOURCE_LOCATION)) {
             return 0xFF000000 | this.defaultColor;

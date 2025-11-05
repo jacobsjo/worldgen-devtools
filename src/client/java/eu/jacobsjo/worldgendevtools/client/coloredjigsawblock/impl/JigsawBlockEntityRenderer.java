@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.FrontAndTop;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.JigsawBlock;
 import net.minecraft.world.level.block.entity.JigsawBlockEntity;
 import net.minecraft.world.phys.Vec3;
@@ -23,10 +23,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
 public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBlockEntity, JigsawBlockRenderState> {
-    private static final ResourceLocation TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath("worldgendevtools","textures/entity/jigsaw.png");
+    private static final Identifier TEXTURE_LOCATION = Identifier.fromNamespaceAndPath("worldgendevtools","textures/entity/jigsaw.png");
     private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucent(TEXTURE_LOCATION);
     private static final float OFFSET = 0.001f;
-    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = ResourceLocation.withDefaultNamespace("empty");
+    private static final Identifier EMPTY_RESOURCE_LOCATION = Identifier.withDefaultNamespace("empty");
 
     private static final ModelPart modelPart = new MeshDefinition().getRoot().addOrReplaceChild("cube", CubeListBuilder.create().texOffs(0, 0).addBox(0f, 0f, 0f, 16f, 16f, 16f), PartPose.ZERO).bake(64, 64);
     public JigsawBlockEntityRenderer(@SuppressWarnings("unused") BlockEntityRendererProvider.Context conext) { }
@@ -65,7 +65,7 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     public void extractRenderState(JigsawBlockEntity jigsawBlockEntity, JigsawBlockRenderState jigsawBlockRenderState, float f, Vec3 vec3, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderer.super.extractRenderState(jigsawBlockEntity, jigsawBlockRenderState, f, vec3, crumblingOverlay);
 
-        ResourceLocation location = jigsawBlockEntity.getName().equals(EMPTY_RESOURCE_LOCATION) ? jigsawBlockEntity.getTarget() : jigsawBlockEntity.getName();
+        Identifier location = jigsawBlockEntity.getName().equals(EMPTY_RESOURCE_LOCATION) ? jigsawBlockEntity.getTarget() : jigsawBlockEntity.getName();
 
         int hash = location.toString().hashCode();
         int r = hash & 0xFF;

@@ -33,7 +33,7 @@ public class ChunkGeneratorMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/placement/PlacedFeature;placeWithBiomeCheck(Lnet/minecraft/world/level/WorldGenLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/util/RandomSource;Lnet/minecraft/core/BlockPos;)Z")
     )
     private boolean profilePlaceWithBiomeCheck(PlacedFeature placedFeature, WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos pos, Operation<Boolean> original, @Local(argsOnly = true) ChunkAccess chunk, @Local(ordinal = 1) Registry<PlacedFeature> placedFeatureRegistry, @Local(ordinal = 2) int step){
-        String featureKey = placedFeatureRegistry.getResourceKey(placedFeature).map(k -> k.location().toString()).orElse("unregistered");
+        String featureKey = placedFeatureRegistry.getResourceKey(placedFeature).map(k -> k.identifier().toString()).orElse("unregistered");
         FeatureGenerationEvent event = new FeatureGenerationEvent(chunk.getPos(), level.getLevel().dimension(), featureKey, step);
         boolean result;
         event.begin();

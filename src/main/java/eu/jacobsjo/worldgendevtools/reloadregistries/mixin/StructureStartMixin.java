@@ -7,7 +7,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -46,7 +46,7 @@ public class StructureStartMixin implements HolderStructureStart {
     @Inject(method = "loadStaticStart", at = @At("RETURN"))
     private static void loadStaticStart(StructurePieceSerializationContext structurePieceSerializationContext, CompoundTag compoundTag, long l, CallbackInfoReturnable<StructureStart> cir, @Local String string){
         Registry<Structure> registry = structurePieceSerializationContext.registryAccess().lookupOrThrow(Registries.STRUCTURE);
-        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getOrThrow(ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(string))));
+        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getOrThrow(ResourceKey.create(Registries.STRUCTURE, Identifier.parse(string))));
     }
 
     /**

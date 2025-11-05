@@ -73,7 +73,7 @@ public class ChunkProfilingCommand {
                     .stream()
                     .filter(e -> !e.getValue().equals(ChunkStatus.EMPTY))
                     .sorted(Comparator.comparingInt(e -> e.getValue().getIndex()))
-                    .map(e -> e.getKey().location())
+                    .map(e -> e.getKey().identifier())
                     .forEach(loc -> {
                         Duration duration = sum.getStatusDuration(loc);
                         Duration average = duration.dividedBy(informations.size());

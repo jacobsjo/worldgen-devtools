@@ -6,13 +6,13 @@ import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import eu.jacobsjo.worldgendevtools.reloadregistries.impl.RegistryReloader;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
@@ -29,7 +29,7 @@ import java.util.Set;
 public abstract class MappedRegistryMixin<T> implements ReloadableRegistry  {
     @Shadow @Final private ObjectList<Holder.Reference<T>> byId;
     @Shadow @Final private Reference2IntMap<T> toId;
-    @Shadow @Final private Map<ResourceLocation, Holder.Reference<T>> byLocation;
+    @Shadow @Final private Map<Identifier, Holder.Reference<T>> byLocation;
     @Shadow @Final private Map<ResourceKey<T>, Holder.Reference<T>> byKey;
     @Shadow @Final private Map<T, Holder.Reference<T>> byValue;
     @Shadow private boolean frozen;
@@ -89,12 +89,12 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry  {
     }
 
     /**
-     * when registering into a reloading registry, override existing ResourceLocations and unmark key as outdated.
+     * when registering into a reloading registry, override existing Identifiers and unmark key as outdated.
      */
     @SuppressWarnings("unchecked")
     @Inject(method = "register", at = @At("HEAD"), cancellable = true)
     public void register(ResourceKey<T> key, T value, RegistrationInfo registrationInfo, CallbackInfoReturnable<Holder.Reference<T>> cir) {
-        if (this.reloading && this.byLocation.containsKey(key.location())){
+        if (this.reloading && this.byLocation.containsKey(key.identifier())){
             // existing element that is changed
             this.outdatedKeys.remove(key);
             this.requiredNewKeys.remove(key);
@@ -113,7 +113,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry  {
             ((OutdatedHolder) reference).worldgenDevtools$markOutdated(false);
 
             this.byKey.put(key, reference);
-            this.byLocation.put(key.location(), reference);
+            this.byLocation.put(key.identifier(), reference);
             this.byValue.put(value, reference);
             this.byId.set(id, reference);
             this.toId.put(value, id);

@@ -18,7 +18,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -61,8 +61,8 @@ public class RegistryReloader {
         RegistryOps.RegistryInfoLookup dimensionsLookup = getRegistrtyInfoLookup(dimensionsContextLayer, dimensionsNewLayer, false);
 
         // Store old dimensions
-        Map<ResourceLocation, JsonElement> generators = new HashMap<>();
-        levels.forEach((key, level) -> generators.put(key.location(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow()));
+        Map<Identifier, JsonElement> generators = new HashMap<>();
+        levels.forEach((key, level) -> generators.put(key.identifier(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow()));
 
         // Reload Worldgen registries
         Map<ResourceKey<?>, Exception> exceptionMap = new HashMap<>();
@@ -99,7 +99,7 @@ public class RegistryReloader {
         RegistryDataLoader.loadContentsFromManager(resourceManager, dimensionsLookup, levelStemRegistry, LevelStem.CODEC, exceptionMap);
 
         // combine dimensions loaded from datapack with already existing dimensions (prioritize new)
-        Stream<ResourceLocation> dimensionKeys = Stream.concat(levelStemRegistry.registryKeySet().stream().map(ResourceKey::location), generators.keySet().stream()).distinct();
+        Stream<Identifier> dimensionKeys = Stream.concat(levelStemRegistry.registryKeySet().stream().map(ResourceKey::identifier), generators.keySet().stream()).distinct();
 
         //for each found dimension, create a generator and set it for the dimension, if one exists. Adding new dimensions isn't supported.
         dimensionKeys.forEach(key -> {
@@ -211,7 +211,7 @@ public class RegistryReloader {
     private static void logErrors(Map<ResourceKey<?>, Exception> map) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        Map<ResourceLocation, Map<ResourceLocation, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).location(), Map.Entry::getValue)));
+        Map<Identifier, Map<Identifier, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).identifier(), Map.Entry::getValue)));
         map2.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
             printWriter.printf("> Errors in registry %s:%n", entry.getKey());
             (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {
@@ -230,7 +230,7 @@ public class RegistryReloader {
     private static Component formatErrors(Map<ResourceKey<?>, Exception> map){
         MutableComponent component = Component.empty();
 
-        Map<ResourceLocation, Map<ResourceLocation, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).location(), Map.Entry::getValue)));
+        Map<Identifier, Map<Identifier, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).identifier(), Map.Entry::getValue)));
         map2.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
             component.append(TextUtil.translatable("worldgendevtools.reloadregistries.error.registry", entry.getKey().toString()).withColor(REGISTRY_COLOR));
             (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {

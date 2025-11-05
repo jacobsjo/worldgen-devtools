@@ -3,15 +3,17 @@ package eu.jacobsjo.worldgendevtools.worldgensettings;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.serialization.Codec;
 import eu.jacobsjo.util.TextUtil;
+import eu.jacobsjo.worldgendevtools.worldgensettings.api.GenerationOptions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -23,11 +25,11 @@ import net.minecraft.world.level.gamerules.GameRuleType;
 import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
 
 public class WorldgenSettingsInit implements ModInitializer {
-    //@Deprecated public static GameRules.Key<EnumRule<GenerationOptions>> MAX_CHUNK_STATUS = GameRuleRegistry.register("maxChunkStatus", GameRuleCategory.MISC, GameRuleFactory.createEnumRule(GenerationOptions.ALL));
-    public static GameRule<Boolean> APPLY_PROCESSOR_LISTS = registrBoolean("apply_processor_lists", GameRuleCategory.MISC, true);;
-    @Deprecated public static GameRule<Boolean> KEEP_JIGSAWS = registrBoolean("keep_jigsaws", GameRuleCategory.MISC, false);
-    public static GameRule<Boolean> APPLY_GRAVITY_PROCESSOR = registrBoolean("apply_gravity_processor", GameRuleCategory.MISC, true);
-    @Deprecated public static GameRule<Boolean> SAVE_CHUNKS = registrBoolean("save_chunks", GameRuleCategory.MISC, true);
+    @Deprecated public static GameRule<GenerationOptions> MAX_CHUNK_STATUS = Registry.register(BuiltInRegistries.GAME_RULE, "max_chunk_status", GameRuleBuilder.forEnum(GenerationOptions.ALL).build());
+    public static GameRule<Boolean> APPLY_PROCESSOR_LISTS = Registry.register(BuiltInRegistries.GAME_RULE, "apply_processor_lists", GameRuleBuilder.forBoolean(true).build());
+    @Deprecated public static GameRule<Boolean> KEEP_JIGSAWS = Registry.register(BuiltInRegistries.GAME_RULE, "keep_jigsaws", GameRuleBuilder.forBoolean(true).build());
+    public static GameRule<Boolean> APPLY_GRAVITY_PROCESSOR = Registry.register(BuiltInRegistries.GAME_RULE, "apply_gravity_processor", GameRuleBuilder.forBoolean(true).build());
+    @Deprecated public static GameRule<Boolean> SAVE_CHUNKS = Registry.register(BuiltInRegistries.GAME_RULE, "save_chunks", GameRuleBuilder.forBoolean(true).build());
 
     public static final Component NO_SAVE_WARNING = TextUtil.translatable("worldgendevtools.worldgensettings.no_save_warning").withStyle(ChatFormatting.RED);
 
@@ -49,7 +51,7 @@ public class WorldgenSettingsInit implements ModInitializer {
 
     public static GameRule<Boolean> registrBoolean(String id, GameRuleCategory category, boolean default_value){
         GameRule<Boolean> gameRule = new GameRule<>(category, GameRuleType.BOOL, BoolArgumentType.bool(), GameRuleTypeVisitor::visitBoolean, Codec.BOOL, b -> b ? 1 : 0, default_value, FeatureFlagSet.of());
-        return Registry.register(BuiltInRegistries.GAME_RULE, ResourceLocation.withDefaultNamespace(id), gameRule); // Using minecraft namespace here as other namespaces are horrible UX
+        return Registry.register(BuiltInRegistries.GAME_RULE, Identifier.withDefaultNamespace(id), gameRule); // Using minecraft namespace here as other namespaces are horrible UX
     }
 
     private void showWarning(Player player){

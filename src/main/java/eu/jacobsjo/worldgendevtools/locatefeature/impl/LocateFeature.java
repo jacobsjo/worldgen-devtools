@@ -12,7 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -59,7 +59,7 @@ public class LocateFeature {
             if (positions.isEmpty()) {
                 return locateNearbyFeature(source, feature, sourcePos, chunk.getPos());
             } else {
-                return showListResult(source, feature.location(), positions, sourcePos);
+                return showListResult(source, feature.identifier(), positions, sourcePos);
             }
         } catch (Exception e){
             LOGGER.error("Exception running command" ,e);
@@ -84,14 +84,14 @@ public class LocateFeature {
             }
             Optional<FeaturePositions.PosAndCount> minPos = foundPositions.min(Comparator.comparingDouble(pos -> pos.pos().distSqr(sourcePos)));
             if (minPos.isPresent()){
-                return showLocateResult(source, feature.location(), minPos.get().pos(), sourcePos);
+                return showLocateResult(source, feature.identifier(), minPos.get().pos(), sourcePos);
             }
         }
-        source.sendFailure(TextUtil.translatable("worldgendevtools.locatefeature.command.failure.not_nearby", feature.location().toString()));
+        source.sendFailure(TextUtil.translatable("worldgendevtools.locatefeature.command.failure.not_nearby", feature.identifier().toString()));
         return -1;
     }
 
-    private static int showListResult(CommandSourceStack source, ResourceLocation location, List<FeaturePositions.PosAndCount> positions, BlockPos sourcePos){
+    private static int showListResult(CommandSourceStack source, Identifier location, List<FeaturePositions.PosAndCount> positions, BlockPos sourcePos){
 
         List<FeaturePositions.PosAndCount> sortedPositions = positions.stream().sorted(Comparator.comparingDouble(pos -> pos.pos().distSqr(sourcePos))).limit(5).toList();
 
@@ -124,7 +124,7 @@ public class LocateFeature {
 
     private static int showLocateResult(
             CommandSourceStack source,
-            ResourceLocation location,
+            Identifier location,
             BlockPos position,
             BlockPos sourcePosition
     ) {

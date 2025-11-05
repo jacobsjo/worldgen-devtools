@@ -53,7 +53,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
      * @author eu.jacobsjo.worldgendevtools
      * @reason setting different screen bacially changes whole method anyway, the inner lambda is still called
      */
-    @SuppressWarnings("DataFlowIssue")
     @Overwrite
     public void onFilesDrop(List<Path> packs) {
         String datapacks = extractPackNames(packs).collect(Collectors.joining(", "));
@@ -63,7 +62,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
         }));
     }
 
-    @SuppressWarnings("DataFlowIssue")
     @Inject(method = "method_29676", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/packs/PackSelectionScreen;copyPacks(Lnet/minecraft/client/Minecraft;Ljava/util/List;Ljava/nio/file/Path;)V"))
     public void beforeCopyPacks(List<Path> packs, boolean bl, CallbackInfo ci, @Local(ordinal = 1) List<Path> list2) {
         if (shouldSymlink) {

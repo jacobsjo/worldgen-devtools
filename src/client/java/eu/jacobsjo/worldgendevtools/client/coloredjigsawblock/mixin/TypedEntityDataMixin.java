@@ -6,7 +6,7 @@ import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TypedEntityData;
@@ -27,7 +27,7 @@ public abstract class TypedEntityDataMixin<IdType> {
     @Shadow @Final private IdType type;
     @Shadow @Final private CompoundTag tag;
     @Unique
-    private static final ResourceLocation EMPTY_RESOURCE_LOCATION = ResourceLocation.withDefaultNamespace("empty");
+    private static final Identifier EMPTY_RESOURCE_LOCATION = Identifier.withDefaultNamespace("empty");
 
     @Inject(method = "addToTooltip", at=@At("TAIL"))
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter, CallbackInfo ci){

@@ -137,6 +137,6 @@ public final class DfCommand{
     @SuppressWarnings("SameParameterValue")
     private static <T> Holder<T> getRegistryKeyType(CommandContext<CommandSourceStack> commandContext, String string, ResourceKey<Registry<T>> resourceKey, DynamicCommandExceptionType dynamicCommandExceptionType) throws CommandSyntaxException {
         ResourceKey<T> resourceKey2 = getRegistryType(commandContext, string, resourceKey, dynamicCommandExceptionType);
-        return getRegistry(commandContext, resourceKey).get(resourceKey2).orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2.location().toString()));
+        return getRegistry(commandContext, resourceKey).get(resourceKey2).orElseThrow(() -> dynamicCommandExceptionType.create(resourceKey2.identifier().toString()));
     }
 }

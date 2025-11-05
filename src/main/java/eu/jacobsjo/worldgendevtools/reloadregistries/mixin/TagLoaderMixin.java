@@ -20,6 +20,6 @@ public class TagLoaderMixin<T> {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void filterTagElements(TagLoader.ElementLookup<T> elementLookup, String string, CallbackInfo ci){
         TagLoader.ElementLookup<T> originalLookup = this.elementLookup;
-        this.elementLookup = (resourceLocation, bl) -> originalLookup.get(resourceLocation, bl).filter(h -> !(h instanceof Holder<?>) || !(((OutdatedHolder) h).worldgenDevtools$isOutdated()));
+        this.elementLookup = (Identifier, bl) -> originalLookup.get(Identifier, bl).filter(h -> !(h instanceof Holder<?>) || !(((OutdatedHolder) h).worldgenDevtools$isOutdated()));
     }
 }

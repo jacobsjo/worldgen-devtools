@@ -43,7 +43,7 @@ public class FeatureGenerationEvent extends Event {
     public FeatureGenerationEvent(ChunkPos chunkPos, ResourceKey<Level> level, String placedFeature, int step) {
         this.chunkPosX = chunkPos.x;
         this.chunkPosZ = chunkPos.z;
-        this.level = level.location().toString();
+        this.level = level.identifier().toString();
         this.placedFeature = placedFeature;
         this.step = step;
         this.stepName = getStepName(step);

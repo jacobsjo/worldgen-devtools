@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class FrozenHolder<T> implements Holder<T> {
     }
 
     @Override
-    public boolean is(ResourceLocation location) {
+    public boolean is(Identifier location) {
         return wrapping.is(location);
     }
 

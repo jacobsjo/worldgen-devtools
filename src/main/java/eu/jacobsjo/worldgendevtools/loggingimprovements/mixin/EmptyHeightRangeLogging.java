@@ -3,7 +3,7 @@ package eu.jacobsjo.worldgendevtools.loggingimprovements.mixin;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.WorldGenerationContext;
 import net.minecraft.world.level.levelgen.heightproviders.BiasedToBottomHeight;
@@ -40,7 +40,7 @@ public class EmptyHeightRangeLogging {
             Optional<PlacedFeature> topFeature = placementContext.topFeature();
             Registry<PlacedFeature> registry = placementContext.getLevel().registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
             if (topFeature.isPresent()){
-                ResourceLocation key = registry.getKey(topFeature.get());
+                Identifier key = registry.getKey(topFeature.get());
                 if (key != null) {
                     MIXIN_LOGGER.warn("Offending placed feature: {}", key);
                 }

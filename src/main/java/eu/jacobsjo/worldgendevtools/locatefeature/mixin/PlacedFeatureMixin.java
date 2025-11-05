@@ -48,7 +48,7 @@ public class PlacedFeatureMixin {
         MutableBoolean mutableBoolean = new MutableBoolean();
         stream.forEach(blockPos -> {
             try (Zone zone =  Profiler.get().zone("configuredFeature")) {
-                key.ifPresent(configuredFeatureResourceKey -> zone.addText(configuredFeatureResourceKey.location().toString()));
+                key.ifPresent(configuredFeatureResourceKey -> zone.addText(configuredFeatureResourceKey.identifier().toString()));
 
                 if (configuredFeature.place(context.getLevel(), context.generator(), source, blockPos)) {
                     mutableBoolean.setTrue();

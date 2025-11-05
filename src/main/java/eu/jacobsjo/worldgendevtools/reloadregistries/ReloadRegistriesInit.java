@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleCategory;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class ReloadRegistriesInit implements ModInitializer {
     public static GameRule<Boolean> RELOAD_REGISTIRES = WorldgenSettingsInit.registrBoolean("reload_registries", GameRuleCategory.MISC, false);
     public static GameRule<Boolean> SYNC_AFTER_REGISTRY_RELOAD = WorldgenSettingsInit.registrBoolean("sync_after_registry_reload", GameRuleCategory.MISC, true);;
 
-    public static ResourceLocation PACKET_ID = ResourceLocation.fromNamespaceAndPath("worldgendevtools", "delay");
+    public static Identifier PACKET_ID = Identifier.fromNamespaceAndPath("worldgendevtools", "delay");
 
     @Override
     public void onInitialize() {

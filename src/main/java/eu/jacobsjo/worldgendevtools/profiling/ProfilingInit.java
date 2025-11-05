@@ -6,14 +6,14 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ProfilingInit implements ModInitializer {
     public static final AttachmentType<ChunkgenProfilingInformation> PROFILING_ATTACHMENT = AttachmentRegistry.<ChunkgenProfilingInformation>builder()
             .initializer(ChunkgenProfilingInformation::new)
             .persistent(ChunkgenProfilingInformation.CODEC)
-            .buildAndRegister(ResourceLocation.fromNamespaceAndPath("worldgendevtools", "profiling"));
+            .buildAndRegister(Identifier.fromNamespaceAndPath("worldgendevtools", "profiling"));
 
     @Override
     public void onInitialize() {

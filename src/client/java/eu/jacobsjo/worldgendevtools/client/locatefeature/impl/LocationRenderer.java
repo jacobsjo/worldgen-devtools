@@ -23,7 +23,7 @@ import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.gizmos.TextGizmo;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.debug.DebugValueAccess;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -69,7 +69,7 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
             List<FeaturePositions.PosAndCount> positions = featurePositions.getPositions(key);
             assert positions != null;
 
-            ColorUtil.RGB color = ColorUtil.randomFromString(key.location().toString());
+            ColorUtil.RGB color = ColorUtil.randomFromString(key.identifier().toString());
 
             positions.forEach(pos -> {
                 if (pos.pos().getCenter().closerThan(playerPos, 24)) {
@@ -84,7 +84,7 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
                         ).setAlwaysOnTop();
                     }
                     if (pos.pos().getCenter().closerThan(playerPos, 8) && count <= 6) {
-                        String text = count == 6 ? "[and more]" : key.location() + (pos.count() > 1 ? " [x" + pos.count() + "]" : "");
+                        String text = count == 6 ? "[and more]" : key.identifier() + (pos.count() > 1 ? " [x" + pos.count() + "]" : "");
                         Gizmos.billboardText(
                                 text,
                                 pos.pos().getCenter().add(0, 0.28 + 0.13 * count, 0),

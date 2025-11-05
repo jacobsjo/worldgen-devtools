@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -37,22 +37,22 @@ import java.util.Map;
 /**
  * Vanilla uses {@code ChunkAccess.structureStarts} and {@code ChunkAccess.structuresRefences} to map structures to
  * structure starts and references. This mixin changes it to use {@link #structureStartsByLocation} and
- * {@link #structuresRefencesByLocation} which use {@link ResourceLocation}s instead. This change is only done on the
+ * {@link #structuresRefencesByLocation} which use {@link Identifier}s instead. This change is only done on the
  * logical server.
  */
 @Mixin(ChunkAccess.class)
 public class ChunkAccessMixin {
 
-    @Shadow protected volatile boolean unsaved;
+    @Shadow private volatile boolean unsaved;
     @Shadow @Final private static LongSet EMPTY_REFERENCE_SET;
 
     @Shadow @Final protected LevelChunkSection[] sections;
     @Unique
-    private Map<ResourceLocation, StructureStart> structureStartsByLocation;
+    private Map<Identifier, StructureStart> structureStartsByLocation;
     @Unique
-    private Map<ResourceLocation, LongSet> structuresRefencesByLocation;
+    private Map<Identifier, LongSet> structuresRefencesByLocation;
     @Unique
-    private RegistryAccess registryAccess;
+    private @Nullable RegistryAccess registryAccess;
 
     @Inject(method="<init>", at = @At("TAIL"))
     private void init(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, PalettedContainerFactory palettedContainerFactory, long l, LevelChunkSection[] levelChunkSections, BlendingData blendingData, CallbackInfo ci){
