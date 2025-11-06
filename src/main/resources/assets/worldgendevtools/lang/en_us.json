@@ -57,5 +57,7 @@
   "worldgendevtools.resetchunks.failed": "Failed to reset chunk %s",
   "worldgendevtools.resetchunks.success": "Marked %s chunks for reset",
 
-  "worldgendevtools.worldgensettings.no_save_warning": "Chunk saving is disabled"
+  "worldgendevtools.worldgensettings.no_save_warning": "Chunk saving is disabled",
+
+  "worldgendevtools.environmentattributes.environmentattribute.get.success": "%s: %s"
 }

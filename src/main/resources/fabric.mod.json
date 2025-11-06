@@ -29,6 +29,7 @@
     "main": [
       "eu.jacobsjo.worldgendevtools.vanillacommands.VanillaCommandsInit",
       "eu.jacobsjo.worldgendevtools.dfcommand.DfCommandInit",
+      "eu.jacobsjo.worldgendevtools.environmentattributes.EnvironmentAttributesInit",
       "eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit",
       "eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit",
       "eu.jacobsjo.worldgendevtools.resetchunks.ReloadChunksInit",
