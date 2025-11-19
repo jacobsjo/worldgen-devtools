@@ -59,5 +59,9 @@
 
   "worldgendevtools.worldgensettings.no_save_warning": "Chunk saving is disabled",
 
-  "worldgendevtools.environmentattributes.environmentattribute.get.success": "%s: %s"
+  "worldgendevtools.environmentattributes.environmentattribute.get.success": "%s: %s",
+  "worldgendevtools.environmentattributes.environmentattribute.set.failure": "Failed to set environment attribute %s: %s",
+  "worldgendevtools.environmentattributes.environmentattribute.set.success": "Environment attribute %s set",
+  "worldgendevtools.environmentattributes.environmentattribute.reset.success": "Environment attribute %s reset",
+  "worldgendevtools.environmentattributes.environmentattribute.resetall.success": "All Environment attributes reset"
 }

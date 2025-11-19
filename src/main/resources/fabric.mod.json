@@ -45,6 +45,7 @@
     "worldgendevtools.profiling.mixins.json",
     "worldgendevtools.locatefeature.mixins.json",
     "worldgendevtools.externalprofiling.mixins.json",
+    "worldgendevtools.environmentattributes.mixins.json",
     {
       "config": "worldgendevtools.client.reloadregistries.mixins.json",
       "environment": "client"
