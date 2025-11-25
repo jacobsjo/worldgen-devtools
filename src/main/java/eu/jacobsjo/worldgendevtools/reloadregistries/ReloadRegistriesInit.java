@@ -3,7 +3,10 @@ package eu.jacobsjo.worldgendevtools.reloadregistries;
 import com.mojang.logging.LogUtils;
 import eu.jacobsjo.worldgendevtools.worldgensettings.WorldgenSettingsInit;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -17,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 public class ReloadRegistriesInit implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static GameRule<Boolean> RELOAD_REGISTIRES = WorldgenSettingsInit.registrBoolean("reload_registries", GameRuleCategory.MISC, false);
-    public static GameRule<Boolean> SYNC_AFTER_REGISTRY_RELOAD = WorldgenSettingsInit.registrBoolean("sync_after_registry_reload", GameRuleCategory.MISC, true);;
+    public static GameRule<Boolean> RELOAD_REGISTIRES = Registry.register(BuiltInRegistries.GAME_RULE, "reload_registries", GameRuleBuilder.forBoolean(false).build());
+    public static GameRule<Boolean> SYNC_AFTER_REGISTRY_RELOAD = Registry.register(BuiltInRegistries.GAME_RULE, "sync_after_registry_reload", GameRuleBuilder.forBoolean(true).build());
 
     public static Identifier PACKET_ID = Identifier.fromNamespaceAndPath("worldgendevtools", "delay");
 

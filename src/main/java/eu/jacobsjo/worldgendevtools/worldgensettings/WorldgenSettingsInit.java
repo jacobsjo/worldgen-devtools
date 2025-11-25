@@ -49,11 +49,6 @@ public class WorldgenSettingsInit implements ModInitializer {
         });
     }
 
-    public static GameRule<Boolean> registrBoolean(String id, GameRuleCategory category, boolean default_value){
-        GameRule<Boolean> gameRule = new GameRule<>(category, GameRuleType.BOOL, BoolArgumentType.bool(), GameRuleTypeVisitor::visitBoolean, Codec.BOOL, b -> b ? 1 : 0, default_value, FeatureFlagSet.of());
-        return Registry.register(BuiltInRegistries.GAME_RULE, Identifier.withDefaultNamespace(id), gameRule); // Using minecraft namespace here as other namespaces are horrible UX
-    }
-
     private void showWarning(Player player){
         if (player instanceof ServerPlayer serverPlayer){
             serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(NO_SAVE_WARNING));
