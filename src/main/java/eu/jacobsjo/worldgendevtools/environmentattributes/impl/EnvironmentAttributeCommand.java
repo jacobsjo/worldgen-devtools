@@ -3,6 +3,7 @@ package eu.jacobsjo.worldgendevtools.environmentattributes.impl;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
+import eu.jacobsjo.worldgendevtools.environmentattributes.EnvironmentAttributesInit;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.attribute.*;
 import net.minecraft.world.phys.Vec3;
 
+@SuppressWarnings("UnstableApiUsage")
 public final class EnvironmentAttributeCommand {
     final static SpatialAttributeInterpolator biomeInterpolator = new SpatialAttributeInterpolator();
 
@@ -77,19 +79,30 @@ public final class EnvironmentAttributeCommand {
             stack.sendFailure(Component.translatable("worldgendevtools.environmentattributes.environmentattribute.set.failure", environmentAttribute.getRegisteredName(), decoded.error().get().message()));
             return 0;
         }
-        AttributeOverrides.addOverride(environmentAttribute.value(), environmentAttribute.value().valueCodec().decode(NbtOps.INSTANCE, value).getOrThrow().getFirst());
+        AttributeOverrides overrides = new AttributeOverrides(stack.getLevel().getAttachedOrCreate(EnvironmentAttributesInit.ENVIRONMENT_ATTRIBUTE_OVERRIDES));
+        overrides.addOverride(
+                        environmentAttribute.value(),
+                        environmentAttribute.value().valueCodec().decode(NbtOps.INSTANCE, value).getOrThrow().getFirst()
+                );
+        stack.getLevel().setAttached(EnvironmentAttributesInit.ENVIRONMENT_ATTRIBUTE_OVERRIDES, overrides);
         stack.sendSuccess(() -> Component.translatable("worldgendevtools.environmentattributes.environmentattribute.set.success", environmentAttribute.getRegisteredName()), true);
         return 1;
     }
 
     private static int resetEnviromentAttribute(CommandSourceStack stack, Holder<EnvironmentAttribute<?>> environmentAttribute){
-        AttributeOverrides.removeOverride(environmentAttribute.value());
+        AttributeOverrides overrides = new AttributeOverrides(stack.getLevel().getAttachedOrCreate(EnvironmentAttributesInit.ENVIRONMENT_ATTRIBUTE_OVERRIDES));
+        overrides.removeOverride(
+                        environmentAttribute.value()
+                );
+        stack.getLevel().setAttached(EnvironmentAttributesInit.ENVIRONMENT_ATTRIBUTE_OVERRIDES, overrides);
         stack.sendSuccess(() -> Component.translatable("worldgendevtools.environmentattributes.environmentattribute.reset.success", environmentAttribute.getRegisteredName()), true);
         return 1;
     }
 
     private static int resetAllEnviromentAttribute(CommandSourceStack stack){
-        AttributeOverrides.clearOverrides();
+        AttributeOverrides overrides = new AttributeOverrides();
+        stack.getLevel().setAttached(EnvironmentAttributesInit.ENVIRONMENT_ATTRIBUTE_OVERRIDES, overrides);
+
         stack.sendSuccess(() -> Component.translatable("worldgendevtools.environmentattributes.environmentattribute.resetall.success"), true);
         return 1;
     }
