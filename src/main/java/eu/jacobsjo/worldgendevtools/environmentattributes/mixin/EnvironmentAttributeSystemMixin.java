@@ -1,6 +1,5 @@
 package eu.jacobsjo.worldgendevtools.environmentattributes.mixin;
 
-import eu.jacobsjo.worldgendevtools.environmentattributes.EnvironmentAttributesInit;
 import eu.jacobsjo.worldgendevtools.environmentattributes.impl.AttributeOverrides;
 import net.minecraft.world.attribute.EnvironmentAttributeSystem;
 import net.minecraft.world.level.Level;
