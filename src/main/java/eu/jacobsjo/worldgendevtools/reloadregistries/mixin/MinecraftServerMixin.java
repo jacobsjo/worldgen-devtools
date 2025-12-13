@@ -36,7 +36,7 @@ public abstract class MinecraftServerMixin {
      * of the registries to the beginning.
      * @param resources the collected resources
      */
-    @Inject (method = "method_29437", at = @At("HEAD"))
+    @Inject(method = "lambda$reloadResources$29", at = @At("HEAD"))
     private void thenCompose(ImmutableList<PackResources> resources, CallbackInfoReturnable<CompletionStage<?>> cir) {
         if (this.getWorldData().getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
             RegistryReloader.reloadRegistries(this.registries, this.levels, resources);

@@ -35,7 +35,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         return null;
     }
 
-    @Shadow protected abstract void method_29676(List<Path> par1, boolean par2);
+    @Shadow protected abstract void lambda$onFilesDrop$8(List<Path> par1, boolean par2);
 
     @SuppressWarnings("EmptyMethod")
     @Shadow
@@ -58,11 +58,11 @@ public abstract class PackSelectionScreenMixin extends Screen {
         String datapacks = extractPackNames(packs).collect(Collectors.joining(", "));
         this.minecraft.setScreen(new PackDropScreen(Component.literal(datapacks), result -> {
             shouldSymlink = result == PackDropScreen.Selection.SYMLINK;
-            method_29676(packs, result == PackDropScreen.Selection.COPY || result == PackDropScreen.Selection.SYMLINK);
+            lambda$onFilesDrop$8(packs, result == PackDropScreen.Selection.COPY || result == PackDropScreen.Selection.SYMLINK);
         }));
     }
 
-    @Inject(method = "method_29676", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/packs/PackSelectionScreen;copyPacks(Lnet/minecraft/client/Minecraft;Ljava/util/List;Ljava/nio/file/Path;)V"))
+    @Inject(method = "lambda$onFilesDrop$8", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/packs/PackSelectionScreen;copyPacks(Lnet/minecraft/client/Minecraft;Ljava/util/List;Ljava/nio/file/Path;)V"))
     public void beforeCopyPacks(List<Path> packs, boolean bl, CallbackInfo ci, @Local(ordinal = 1) List<Path> list2) {
         if (shouldSymlink) {
             list2.stream()
@@ -71,7 +71,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         }
     }
 
-    @Redirect(method = "method_29676", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/packs/PackSelectionScreen;copyPacks(Lnet/minecraft/client/Minecraft;Ljava/util/List;Ljava/nio/file/Path;)V"))
+    @Redirect(method = "lambda$onFilesDrop$8", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/packs/PackSelectionScreen;copyPacks(Lnet/minecraft/client/Minecraft;Ljava/util/List;Ljava/nio/file/Path;)V"))
     public void callCopyPacks(Minecraft minecraft, List<Path> packs, Path outDir){
         if (shouldSymlink){
             SymlinkUtil.symlinkPacks(minecraft, packs, outDir);

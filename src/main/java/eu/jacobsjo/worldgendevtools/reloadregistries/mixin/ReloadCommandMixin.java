@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ReloadCommand.class)
 public class ReloadCommandMixin {
-    @Inject(method = "method_29479", at = @At("TAIL"))
+    @Inject(method = "lambda$reloadPacks$0", at = @At("TAIL"))
     private static void sendFailure(CommandSourceStack source, Throwable throwable, CallbackInfoReturnable<Void> cir){
         if (throwable.getCause() instanceof ComponentFormattedException componentFormattedException){
             source.sendFailure(componentFormattedException.getComponentMessage());

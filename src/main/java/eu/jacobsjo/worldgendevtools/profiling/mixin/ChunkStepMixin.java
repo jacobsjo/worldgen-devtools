@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 @SuppressWarnings("UnstableApiUsage")
 @Mixin(ChunkStep.class)
 public class ChunkStepMixin {
-    @Shadow @Final ChunkStatus targetStatus;
+    @Shadow @Final private ChunkStatus targetStatus;
 
     @Inject(
             method = "apply",

@@ -17,8 +17,9 @@ public class ChunkGeneratorMixin {
      * @author jacobsjo
      * @reason overwriting simple lambda
      */
+
     @Overwrite
-    private static void method_39788(IntSet intSet, FeatureSorter.StepFeatureData stepFeatureData, PlacedFeature placedFeature){
+    private static void lambda$applyBiomeDecoration$9(IntSet intSet, FeatureSorter.StepFeatureData stepFeatureData, PlacedFeature placedFeature){
         int id = stepFeatureData.indexMapping().applyAsInt(placedFeature);
         /*
          if id is -1 then the placedFeature wasn't found in the indexMapping. This happens when biomeDecoration happends

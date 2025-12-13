@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(ChunkStep.class)
 public class ChunkStepMixin {
 
-    @Shadow @Final ChunkStatus targetStatus;
+    @Shadow @Final private ChunkStatus targetStatus;
 
     @WrapMethod(method = "apply")
     public CompletableFuture<ChunkAccess> apply(WorldGenContext worldGenContext, StaticCache2D<GenerationChunkHolder> staticCache2D, ChunkAccess chunkAccess, Operation<CompletableFuture<ChunkAccess>> original){
