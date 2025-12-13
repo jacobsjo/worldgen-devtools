@@ -34,6 +34,6 @@ jobs:
           files: build/libs/!(*-@(dev|sources|javadoc)).jar
           game-versions: ${{ steps.minecraft_version.outputs.minecraft_version }}
           game-version-filter: none
-          modrinth-id: EyDzmyQr
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          #modrinth-id: EyDzmyQr
+          #modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
