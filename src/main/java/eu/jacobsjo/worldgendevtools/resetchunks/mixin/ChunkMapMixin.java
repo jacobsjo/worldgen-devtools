@@ -70,11 +70,6 @@ public abstract class ChunkMapMixin extends SimpleRegionStorage implements Reset
             // reactivate all deactivated tickets, so the chunk gets reloaded and sent to the client
             this.ticketStorage.activateAllDeactivatedTickets();
 
-            // this makes the playerTicketManager readd the player tickets we just deleted, so the chunk gets reloaded and sent to the client.
-            //int level = distanceManager.playerTicketManager.getLevel(chunkPos.toLong());
-            //distanceManager.playerTicketManager.onLevelChange(chunkPos.toLong(), level, false, distanceManager.playerTicketManager.haveTicketFor(level));
-            // other tickets aren't readded, so some chunks (like in spawn-chunks) aren't reloaded after a reset. I don't think this matters though.
-
         } catch (Exception e) {
             ResetChunksCommand.LOGGER.error("Failed to reset chunk {}", chunkPos, e);
             return false;

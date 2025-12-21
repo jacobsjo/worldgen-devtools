@@ -1,12 +1,15 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 
 import com.google.common.collect.ImmutableList;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import eu.jacobsjo.worldgendevtools.reloadregistries.ReloadRegistriesInit;
 import eu.jacobsjo.worldgendevtools.reloadregistries.impl.RegistryReloader;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RegistryLayer;
+import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.packs.PackResources;
@@ -32,15 +35,14 @@ public abstract class MinecraftServerMixin {
     @Shadow public abstract WorldData getWorldData();
 
     /**
-     * This is a lambda in the reloadResources method that gets called with the collected packResources. We add the reloading
-     * of the registries to the beginning.
-     * @param resources the collected resources
+     * We add the reloading of the registries as a seperate step before reloading of reloadable resources.
      */
-    @Inject(method = "lambda$reloadResources$29", at = @At("HEAD"))
-    private void thenCompose(ImmutableList<PackResources> resources, CallbackInfoReturnable<CompletionStage<?>> cir) {
+    @WrapMethod(method = "lambda$reloadResources$1")
+    private CompletionStage<ReloadableServerResources> thenCompose(ImmutableList<PackResources> packsToLoad, Operation<CompletionStage<ReloadableServerResources>> original) {
         if (this.getWorldData().getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
-            RegistryReloader.reloadRegistries(this.registries, this.levels, resources);
+            return RegistryReloader.reloadRegistries(this.registries, this.levels, packsToLoad).thenCompose(object -> original.call(packsToLoad));
         }
+        return original.call(packsToLoad);
     }
 
     /**

@@ -67,8 +67,8 @@
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
     "fabricloader": "*",
-    "fabric-api": "*",
-    "minecraft": ">=1.21.11- <1.21.12-",
+    "fabric-api": "~0.140",
+    "minecraft": "~26.1-",
     "java": ">=21"
   }
 }

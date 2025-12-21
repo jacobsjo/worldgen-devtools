@@ -1,11 +1,17 @@
 accessWidener v2 official
-accessible method net/minecraft/resources/RegistryDataLoader loadContentsFromManager (Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;Lnet/minecraft/core/WritableRegistry;Lcom/mojang/serialization/Decoder;Ljava/util/Map;)V
-accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V
+
+accessible class net/minecraft/resources/RegistryDataLoader$ResourceManagerRegistryLoadTask
+accessible method net/minecraft/resources/RegistryDataLoader$ResourceManagerRegistryLoadTask <init> (Lnet/minecraft/resources/RegistryDataLoader$RegistryData;Lcom/mojang/serialization/Lifecycle;Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;)V
+accessible field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
+mutable field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
+accessible method net/minecraft/resources/RegistryDataLoader load (Lnet/minecraft/resources/RegistryDataLoader$LoaderFactory;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;
+accessible class net/minecraft/resources/RegistryDataLoader$LoaderFactory
+accessible class net/minecraft/resources/RegistryDataLoader$RegistryLoadTask
+accessible field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask registryWriteLock Ljava/lang/Object;
+mutable field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask concurrentRegistrationGetter Lnet/minecraft/core/registries/ConcurrentHolderGetter;
+
 accessible class net/minecraft/world/level/levelgen/DensityFunctions$EndIslandDensityFunction
-accessible field net/minecraft/server/level/DistanceManager playerTicketManager Lnet/minecraft/server/level/DistanceManager$PlayerTicketTracker;
-accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker onLevelChange (JIZZ)V
-accessible method net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker getLevel (J)I
-accessible method net/minecraft/server/level/DistanceManager$PlayerTicketTracker haveTicketFor (I)Z
+#accessible method net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker getLevel (J)I
 accessible method net/minecraft/server/level/ChunkMap generator ()Lnet/minecraft/world/level/chunk/ChunkGenerator;
 accessible class net/minecraft/core/MappedRegistry$TagSet
 

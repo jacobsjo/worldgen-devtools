@@ -5,20 +5,18 @@ import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
-import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.UpdatableGeneratorChunkMap;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.*;
+import net.minecraft.core.registries.ConcurrentHolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -29,77 +27,105 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.tags.TagLoader;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 public class RegistryReloader {
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    private static class ResourceManagerRegistryReloadTask<T> extends RegistryDataLoader.ResourceManagerRegistryLoadTask<T> {
+
+        private ResourceManagerRegistryReloadTask(
+                final RegistryDataLoader.RegistryData<T> data,
+                final Lifecycle lifecycle,
+                final Map<ResourceKey<?>, Exception> loadingErrors,
+                final ResourceManager resourceManager,
+                RegistryAccess.Frozen reloadedLayer
+        ) {
+            super(data, lifecycle, loadingErrors, resourceManager);
+            Registry<T> registry = reloadedLayer.lookup(data.key()).orElseThrow();
+            if (registry instanceof WritableRegistry<T> writableRegistry) {
+                this.registry = writableRegistry;
+                ((ReloadableRegistry) this.registry).worldgenDevtools$startReload();
+                this.concurrentRegistrationGetter = new ConcurrentHolderGetter<>(this.registryWriteLock, this.registry.createRegistrationLookup());
+            } else {
+                throw new IllegalStateException("Registry is not writable");
+            }
+        }
+    }
+
     /**
      * Reloades the registries.
-     * @param registries the RegistryAccess from the server
-     * @param levels map of levels to recreate the generatores for
-     * @param resources datapack resources
+     *
+     * @param registries  the RegistryAccess from the server
+     * @param levels      map of levels to recreate the generatores for
+     * @param packsToLoad the packs to load from
+     * @return CompletableFuture that completes when the reload is done
      */
-    public static void reloadRegistries(LayeredRegistryAccess<RegistryLayer> registries, Map<ResourceKey<Level>, ServerLevel> levels, ImmutableList<PackResources> resources){
+    public static CompletableFuture<Object> reloadRegistries(
+            LayeredRegistryAccess<RegistryLayer> registries,
+            Map<ResourceKey<Level>, ServerLevel> levels,
+            ImmutableList<PackResources> packsToLoad
+        ){
+
+        final Executor backgroundExecutor = Util.backgroundExecutor();
         LOGGER.info("Reloading registries");
 
-        CloseableResourceManager resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, resources);
-
-        RegistryAccess.Frozen dimensionsContextLayer = registries.getAccessForLoading(RegistryLayer.DIMENSIONS);
-        RegistryAccess.Frozen dimensionsNewLayer = registries.getLayer(RegistryLayer.DIMENSIONS);
-        RegistryOps.RegistryInfoLookup dimensionsLookup = getRegistrtyInfoLookup(dimensionsContextLayer, dimensionsNewLayer, false);
+        CloseableResourceManager resources = new MultiPackResourceManager(PackType.SERVER_DATA, packsToLoad);
 
         // Store old dimensions
+        RegistryAccess.Frozen dimensionsContextLayer = registries.getAccessForLoading(RegistryLayer.DIMENSIONS);
+        HolderLookup.Provider oldDimensionContextProvider = HolderLookup.Provider.create(dimensionsContextLayer.listRegistries());
         Map<Identifier, JsonElement> generators = new HashMap<>();
-        levels.forEach((key, level) -> generators.put(key.identifier(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, dimensionsLookup), level.getChunkSource().getGenerator()).getOrThrow()));
+        levels.forEach((key, level) -> generators.put(key.identifier(), ChunkGenerator.CODEC.encodeStart(RegistryOps.create(JsonOps.INSTANCE, oldDimensionContextProvider), level.getChunkSource().getGenerator()).getOrThrow()));
 
         // Reload Worldgen registries
-        Map<ResourceKey<?>, Exception> exceptionMap = new HashMap<>();
+        LayeredRegistryAccess<RegistryLayer> initialLayers = RegistryLayer.createRegistryAccess();
+        List<Registry.PendingTags<?>> staticLayerTags = TagLoader.loadTagsForExistingRegistries(resources, initialLayers.getLayer(RegistryLayer.STATIC));
+        RegistryAccess.Frozen worldgenLoadContext = registries.getAccessForLoading(RegistryLayer.WORLDGEN);
+        List<HolderLookup.RegistryLookup<?>> worldgenContextRegistries = TagLoader.buildUpdatedLookups(worldgenLoadContext, staticLayerTags);
 
-        RegistryAccess.Frozen worldgenContextLayer = registries.getAccessForLoading(RegistryLayer.WORLDGEN);
-        RegistryAccess.Frozen worldgenNewLayer = registries.getLayer(RegistryLayer.WORLDGEN);
-        RegistryOps.RegistryInfoLookup worldgenLookup = getRegistrtyInfoLookup(worldgenContextLayer, worldgenNewLayer, true);
+        RegistryAccess.Frozen worldgenLayerToReload = registries.getLayer(RegistryLayer.WORLDGEN);
 
-        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> loadData(worldgenLookup, resourceManager, data, worldgenNewLayer, exceptionMap));
+        return reloadData(resources, worldgenContextRegistries, RegistryDataLoader.WORLDGEN_REGISTRIES, backgroundExecutor, worldgenLayerToReload)
+                .thenComposeAsync(loadedWorldgenRegistries -> {
+                    List<HolderLookup.RegistryLookup<?>> dimensionContextRegistries = Stream.concat(
+                                    worldgenContextRegistries.stream(), loadedWorldgenRegistries.listRegistries()
+                            )
+                            .toList();
+                    return RegistryDataLoader.load(resources, dimensionContextRegistries, RegistryDataLoader.DIMENSION_REGISTRIES, backgroundExecutor)
+                            .thenApply(newDimensionRegistires -> {
+                                Registry<LevelStem> newLevelStemRegistry = (Registry<LevelStem>) newDimensionRegistires.registries().findAny().orElseThrow().value();
 
-        List<IllegalStateException> freezingExceptions = new ArrayList<>();
-        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
-            try {
-                Registry<?> registry = worldgenNewLayer.lookupOrThrow(data.key());
-                registry.freeze();
-            } catch (IllegalStateException e){
-                freezingExceptions.add(e);
-            }
-        });
+                                HolderLookup.Provider dimensionContextProvider = HolderLookup.Provider.create(dimensionContextRegistries.stream());
 
-        if (!exceptionMap.isEmpty()) {
-            logErrors(exceptionMap);
-            resourceManager.close();
-            throw new ComponentFormattedException(formatErrors(exceptionMap));
-        }
+                                reloadDimensions(levels, newLevelStemRegistry, generators, dimensionContextProvider);
+                                return null;
+                            });
+                });
+    }
 
-        if (!freezingExceptions.isEmpty()){
-            resourceManager.close();
-            throw new ComponentFormattedException(formatFreezingErrors(freezingExceptions));
-        }
-
-        // Reload Dimension registry
-        MappedRegistry<LevelStem> levelStemRegistry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable());
-        RegistryDataLoader.loadContentsFromManager(resourceManager, dimensionsLookup, levelStemRegistry, LevelStem.CODEC, exceptionMap);
-
-        // combine dimensions loaded from datapack with already existing dimensions (prioritize new)
-        Stream<Identifier> dimensionKeys = Stream.concat(levelStemRegistry.registryKeySet().stream().map(ResourceKey::identifier), generators.keySet().stream()).distinct();
+    /// combine dimensions loaded from datapack with already existing dimensions (prioritize new)
+    private static void reloadDimensions(
+            Map<ResourceKey<Level>, ServerLevel> levels,
+            Registry<LevelStem> newLevelStems,
+            Map<Identifier, JsonElement> oldGenerators,
+            HolderLookup.Provider dimensionContextProvider
+        ){
+        Stream<Identifier> dimensionKeys = Stream.concat(newLevelStems.registryKeySet().stream().map(ResourceKey::identifier), oldGenerators.keySet().stream()).distinct();
 
         //for each found dimension, create a generator and set it for the dimension, if one exists. Adding new dimensions isn't supported.
         dimensionKeys.forEach(key -> {
@@ -111,7 +137,7 @@ public class RegistryReloader {
                 return;
             }
 
-            Optional<LevelStem> levelStem = levelStemRegistry.getOptional(key);
+            Optional<LevelStem> levelStem = newLevelStems.getOptional(key);
 
             ChunkGenerator chunkGenerator;
             if (levelStem.isPresent()) {
@@ -122,7 +148,7 @@ public class RegistryReloader {
                 level.dimensionTypeRegistration = new FrozenHolder<>(levelStem.get().type());
                 chunkGenerator = levelStem.get().generator();
             } else {
-                chunkGenerator = ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, worldgenLookup), generators.get(key)).result().orElseThrow();
+                chunkGenerator = ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, dimensionContextProvider), oldGenerators.get(key)).result().orElseThrow();
             }
 
             ChunkMap chunkMap = level.getChunkSource().chunkMap;
@@ -154,98 +180,20 @@ public class RegistryReloader {
         }
     }
 
-    private static <T> void loadData(
-            RegistryOps.RegistryInfoLookup registryInfoLookup,
-            ResourceManager resourceManager,
-            RegistryDataLoader.RegistryData<T> data,
-            RegistryAccess.Frozen layer,
-            Map<ResourceKey<?>, Exception> exceptionMap
-    ){
-        Optional<Registry<T>> registry = layer.lookup(data.key());
-        if (registry.isEmpty()){
-            exceptionMap.put(data.key(), new Exception("Registry doesn't exist"));
-            return;
-        }
-
-        if (!(registry.get() instanceof WritableRegistry<T>)){
-            exceptionMap.put(data.key(), new Exception("Registry is not writable"));
-            return;
-        }
-
-        RegistryDataLoader.loadContentsFromManager(resourceManager, registryInfoLookup, (WritableRegistry<T>) registry.get(), data.elementCodec(), exceptionMap);
-    }
-
-    private static <T> RegistryOps.RegistryInfo<T> createInfoForNewRegistry(WritableRegistry<T> writableRegistry) {
-        return new RegistryOps.RegistryInfo<>(writableRegistry, writableRegistry.createRegistrationLookup(), writableRegistry.registryLifecycle());
-    }
-
-    private static <T> RegistryOps.RegistryInfo<T> createInfoForContextRegistry(Registry<T> registry) {
-        return new RegistryOps.RegistryInfo<>(registry, registry, registry.registryLifecycle());
-    }
-
-    private static RegistryOps.RegistryInfoLookup getRegistrtyInfoLookup(RegistryAccess.Frozen contextLayer, RegistryAccess.Frozen newLayer, boolean reset){
-
-        final Map<ResourceKey<? extends Registry<?>>, RegistryOps.RegistryInfo<?>> lookupMap = new HashMap<>();
-        contextLayer.registries().forEach((registryEntry) -> lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value())));
-
-        newLayer.registries().forEach((registryEntry) -> {
-            assert registryEntry.value() instanceof MappedRegistry;
-            MappedRegistry<?> registry = (MappedRegistry<?>) registryEntry.value();
-            if (reset) {
-                ((ReloadableRegistry) registry).worldgenDevtools$startReload();
-                lookupMap.put(registryEntry.key(), createInfoForNewRegistry(registry));
-            } else {
-                lookupMap.put(registryEntry.key(), createInfoForContextRegistry(registryEntry.value()));
-            }
-        });
-
-        return new RegistryOps.RegistryInfoLookup() {
-            @SuppressWarnings("unchecked")
-            public <E> @NotNull Optional<RegistryOps.RegistryInfo<E>> lookup(ResourceKey<? extends Registry<? extends E>> resourceKey) {
-                return Optional.ofNullable((RegistryOps.RegistryInfo<E>) lookupMap.get(resourceKey));
+    public static CompletableFuture<RegistryAccess.Frozen> reloadData(
+            final ResourceManager resourceManager,
+            final List<HolderLookup.RegistryLookup<?>> contextRegistries,
+            final List<RegistryDataLoader.RegistryData<?>> registriesToLoad,
+            final Executor executor,
+            RegistryAccess.Frozen reloadedLayer
+    ) {
+        RegistryDataLoader.LoaderFactory loaderFactory = new RegistryDataLoader.LoaderFactory() {
+            @Override
+            public <T> RegistryDataLoader.RegistryLoadTask<T> create(final RegistryDataLoader.RegistryData<T> data, final Map<ResourceKey<?>, Exception> loadingErrors) {
+                return new ResourceManagerRegistryReloadTask<>(data, Lifecycle.stable(), loadingErrors, resourceManager, reloadedLayer);
             }
         };
-    }
-
-
-    private static void logErrors(Map<ResourceKey<?>, Exception> map) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        Map<Identifier, Map<Identifier, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).identifier(), Map.Entry::getValue)));
-        map2.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
-            printWriter.printf("> Errors in registry %s:%n", entry.getKey());
-            (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {
-                printWriter.printf(">> Errors in element %s:%n", entryx.getKey());
-                (entryx.getValue()).printStackTrace(printWriter);
-            });
-        });
-        printWriter.flush();
-        LOGGER.error("Registry loading errors:\n{}", stringWriter);
-    }
-
-    public static final int REGISTRY_COLOR = 0x80FF80;
-    public static final int ELEMENT_COLOR = 0x8080FF;
-    public static final int ERROR_COLOR = 0xFF8080;
-
-    private static Component formatErrors(Map<ResourceKey<?>, Exception> map){
-        MutableComponent component = Component.empty();
-
-        Map<Identifier, Map<Identifier, Exception>> map2 = map.entrySet().stream().collect(Collectors.groupingBy((entry) -> (entry.getKey()).registry(), Collectors.toMap((entry) -> (entry.getKey()).identifier(), Map.Entry::getValue)));
-        map2.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
-            component.append(TextUtil.translatable("worldgendevtools.reloadregistries.error.registry", entry.getKey().toString()).withColor(REGISTRY_COLOR));
-            (entry.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entryx) -> {
-                component.append(TextUtil.translatable("worldgendevtools.reloadregistries.error.element", entryx.getKey().toString()).withColor(ELEMENT_COLOR));
-                component.append(Component.literal(entryx.getValue().getCause().getMessage() + "\n").withColor(ERROR_COLOR));
-            });
-        });
-        return component;
-    }
-
-    private static Component formatFreezingErrors(List<IllegalStateException> list){
-        MutableComponent component = Component.empty();
-
-        list.forEach(e -> component.append(Component.literal(e.getMessage() + "\n").withColor(ERROR_COLOR)));
-        return component;
+        return RegistryDataLoader.load(loaderFactory, contextRegistries, registriesToLoad, executor);
     }
 
 }
