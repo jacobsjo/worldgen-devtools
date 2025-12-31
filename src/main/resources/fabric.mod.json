@@ -62,12 +62,11 @@
       "config": "worldgendevtools.client.locatefeature.mixins.json",
       "environment": "client"
     }
-
   ],
   "accessWidener": "worldgendevtools.accesswidener",
   "depends": {
     "fabricloader": "*",
-    "fabric-api": "~0.140",
+    "fabric-api": "0.140.3",
     "minecraft": "~26.1-",
     "java": ">=21"
   }
