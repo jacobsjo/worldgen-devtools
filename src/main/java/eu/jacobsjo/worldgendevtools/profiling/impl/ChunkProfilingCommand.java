@@ -39,13 +39,13 @@ public class ChunkProfilingCommand {
     }
 
     public static int getProfiling(CommandSourceStack source, int range){
-        ChunkPos centerChunkPos = new ChunkPos(BlockPos.containing(source.getPosition()));
+        ChunkPos centerChunkPos = ChunkPos.containing(BlockPos.containing(source.getPosition()));
 
         List<ChunkgenProfilingInformation> informations = new ArrayList<>();
 
         for (int x = -range; x <= range; x++) {
             for (int z = -range; z <= range; z++) {
-                ChunkAccess chunk = source.getLevel().getChunk(centerChunkPos.x + x, centerChunkPos.z + z);
+                ChunkAccess chunk = source.getLevel().getChunk(centerChunkPos.x() + x, centerChunkPos.z() + z);
                 ChunkgenProfilingInformation info = chunk.getAttached(ProfilingInit.PROFILING_ATTACHMENT);
                 if (info != null) {
                     informations.add(info);

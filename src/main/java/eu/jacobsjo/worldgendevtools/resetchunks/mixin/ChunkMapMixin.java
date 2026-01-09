@@ -61,8 +61,8 @@ public abstract class ChunkMapMixin extends SimpleRegionStorage implements Reset
             //ResetChunksCommand.LOGGER.debug("Removing chunk {} with tickets {}", chunkPos, this.getTicketDebugString(chunkPos.toLong()));
 
             // this forces the chunk to be unloaded, without regard to its saving status. But that doesn't matter, since we are resetting it anyway.
-            this.updatingChunkMap.remove(chunkPos.toLong());
-            ((DeactivateableTicketStorage) this.ticketStorage).worldgenDevtools$deactiveChunk(chunkPos.toLong()); // deactivate tickets from unloaded chunks, to make sure they are reloaded before usage.
+            this.updatingChunkMap.remove(chunkPos.pack());
+            ((DeactivateableTicketStorage) this.ticketStorage).worldgenDevtools$deactiveChunk(chunkPos.pack()); // deactivate tickets from unloaded chunks, to make sure they are reloaded before usage.
 
             // this removes the chunks from disk, so they are regenerated when reloading the chunk
             this.write(chunkPos, () -> null);

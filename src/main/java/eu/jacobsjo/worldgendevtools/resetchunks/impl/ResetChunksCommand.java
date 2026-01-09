@@ -35,18 +35,18 @@ public class ResetChunksCommand {
 
         ServerLevel level = source.getLevel();
         ChunkMap chunkMap = level.getChunkSource().chunkMap;
-        ChunkPos centerChunkPos = new ChunkPos(BlockPos.containing(source.getPosition()));
+        ChunkPos centerChunkPos = ChunkPos.containing(BlockPos.containing(source.getPosition()));
 
         // discard entities in affected chunks
-        ChunkPos minChunkPos = new ChunkPos(centerChunkPos.x - range, centerChunkPos.z - range);
-        ChunkPos maxChunkPos = new ChunkPos(centerChunkPos.x + range, centerChunkPos.z + range);
+        ChunkPos minChunkPos = new ChunkPos(centerChunkPos.x() - range, centerChunkPos.z() - range);
+        ChunkPos maxChunkPos = new ChunkPos(centerChunkPos.x() + range, centerChunkPos.z() + range);
         AABB aabb = new AABB(minChunkPos.getMinBlockX(), level.getMinY(), minChunkPos.getMinBlockZ(), maxChunkPos.getMaxBlockX(), level.getMaxY(), maxChunkPos.getMaxBlockZ());
         level.getEntitiesOfClass(Entity.class, aabb, entity -> !(entity instanceof Player)).forEach(Entity::discard);
 
         // reset chunks
         for (int x = -range; x <= range ; x++) {
             for (int z = -range; z <= range; z++) {
-                ChunkPos chunkPos = new ChunkPos(centerChunkPos.x + x, centerChunkPos.z + z);
+                ChunkPos chunkPos = new ChunkPos(centerChunkPos.x() + x, centerChunkPos.z() + z);
                 boolean success = ((ResettableChunkMap) chunkMap).worldgenDevtools$resetChunk(chunkPos);
                 if (!success){
                     source.sendFailure(TextUtil.translatable("worldgendevtools.resetchunks.failed", chunkPos));

@@ -74,7 +74,7 @@ public class LocateFeature {
                 for (int z = -range ; z <= range ; z++) {
                     if (Math.abs(x) < range && Math.abs(z) < range) continue;
 
-                    ChunkAccess chunk = source.getLevel().getChunk(centerChunkPos.x + x, centerChunkPos.z + z, ChunkStatus.EMPTY);
+                    ChunkAccess chunk = source.getLevel().getChunk(centerChunkPos.x() + x, centerChunkPos.z() + z, ChunkStatus.EMPTY);
                     FeaturePositions featurePositions = chunk.getAttached(LocateFeatureInit.FEATURE_POSITION_ATTACHMENT);
                     if (featurePositions == null) continue;
 
