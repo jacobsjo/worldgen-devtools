@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,14 +33,16 @@ public abstract class MinecraftServerMixin {
     @Shadow @Final private LayeredRegistryAccess<RegistryLayer> registries;
     @Shadow @Final private Map<ResourceKey<Level>, ServerLevel> levels;
     @Shadow public abstract ServerConnectionListener getConnection();
-    @Shadow public abstract WorldData getWorldData();
+
+    @Shadow
+    public abstract GameRules getGameRules();
 
     /**
      * We add the reloading of the registries as a seperate step before reloading of reloadable resources.
      */
     @WrapMethod(method = "lambda$reloadResources$1")
     private CompletionStage<ReloadableServerResources> thenCompose(ImmutableList<PackResources> packsToLoad, Operation<CompletionStage<ReloadableServerResources>> original) {
-        if (this.getWorldData().getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
+        if (this.getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES)) {
             return RegistryReloader.reloadRegistries(this.registries, this.levels, packsToLoad).thenCompose(object -> original.call(packsToLoad));
         }
         return original.call(packsToLoad);
@@ -51,7 +54,7 @@ public abstract class MinecraftServerMixin {
      */
     @Inject(method = "reloadResources", at = @At("RETURN"))
     private void afterReloadResources(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir){
-        if (this.getWorldData().getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES) && this.getWorldData().getGameRules().get(ReloadRegistriesInit.SYNC_AFTER_REGISTRY_RELOAD)) {
+        if (this.getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES) && this.getGameRules().get(ReloadRegistriesInit.SYNC_AFTER_REGISTRY_RELOAD)) {
             cir.getReturnValue().thenAccept(reloadableResources -> RegistryReloader.syncClient(this.getConnection()));
         }
     }

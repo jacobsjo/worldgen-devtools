@@ -16,6 +16,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.storage.ServerLevelData;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,11 +26,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Objects;
 
 @Mixin(SinglePoolElement.class)
 public abstract class SinglePoolElementMixin {
 
-    @Unique
+    @Unique @Nullable
     private WorldGenLevel level;
 
     /**
@@ -45,7 +47,8 @@ public abstract class SinglePoolElementMixin {
      */
     @ModifyVariable(method = "getSettings", at=@At("HEAD"), ordinal = 0, argsOnly = true)
     public boolean getSettings(boolean keepJigsaws){
-        if (((ServerLevelData) level.getLevelData()).getGameRules().get(WorldgenSettingsInit.KEEP_JIGSAWS)){
+        assert level != null;
+        if (Objects.requireNonNull(level.getServer()).getGameRules().get(WorldgenSettingsInit.KEEP_JIGSAWS)){
             return true;
         }
         return keepJigsaws;
@@ -56,7 +59,8 @@ public abstract class SinglePoolElementMixin {
      */
     @Redirect(method = "getSettings", at= @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureProcessorList;list()Ljava/util/List;"))
     public List<StructureProcessor> getProcessorList(StructureProcessorList processorList) {
-        if (!((ServerLevelData) level.getLevelData()).getGameRules().get(WorldgenSettingsInit.APPLY_PROCESSOR_LISTS)) {
+        assert level != null;
+        if (!Objects.requireNonNull(level.getServer()).getGameRules().get(WorldgenSettingsInit.APPLY_PROCESSOR_LISTS)) {
             return ImmutableList.of();
         }
         return processorList.list();
@@ -67,7 +71,8 @@ public abstract class SinglePoolElementMixin {
      */
     @Redirect(method = "getSettings", at= @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool$Projection;getProcessors()Lcom/google/common/collect/ImmutableList;"))
     public ImmutableList<StructureProcessor> getProcessors(StructureTemplatePool.Projection projection){
-        if (!((ServerLevelData) level.getLevelData()).getGameRules().get(WorldgenSettingsInit.APPLY_GRAVITY_PROCESSOR)) {
+        assert level != null;
+        if (!Objects.requireNonNull(level.getServer()).getGameRules().get(WorldgenSettingsInit.APPLY_GRAVITY_PROCESSOR)) {
             return ImmutableList.of();
         }
         return projection.getProcessors();

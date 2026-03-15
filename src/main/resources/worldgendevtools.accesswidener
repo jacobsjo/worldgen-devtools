@@ -1,14 +1,12 @@
 accessWidener v2 official
 
-accessible class net/minecraft/resources/RegistryDataLoader$ResourceManagerRegistryLoadTask
-accessible method net/minecraft/resources/RegistryDataLoader$ResourceManagerRegistryLoadTask <init> (Lnet/minecraft/resources/RegistryDataLoader$RegistryData;Lcom/mojang/serialization/Lifecycle;Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;)V
-accessible field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
-mutable field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
+accessible method net/minecraft/resources/ResourceManagerRegistryLoadTask <init> (Lnet/minecraft/resources/RegistryDataLoader$RegistryData;Lcom/mojang/serialization/Lifecycle;Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;)V
+accessible field net/minecraft/resources/RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
+mutable field net/minecraft/resources/RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
 accessible method net/minecraft/resources/RegistryDataLoader load (Lnet/minecraft/resources/RegistryDataLoader$LoaderFactory;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;
 accessible class net/minecraft/resources/RegistryDataLoader$LoaderFactory
-accessible class net/minecraft/resources/RegistryDataLoader$RegistryLoadTask
-accessible field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask registryWriteLock Ljava/lang/Object;
-mutable field net/minecraft/resources/RegistryDataLoader$RegistryLoadTask concurrentRegistrationGetter Lnet/minecraft/core/registries/ConcurrentHolderGetter;
+accessible field net/minecraft/resources/RegistryLoadTask registryWriteLock Ljava/lang/Object;
+mutable field net/minecraft/resources/RegistryLoadTask concurrentRegistrationGetter Lnet/minecraft/core/registries/ConcurrentHolderGetter;
 
 accessible class net/minecraft/world/level/levelgen/DensityFunctions$EndIslandDensityFunction
 #accessible method net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker getLevel (J)I

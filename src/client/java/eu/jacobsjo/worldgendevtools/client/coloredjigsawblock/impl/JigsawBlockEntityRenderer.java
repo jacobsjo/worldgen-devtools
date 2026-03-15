@@ -11,12 +11,14 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.FrontAndTop;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.JigsawBlock;
 import net.minecraft.world.level.block.entity.JigsawBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,11 +41,11 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     }
 
     @Override
-    public void submit(JigsawBlockRenderState blockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+    public void submit(JigsawBlockRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         poseStack.pushPose();
         poseStack.scale(1 + OFFSET * 2, 1 + OFFSET * 2, 1 + OFFSET * 2);
         poseStack.translate(-OFFSET, -OFFSET, -OFFSET);
-        poseStack.rotateAround(getRotation(blockEntityRenderState.blockState.getValue(JigsawBlock.ORIENTATION)), 0.5f, 0.5f, 0.5f);
+        poseStack.rotateAround(getRotation(state.orientation), 0.5f, 0.5f, 0.5f);
         submitNodeCollector.submitModelPart(
                 modelPart,
                 poseStack,
@@ -51,13 +53,13 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
                 0xF000F0,
                 OverlayTexture.NO_OVERLAY,
                 null,
-                blockEntityRenderState.argb,
-                blockEntityRenderState.breakProgress);
+                state.argb,
+                null);
         poseStack.popPose();
     }
 
     @Override
-    public @NotNull JigsawBlockRenderState createRenderState() {
+    public JigsawBlockRenderState createRenderState() {
         return new JigsawBlockRenderState();
     }
 
@@ -72,6 +74,10 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
         int g = hash >> 8 & 0xFF;
         int b = hash >> 16 & 0xFF;
         jigsawBlockRenderState.argb = 0xFF000000 | r << 16 | g << 8 | b;
+
+        if (jigsawBlockEntity.getLevel() != null){
+            jigsawBlockRenderState.orientation = jigsawBlockEntity.getBlockState().getValue(JigsawBlock.ORIENTATION);
+        }
     }
 
     @Override

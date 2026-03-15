@@ -13,10 +13,7 @@ import net.minecraft.core.registries.ConcurrentHolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.RegistryDataLoader;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.*;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -46,7 +43,7 @@ import java.util.stream.Stream;
 public class RegistryReloader {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static class ResourceManagerRegistryReloadTask<T> extends RegistryDataLoader.ResourceManagerRegistryLoadTask<T> {
+    private static class ResourceManagerRegistryReloadTask<T> extends ResourceManagerRegistryLoadTask<T> {
 
         private ResourceManagerRegistryReloadTask(
                 final RegistryDataLoader.RegistryData<T> data,
@@ -173,9 +170,11 @@ public class RegistryReloader {
      */
     public static void syncClient(ServerConnectionListener serverConnection) {
         for (Connection connection : serverConnection.getConnections()) {
-            PacketListener var5 = connection.getPacketListener();
-            if (var5 instanceof ServerGamePacketListenerImpl impl) {
-                ServerPlayNetworking.reconfigure(impl);
+            if (!connection.isMemoryConnection()) {
+                PacketListener var5 = connection.getPacketListener();
+                if (var5 instanceof ServerGamePacketListenerImpl impl) {
+                    ServerPlayNetworking.reconfigure(impl);
+                }
             }
         }
     }
@@ -189,7 +188,7 @@ public class RegistryReloader {
     ) {
         RegistryDataLoader.LoaderFactory loaderFactory = new RegistryDataLoader.LoaderFactory() {
             @Override
-            public <T> RegistryDataLoader.RegistryLoadTask<T> create(final RegistryDataLoader.RegistryData<T> data, final Map<ResourceKey<?>, Exception> loadingErrors) {
+            public <T> RegistryLoadTask<T> create(final RegistryDataLoader.RegistryData<T> data, final Map<ResourceKey<?>, Exception> loadingErrors) {
                 return new ResourceManagerRegistryReloadTask<>(data, Lifecycle.stable(), loadingErrors, resourceManager, reloadedLayer);
             }
         };

@@ -2,7 +2,7 @@ package eu.jacobsjo.worldgendevtools.client.datapackadding.impl;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -11,7 +11,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -35,7 +34,6 @@ public class PackDropScreen extends Screen {
     }
 
     @Override
-    @NotNull
     public Component getNarrationMessage() {
         return CommonComponents.joinForNarration(super.getNarrationMessage(), this.datapacks);
     }
@@ -55,10 +53,10 @@ public class PackDropScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.titleTop(), -1);
-        this.display.visitLines(TextAlignment.CENTER, this.width / 2, this.messageTop(), 9, guiGraphics.textRenderer());
+    public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
+        graphics.centeredText(this.font, this.title, this.width / 2, this.titleTop(), -1);
+        this.display.visitLines(TextAlignment.CENTER, this.width / 2, this.messageTop(), 9, graphics.textRenderer());
     }
 
     private int titleTop() {

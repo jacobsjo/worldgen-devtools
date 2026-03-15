@@ -3,9 +3,11 @@ package eu.jacobsjo.worldgendevtools.reloadregistries.impl;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -13,7 +15,7 @@ import java.util.stream.Stream;
 
 public class FrozenHolder<T> implements Holder<T> {
     private final Holder<T> wrapping;
-    T value = null;
+    @Nullable T value = null;
 
     public FrozenHolder(Holder<T> wrapping){
         this.wrapping = wrapping;
@@ -30,6 +32,11 @@ public class FrozenHolder<T> implements Holder<T> {
     @Override
     public boolean isBound() {
         return value != null || wrapping.isBound();
+    }
+
+    @Override
+    public boolean areComponentsBound() {
+        return this.wrapping.areComponentsBound();
     }
 
     @Override
@@ -60,6 +67,11 @@ public class FrozenHolder<T> implements Holder<T> {
     @Override
     public Stream<TagKey<T>> tags() {
         return this.wrapping.tags();
+    }
+
+    @Override
+    public DataComponentMap components() {
+        return this.wrapping.components();
     }
 
     @Override
