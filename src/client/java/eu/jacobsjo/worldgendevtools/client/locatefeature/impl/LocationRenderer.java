@@ -24,7 +24,6 @@ import java.util.List;
 
 import static eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit.FEATURE_POSITION_ATTACHMENT;
 
-@SuppressWarnings("UnstableApiUsage")
 public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
     private static final int RANGE = 2;
 
@@ -55,7 +54,6 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
 
         for (ResourceKey<ConfiguredFeature<?, ?>> key: featurePositions.getFeatureTypes()) {
             List<FeaturePositions.PosAndCount> positions = featurePositions.getPositions(key);
-            assert positions != null;
 
             ColorUtil.RGB color = ColorUtil.randomFromString(key.identifier().toString());
 
