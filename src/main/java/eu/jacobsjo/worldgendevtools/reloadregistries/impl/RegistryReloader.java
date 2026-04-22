@@ -8,6 +8,7 @@ import com.mojang.serialization.Lifecycle;
 import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.UpdatableGeneratorChunkMap;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
@@ -71,10 +72,10 @@ public class RegistryReloader {
         RegistryAccess.Frozen worldgenNewLayer = registries.getLayer(RegistryLayer.WORLDGEN);
         RegistryOps.RegistryInfoLookup worldgenLookup = getRegistrtyInfoLookup(worldgenContextLayer, worldgenNewLayer, true);
 
-        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> loadData(worldgenLookup, resourceManager, data, worldgenNewLayer, exceptionMap));
+        DynamicRegistries.getDynamicRegistries().forEach((RegistryDataLoader.RegistryData<?> data) -> loadData(worldgenLookup, resourceManager, data, worldgenNewLayer, exceptionMap));
 
         List<IllegalStateException> freezingExceptions = new ArrayList<>();
-        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((RegistryDataLoader.RegistryData<?> data) -> {
+        DynamicRegistries.getDynamicRegistries().forEach((RegistryDataLoader.RegistryData<?> data) -> {
             try {
                 Registry<?> registry = worldgenNewLayer.lookupOrThrow(data.key());
                 registry.freeze();
