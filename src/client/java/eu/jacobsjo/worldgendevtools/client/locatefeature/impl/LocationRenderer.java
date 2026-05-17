@@ -58,7 +58,7 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
             ColorUtil.RGB color = ColorUtil.randomFromString(key.identifier().toString());
 
             positions.forEach(pos -> {
-                if (pos.pos().getCenter().closerThan(playerPos, 24)) {
+                if (pos.pos().distToCenterSqr(playerPos) <= 24 * 24) {
                     int count = posCounts.getOrDefault(pos.pos(), 0);
                     posCounts.put(pos.pos(), count + 1);
                     if (count < 5) {
@@ -69,11 +69,11 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
                                 GizmoStyle.fill((alpha << 24) | color.asInt())
                         ).setAlwaysOnTop();
                     }
-                    if (pos.pos().getCenter().closerThan(playerPos, 8) && count <= 6) {
+                    if (pos.pos().distToCenterSqr(playerPos) <= 8 * 8 && count <= 6) {
                         String text = count == 6 ? "[and more]" : key.identifier() + (pos.count() > 1 ? " [x" + pos.count() + "]" : "");
                         Gizmos.billboardText(
                                 text,
-                                pos.pos().getCenter().add(0, 0.28 + 0.13 * count, 0),
+                                new Vec3(pos.pos().getX() + 0.5, pos.pos().getY() + 0.5 + 0.28 + 0.13 * count, pos.pos().getZ() + 0.5),
                                 TextGizmo.Style.forColorAndCentered(0xFF000000 | color.asInt()).withScale(0.2f)
                             ).setAlwaysOnTop();
                     }

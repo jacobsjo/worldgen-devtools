@@ -27,7 +27,7 @@ public abstract class MinecraftServerMixin {
     @Inject(method = "reloadResources", at = @At("RETURN"))
     private void afterReloadResources(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir){
         if (this.getGameRules().get(ReloadRegistriesInit.RELOAD_REGISTIRES) && this.getGameRules().get(ReloadRegistriesInit.SYNC_AFTER_REGISTRY_RELOAD)) {
-            cir.getReturnValue().thenAccept(reloadableResources -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().levelRenderer.allChanged()));
+            cir.getReturnValue().thenAccept(reloadableResources -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().levelExtractor.allChanged()));
         }
     }
 }

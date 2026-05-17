@@ -13,11 +13,12 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class FrozenHolder<T> implements Holder<T> {
+public class FrozenHolder<T> extends Holder.Reference<T> {
     private final Holder<T> wrapping;
     @Nullable T value = null;
 
     public FrozenHolder(Holder<T> wrapping){
+        super(Type.STAND_ALONE, new HolderOwner<>() {}, null, null);
         this.wrapping = wrapping;
     }
 

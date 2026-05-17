@@ -56,7 +56,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Overwrite
     public void onFilesDrop(List<Path> packs) {
         String datapacks = extractPackNames(packs).collect(Collectors.joining(", "));
-        this.minecraft.setScreen(new PackDropScreen(Component.literal(datapacks), result -> {
+        this.minecraft.gui.setScreen(new PackDropScreen(Component.literal(datapacks), result -> {
             shouldSymlink = result == PackDropScreen.Selection.SYMLINK;
             lambda$onFilesDrop$0(packs, result == PackDropScreen.Selection.COPY || result == PackDropScreen.Selection.SYMLINK);
         }));

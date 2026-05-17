@@ -57,6 +57,6 @@ public class SymlinkUtil {
             LOGGER.error("Failed to save allowed symlink", e);
         }
 
-        SystemToast.add(minecraft.getToastManager(), ADD_SYMLINK_TOAST, Component.translatable("worldgendevtools.datapackadding.gui.symlink.add_allowed"), Component.literal(path.toString()));
+        SystemToast.add(minecraft.gui.toastManager(), ADD_SYMLINK_TOAST, Component.translatable("worldgendevtools.datapackadding.gui.symlink.add_allowed"), Component.literal(path.toString()));
     }
 }

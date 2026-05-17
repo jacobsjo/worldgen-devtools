@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,7 +32,7 @@ public abstract class TypedEntityDataMixin<IdType> {
 
     @Inject(method = "addToTooltip", at=@At("TAIL"))
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter, CallbackInfo ci){
-        if (this.type == BlockEntityType.JIGSAW) {
+        if (this.type == BlockEntityTypes.JIGSAW) {
             DataResult<JigsawBlockData> data = JigsawBlockData.CODEC.decode(NbtOps.INSTANCE, NbtOps.INSTANCE.getMap(this.tag).getOrThrow());
 
             if (data.isError() || data.result().isEmpty())
