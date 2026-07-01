@@ -11,13 +11,13 @@ import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import org.slf4j.Logger;
 
 import java.util.Comparator;
@@ -34,7 +34,7 @@ public class LocateFeature {
         return command.then(
             Commands.literal("feature")
                 .then(
-                    Commands.argument("configured_feature", ResourceKeyArgument.key(Registries.CONFIGURED_FEATURE))
+                    Commands.argument("configured_feature", ResourceKeyArgument.key(Registries.FEATURE))
                         .executes(
                             commandContext -> locateFeature(
                                 commandContext.getSource(),  ResourceKeyArgument.getConfiguredFeature(commandContext, "configured_feature").key()
@@ -44,7 +44,7 @@ public class LocateFeature {
         );
 
     }
-    public static int locateFeature(CommandSourceStack source, ResourceKey<ConfiguredFeature<?, ?>> feature ){
+    public static int locateFeature(CommandSourceStack source, ResourceKey<Feature> feature ){
         try {
             BlockPos sourcePos = BlockPos.containing(source.getPosition());
             ChunkAccess chunk = source.getLevel().getChunk(sourcePos);
@@ -67,7 +67,7 @@ public class LocateFeature {
         }
     }
 
-    public static int locateNearbyFeature(CommandSourceStack source, ResourceKey<ConfiguredFeature<?, ?>> feature, BlockPos sourcePos, ChunkPos centerChunkPos ){
+    public static int locateNearbyFeature(CommandSourceStack source, ResourceKey<Feature> feature, BlockPos sourcePos, ChunkPos centerChunkPos ){
         for (int range = 1 ; range <= MAX_RANGE ; range++){
             Stream<FeaturePositions.PosAndCount> foundPositions = Stream.empty();
             for (int x = -range ; x <= range ; x++){

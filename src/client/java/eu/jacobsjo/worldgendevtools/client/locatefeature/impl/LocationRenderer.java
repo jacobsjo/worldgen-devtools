@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.debug.DebugValueAccess;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class LocationRenderer implements DebugRenderer.SimpleDebugRenderer{
 
         Object2IntOpenHashMap<BlockPos> posCounts = new Object2IntOpenHashMap<>();
 
-        for (ResourceKey<ConfiguredFeature<?, ?>> key: featurePositions.getFeatureTypes()) {
+        for (ResourceKey<Feature> key: featurePositions.getFeatureTypes()) {
             List<FeaturePositions.PosAndCount> positions = featurePositions.getPositions(key);
 
             ColorUtil.RGB color = ColorUtil.randomFromString(key.identifier().toString());

@@ -51,7 +51,7 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
                 OverlayTexture.NO_OVERLAY,
                 null,
                 state.argb,
-                null);
+                0);
         poseStack.popPose();
     }
 

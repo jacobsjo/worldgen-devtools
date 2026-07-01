@@ -7,7 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.jacobsjo.util.TextUtil;
-import eu.jacobsjo.worldgendevtools.dfcommand.RandomState;
+import eu.jacobsjo.worldgendevtools.dfcommand.api.RandomStateVisitorAccessor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
@@ -19,12 +19,15 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.*;
+import org.jspecify.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public final class DfCommand{
@@ -108,15 +111,21 @@ public final class DfCommand{
         if (chunkGenerator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
             return getDensity(commandSourceStack, densityFunctionHolder.value(), pos, noiseBasedChunkGenerator.generatorSettings().value(), level);
         } else {
-            return getDensity(commandSourceStack, densityFunctionHolder.value(), pos, NoiseGeneratorSettings.dummy(), level);
+            return getDensity(commandSourceStack, densityFunctionHolder.value(), pos, null, level);
         }
     }
 
-    public static int getDensity(CommandSourceStack commandSourceStack, DensityFunction densityFunction, BlockPos pos, NoiseGeneratorSettings generatorSettings, ServerLevel level){
+    public static int getDensity(CommandSourceStack commandSourceStack, DensityFunction densityFunction, BlockPos pos, @Nullable NoiseGeneratorSettings generatorSettings, ServerLevel level){
         HolderGetter.Provider registryAccess = level.registryAccess();
-        RandomState randomState = RandomState.create(generatorSettings, registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed());
+        RandomState randomState;
+        if (generatorSettings != null) {
+            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), generatorSettings);
+        } else {
+            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), false, Blocks.STONE.defaultBlockState(), 63, NoiseRouterData.none(), List.of());
+        }
 
-        double value = densityFunction.mapAll(randomState.getVisitor()).compute( new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
+        DensityFunction.Visitor visitor = ((RandomStateVisitorAccessor)(Object) randomState).worldgenDevtools$getVisitor();
+        double value = densityFunction.mapAll(visitor).compute( new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
 
         DecimalFormat format = new DecimalFormat("0.000");
 

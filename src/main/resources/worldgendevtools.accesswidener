@@ -22,3 +22,5 @@ mutable field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/min
 
 accessible field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
 mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
+
+accessible class net/minecraft/world/level/levelgen/RandomState$1NoiseWiringHelper

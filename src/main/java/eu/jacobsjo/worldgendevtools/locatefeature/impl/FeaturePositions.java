@@ -10,7 +10,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 
 import java.util.*;
 
@@ -35,13 +35,13 @@ public class FeaturePositions {
         positions.forEach(pos -> featurePositions.put(pos.feature, new ArrayList<>(pos.positions)));
     }
 
-    private final Map<ResourceKey<ConfiguredFeature<?,?>>, List<PosAndCount>> featurePositions;
+    private final Map<ResourceKey<Feature>, List<PosAndCount>> featurePositions;
 
     private List<PositionsOfFeature> getList(){
         return featurePositions.entrySet().stream().map(entry -> new PositionsOfFeature(entry.getKey(), entry.getValue())).toList();
     }
 
-    public void addPosiition(ResourceKey<ConfiguredFeature<?, ?>> feature, BlockPos pos) {
+    public void addPosiition(ResourceKey<Feature> feature, BlockPos pos) {
         List<PosAndCount> positions = this.featurePositions.computeIfAbsent(feature, f -> new ArrayList<>());
         Optional<PosAndCount> posAndCount = positions.stream().filter(p -> p.pos().equals(pos)).findAny();
         if (posAndCount.isPresent()){
@@ -51,11 +51,11 @@ public class FeaturePositions {
         }
     }
 
-    public List<PosAndCount> getPositions(ResourceKey<ConfiguredFeature<?, ?>> feature){
+    public List<PosAndCount> getPositions(ResourceKey<Feature> feature){
         return this.featurePositions.getOrDefault(feature, List.of());
     }
 
-    public Set<ResourceKey<ConfiguredFeature<?, ?>>> getFeatureTypes(){
+    public Set<ResourceKey<Feature>> getFeatureTypes(){
         return this.featurePositions.keySet();
     }
 
@@ -123,16 +123,16 @@ public class FeaturePositions {
 
         }
 
-    private record PositionsOfFeature(ResourceKey<ConfiguredFeature<?,?>> feature, List<PosAndCount> positions){
+    private record PositionsOfFeature(ResourceKey<Feature> feature, List<PosAndCount> positions){
         private static final Codec<PositionsOfFeature> CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(
-                        ResourceKey.codec(Registries.CONFIGURED_FEATURE).fieldOf("feature").forGetter(i -> i.feature),
+                        ResourceKey.codec(Registries.FEATURE).fieldOf("feature").forGetter(i -> i.feature),
                         Codec.list(PosAndCount.CODEC).fieldOf("positions").forGetter(i -> i.positions)
                 ).apply(instance, PositionsOfFeature::new)
         );
 
         private static final StreamCodec<RegistryFriendlyByteBuf, PositionsOfFeature> STREAM_CODEC = StreamCodec.composite(
-                ResourceKey.streamCodec(Registries.CONFIGURED_FEATURE), PositionsOfFeature::feature,
+                ResourceKey.streamCodec(Registries.FEATURE), PositionsOfFeature::feature,
                 PosAndCount.STREAM_CODEC.apply(ByteBufCodecs.list()), PositionsOfFeature::positions,
                 PositionsOfFeature::new
         );
