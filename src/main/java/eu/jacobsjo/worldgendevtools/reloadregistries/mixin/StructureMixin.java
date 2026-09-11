@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -31,7 +32,7 @@ public abstract class StructureMixin {
      */
     @SuppressWarnings("DataFlowIssue")
     @Inject(method = "generate", at = @At("RETURN"), cancellable = true)
-    public void generate(Holder<Structure> holder, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkPos chunkPos, int i, LevelHeightAccessor levelHeightAccessor, Predicate<Holder<Biome>> predicate, CallbackInfoReturnable<StructureStart> cir) {
+    public void generate(Holder<Structure> selected, ResourceKey<Level> dimension, RegistryAccess registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, Climate.Sampler climateSampler, RandomState randomState, StructureTemplateManager structureTemplateManager, long seed, ChunkPos sourceChunkPos, int references, LevelHeightAccessor heightAccessor, Predicate<Holder<Biome>> validBiome, CallbackInfoReturnable<StructureStart> cir) {
         try {
             Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
             ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.get(registry.getResourceKey((Structure) (Object) this).orElseThrow()).orElseThrow());

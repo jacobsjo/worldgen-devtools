@@ -7,7 +7,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.jacobsjo.util.TextUtil;
-import eu.jacobsjo.worldgendevtools.dfcommand.api.RandomStateVisitorAccessor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
@@ -21,92 +20,34 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.NoiseRouterData;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
+import net.minecraft.world.level.levelgen.densityfunction.DensitySampler;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import org.jspecify.annotations.Nullable;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public final class DfCommand{
     private static final DynamicCommandExceptionType ERROR_INVALID_DENSITY_FUNCTION = new DynamicCommandExceptionType((object) -> TextUtil.translatable("worldgendevtools.dfcommand.density_function.invalid", object));
     private static final DynamicCommandExceptionType ERROR_NO_NOISE_ROUTER = new DynamicCommandExceptionType((objcet) -> TextUtil.translatable("worldgendevtools.dfcommand.noise_router.no"));
 
-    private static final Collection<String> NOISE_ROUTER_VALUES = Arrays.asList(
-            "temperature",
-            "vegetation",
-            "continents",
-            "erosion",
-            "depth",
-            "ridges",
-            "preliminary_surface_level",
-            "final_density"
-    );
-
-    private static final Collection<String> AQUIFER_VALUES = Arrays.asList(
-            "barrier",
-            "fluid_level_floodedness",
-            "fluid_level_spread",
-            "lava"
-    );
-
-    private static final Collection<String> ORE_VEIN_VALUES = Arrays.asList(
-            "barrier",
-            "fluid_level_floodedness",
-            "fluid_level_spread",
-            "lava",
-            "vein_toggle",
-            "vein_ridged",
-            "vein_gap"
-    );
-
 
     public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher){
         ArgumentBuilder<CommandSourceStack, LiteralArgumentBuilder<CommandSourceStack>> noiseRouterArgument = Commands.literal("noise_router");
 
-        for (String value : NOISE_ROUTER_VALUES){
-            noiseRouterArgument = noiseRouterArgument.then(Commands.literal(value)
-                    .executes((commandContext)-> getNouseRouterDensity(commandContext.getSource(), value, BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel()))
-                    .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                            .executes((commandContext)-> getNouseRouterDensity(commandContext.getSource(), value, BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel()))
-                    ));
-        }
-
         commandDispatcher.register(
             Commands.literal("getdensity")
-                    .then(Commands.literal("density_function")
-                        .then(Commands.argument("density_function", ResourceKeyArgument.key(Registries.DENSITY_FUNCTION))
-                            .executes((commandContext)-> getDensityFunctionDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel()))
-                            .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                                .executes((commandContext)-> getDensityFunctionDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel())))
-                        )
-                    )
-                    .then(noiseRouterArgument)
+                .then(Commands.argument("density_function", ResourceKeyArgument.key(Registries.DENSITY_FUNCTION))
+                    .executes((commandContext)-> getDensityFunctionDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel()))
+                    .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                        .executes((commandContext)-> getDensityFunctionDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel())))
+                )
         );
-    }
-
-    public static int getNouseRouterDensity(CommandSourceStack commandSourceStack, String routerDensityFunction, BlockPos pos, ServerLevel level) throws CommandSyntaxException {
-        ChunkGenerator chunkGenerator = level.getChunkSource().getGenerator();
-        if (chunkGenerator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
-            NoiseRouter router = noiseBasedChunkGenerator.generatorSettings().value().noiseRouter();
-            DensityFunction densityFunction = switch (routerDensityFunction) {
-                case "temperature" -> router.temperature();
-                case "vegetation" -> router.vegetation();
-                case "continents" -> router.continents();
-                case "erosion" -> router.erosion();
-                case "depth" -> router.depth();
-                case "ridges" -> router.ridges();
-                case "preliminary_surface_level" -> router.preliminarySurfaceLevel();
-                case "final_density" -> router.finalDensity();
-                default -> DensityFunctions.zero(); // this case should never happen.
-            };
-
-            return getDensity(commandSourceStack, densityFunction, pos, noiseBasedChunkGenerator.generatorSettings().value(), level);
-        } else {
-            throw ERROR_NO_NOISE_ROUTER.create(routerDensityFunction);
-        }
     }
 
     public static int getDensityFunctionDensity(CommandSourceStack commandSourceStack, Holder<DensityFunction> densityFunctionHolder, BlockPos pos, ServerLevel level){
@@ -125,11 +66,11 @@ public final class DfCommand{
         if (generatorSettings != null) {
             randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), generatorSettings);
         } else {
-            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), false, Blocks.STONE.defaultBlockState(), 63, NoiseRouterData.none(), List.of(), Optional.empty(), List.of());
+            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), false, Blocks.STONE.defaultBlockState(), 63, NoiseRouterData.none());
         }
 
-        DensityFunction.Visitor visitor = ((RandomStateVisitorAccessor) (Object) randomState).worldgenDevtools$getVisitor();
-        double value = densityFunction.mapAll(visitor).compute(new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
+        DensitySampler sampler = randomState.getSampler(densityFunction);
+        double value = sampler.sampleValue(SamplerContext.EMPTY_UNCACHED, pos.getX(), pos.getY(), pos.getZ());
 
         DecimalFormat format = new DecimalFormat("0.000");
 

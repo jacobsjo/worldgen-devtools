@@ -8,7 +8,7 @@ accessible class net/minecraft/resources/RegistryDataLoader$LoaderFactory
 accessible field net/minecraft/resources/RegistryLoadTask registryWriteLock Ljava/lang/Object;
 mutable field net/minecraft/resources/RegistryLoadTask concurrentRegistrationGetter Lnet/minecraft/core/registries/ConcurrentHolderGetter;
 
-accessible class net/minecraft/world/level/levelgen/DensityFunctions$EndIslandDensityFunction
+#accessible class net/minecraft/world/level/levelgen/DensityFunctions$EndIslandDensityFunction
 #accessible method net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker getLevel (J)I
 accessible method net/minecraft/server/level/ChunkMap generator ()Lnet/minecraft/world/level/chunk/ChunkGenerator;
 accessible class net/minecraft/core/MappedRegistry$TagSet
@@ -23,6 +23,6 @@ mutable field net/minecraft/world/level/Level dimensionTypeRegistration Lnet/min
 accessible field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
 mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
 
-accessible class net/minecraft/world/level/levelgen/RandomState$1NoiseWiringHelper
+#accessible class net/minecraft/world/level/levelgen/RandomState$1NoiseWiringHelper
 
 accessible method net/minecraft/commands/arguments/ResourceKeyArgument resolveKey (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;Lnet/minecraft/resources/ResourceKey;Lcom/mojang/brigadier/exceptions/DynamicCommandExceptionType;)Lnet/minecraft/core/Holder$Reference;

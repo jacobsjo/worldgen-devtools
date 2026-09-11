@@ -1,7 +1,6 @@
 package eu.jacobsjo.worldgendevtools.worldgensettings;
 
 import eu.jacobsjo.util.TextUtil;
-import eu.jacobsjo.worldgendevtools.worldgensettings.api.GenerationOptions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -18,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.gamerules.GameRule;
 
 public class WorldgenSettingsInit implements ModInitializer {
-    @Deprecated public static GameRule<GenerationOptions> MAX_CHUNK_STATUS = Registry.register(BuiltInRegistries.GAME_RULE, "max_chunk_status", GameRuleBuilder.forEnum(GenerationOptions.ALL).build());
     public static GameRule<Boolean> APPLY_PROCESSOR_LISTS = Registry.register(BuiltInRegistries.GAME_RULE, "apply_processor_lists", GameRuleBuilder.forBoolean(true).build());
     @Deprecated public static GameRule<Boolean> KEEP_JIGSAWS = Registry.register(BuiltInRegistries.GAME_RULE, "keep_jigsaws", GameRuleBuilder.forBoolean(false).build());
     public static GameRule<Boolean> APPLY_GRAVITY_PROCESSOR = Registry.register(BuiltInRegistries.GAME_RULE, "apply_gravity_processor", GameRuleBuilder.forBoolean(true).build());

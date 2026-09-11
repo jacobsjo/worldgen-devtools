@@ -4,9 +4,7 @@
   "package": "eu.jacobsjo.worldgendevtools.worldgensettings.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ChunkGeneratorMixin",
     "EntityStorageMixin",
-    "NoiseBasedChunkGeneratorMixin",
     "SinglePoolElementMixin"
   ],
   "client": [

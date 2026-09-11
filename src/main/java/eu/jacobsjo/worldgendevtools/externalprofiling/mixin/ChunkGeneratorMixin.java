@@ -8,7 +8,6 @@ import eu.jacobsjo.worldgendevtools.externalprofiling.api.FeatureGenerationEvent
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.Profiler;
@@ -17,6 +16,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
@@ -60,10 +60,10 @@ public class ChunkGeneratorMixin {
     @WrapMethod(
             method = "tryGenerateStructure"
     )
-    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, Operation<Boolean> original){
+    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry selected, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess centerChunk, ChunkPos sourceChunkPos, ResourceKey<Level> level, Climate.Sampler climateSampler, Operation<Boolean> original){
         try (Zone zone = Profiler.get().zone("structure")) {
-            zone.addText(structureSelectionEntry.structure().getRegisteredName());
-            boolean result = original.call(structureSelectionEntry, structureManager, registryAccess, random, structureTemplateManager, seed, chunk, chunkPos, sectionPos, resourceKey);
+            zone.addText(selected.structure().getRegisteredName());
+            boolean result = original.call(selected, structureManager, registryAccess, randomState, structureTemplateManager, seed, centerChunk, sourceChunkPos, level, climateSampler);
             if (!result) {
                 zone.addText("(not placed)");
             }
