@@ -42,6 +42,7 @@
   "worldgendevtools.locatefeature.command.failure.not_nearby": "Could not find a feature of type \"%s\" within reasonable distance",
   "worldgendevtools.locatefeature.renderer.on": "Feature locations: shown",
   "worldgendevtools.locatefeature.renderer.off": "Feature locations: hidden",
+  "worldgendevtools.locatefeature.renderer.keybind": "Show feature locations",
 
   "worldgendevtools.profiling.command.no_information": "No chunks have profiling information saved",
   "worldgendevtools.profiling.command.header": "Profiling of %d chunks:",

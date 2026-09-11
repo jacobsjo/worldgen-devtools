@@ -24,3 +24,5 @@ accessible field net/minecraft/world/level/validation/DirectoryValidator symlink
 mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTargetAllowList Ljava/nio/file/PathMatcher;
 
 accessible class net/minecraft/world/level/levelgen/RandomState$1NoiseWiringHelper
+
+accessible method net/minecraft/commands/arguments/ResourceKeyArgument resolveKey (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;Lnet/minecraft/resources/ResourceKey;Lcom/mojang/brigadier/exceptions/DynamicCommandExceptionType;)Lnet/minecraft/core/Holder$Reference;

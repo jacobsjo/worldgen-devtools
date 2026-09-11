@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This mixin allows to set a new {@link ChunkGenerator} after reloading the registries,
@@ -41,7 +42,7 @@ public abstract class ChunkMapMixin implements UpdatableGeneratorChunkMap {
         if (generator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
             this.randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), seed, noiseBasedChunkGenerator.generatorSettings().value());
         } else {
-            this.randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), seed, false, Blocks.STONE.defaultBlockState(), 63, NoiseRouterData.none(), List.of());
+            this.randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), seed, false, Blocks.STONE.defaultBlockState(), 63, NoiseRouterData.none(), List.of(), Optional.empty(), List.of());
         }
         this.chunkGeneratorState = generator.createState(registryAccess.lookupOrThrow(Registries.STRUCTURE_SET), this.randomState, seed);
         this.worldGenContext = new WorldGenContext(this.worldGenContext.level(), generator, this.worldGenContext.structureManager(), this.worldGenContext.lightEngine(), this.worldGenContext.mainThreadExecutor(), this.worldGenContext.unsavedListener());

@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EnvironmentAttributeSystem.class)
 public class EnvironmentAttributeSystemMixin {
 
-    @Inject(method = "addDefaultLayers", at = @At("TAIL"))
-    private static void addDefaultLayers(EnvironmentAttributeSystem.Builder builder, Level level, CallbackInfo ci){
+    @Inject(method = "addDynamicLayers", at = @At("TAIL"))
+    private static void addDynamicLayers(EnvironmentAttributeSystem.Builder builder, Level level, CallbackInfo ci){
         AttributeOverrides.addLayers(builder, level);
     }
 }

@@ -92,12 +92,12 @@ public class RegistryReloader {
         // Reload Worldgen registries
         LayeredRegistryAccess<RegistryLayer> initialLayers = RegistryLayer.createRegistryAccess();
         List<Registry.PendingTags<?>> staticLayerTags = TagLoader.loadTagsForExistingRegistries(resources, initialLayers.getLayer(RegistryLayer.STATIC));
-        RegistryAccess.Frozen worldgenLoadContext = registries.getAccessForLoading(RegistryLayer.WORLDGEN);
+        RegistryAccess.Frozen worldgenLoadContext = registries.getAccessForLoading(RegistryLayer.WORLD);
         List<HolderLookup.RegistryLookup<?>> worldgenContextRegistries = TagLoader.buildUpdatedLookups(worldgenLoadContext, staticLayerTags);
 
-        RegistryAccess.Frozen worldgenLayerToReload = registries.getLayer(RegistryLayer.WORLDGEN);
+        RegistryAccess.Frozen worldgenLayerToReload = registries.getLayer(RegistryLayer.WORLD);
 
-        return reloadData(resources, worldgenContextRegistries, RegistryDataLoader.WORLDGEN_REGISTRIES, backgroundExecutor, worldgenLayerToReload)
+        return reloadData(resources, worldgenContextRegistries, RegistryDataLoader.WORLD_REGISTRIES, backgroundExecutor, worldgenLayerToReload)
                 .thenComposeAsync(loadedWorldgenRegistries -> {
                     List<HolderLookup.RegistryLookup<?>> dimensionContextRegistries = Stream.concat(
                                     worldgenContextRegistries.stream(), loadedWorldgenRegistries.listRegistries()
