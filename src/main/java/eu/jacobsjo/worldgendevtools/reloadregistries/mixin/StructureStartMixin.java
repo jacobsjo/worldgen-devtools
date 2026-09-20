@@ -17,6 +17,9 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,10 +33,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(StructureStart.class)
 public class StructureStartMixin implements HolderStructureStart {
-
-    @Mutable @Shadow @Final private Structure structure;
     @Unique
+    private static final Logger MIXIN_LOGGER = LoggerFactory.getLogger("worldgendevtools");
+
+    @Mutable @Shadow @Final @Nullable private Structure structure;
+    @Unique @Nullable
     Holder<Structure> holder;
+
+    @Unique
+    private void updateStructureFromHolder(){
+        if (this.holder != null) {
+            this.structure = this.holder.value();
+        } else if (this.structure != null){
+            MIXIN_LOGGER.warn("No holder set for StructureStart");
+        }
+    }
 
     @Override
     public void worldgenDevtools$setHolder(Holder.Reference<Structure> holder) {
@@ -54,7 +68,7 @@ public class StructureStartMixin implements HolderStructureStart {
      */
     @Inject(method = "getBoundingBox", at = @At(value = "HEAD"))
     public void getBoundingBox(CallbackInfoReturnable<BoundingBox> cir) {
-        this.structure = this.holder.value();
+        this.updateStructureFromHolder();
     }
 
     /**
@@ -62,7 +76,7 @@ public class StructureStartMixin implements HolderStructureStart {
      */
     @Inject(method = "placeInChunk", at = @At(value = "HEAD"))
     public void placeInChunk(WorldGenLevel worldGenLevel, StructureManager structureManager, ChunkGenerator chunkGenerator, RandomSource randomSource, BoundingBox boundingBox, ChunkPos chunkPos, CallbackInfo ci) {
-        this.structure = this.holder.value();
+        this.updateStructureFromHolder();
     }
 
     /**
@@ -70,10 +84,7 @@ public class StructureStartMixin implements HolderStructureStart {
      */
     @Inject(method = "createTag", at = @At(value = "HEAD"))
     public void createTag(CallbackInfoReturnable<BoundingBox> cir) {
-        if (this.holder == null){
-            throw new IllegalStateException("no holder found");
-        }
-        this.structure = this.holder.value();
+        this.updateStructureFromHolder();
     }
 
     /**
@@ -81,7 +92,7 @@ public class StructureStartMixin implements HolderStructureStart {
      */
     @Inject(method = "getStructure", at = @At(value = "HEAD"))
     public void getStructure(CallbackInfoReturnable<Structure> cir) {
-        this.structure = this.holder.value();
+        this.updateStructureFromHolder();
     }
 
 }
