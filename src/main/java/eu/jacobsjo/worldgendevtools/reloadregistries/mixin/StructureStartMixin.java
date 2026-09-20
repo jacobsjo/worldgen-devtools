@@ -16,7 +16,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.*;
@@ -36,7 +36,8 @@ public class StructureStartMixin implements HolderStructureStart {
     @Unique
     private static final Logger MIXIN_LOGGER = LoggerFactory.getLogger("worldgendevtools");
 
-    @Mutable @Shadow @Final @Nullable private Structure structure;
+    @Mutable @Shadow @Final @Nullable
+    private Structure structure;
     @Unique @Nullable
     Holder<Structure> holder;
 
