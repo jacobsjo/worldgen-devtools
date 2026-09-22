@@ -22,7 +22,7 @@ public class LevelMixin {
 
     // freeze dimensionType holder, so it doesn't get automatically updated, causing potential crashes when changing world height. DimensionType gets reset manually by resetter.
     @Inject(method = "<init>", at=@At("TAIL"))
-    public void freezeHolder(WritableLevelData levelData, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimensionTypeRegistration, boolean isClientSide, boolean isDebug, long biomeZoomSeed, int maxChainedNeighborUpdates, CallbackInfo ci){
+    public void freezeHolder(WritableLevelData levelData, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimensionTypeRegistration, boolean isClientSide, boolean isDebug, int maxChainedNeighborUpdates, CallbackInfo ci){
         this.frozenDimensionTypeRegistration = new FrozenHolder<>(dimensionTypeRegistration);
     }
 

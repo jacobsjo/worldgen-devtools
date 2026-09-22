@@ -5,7 +5,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import net.minecraft.world.level.chunk.status.WorldGenContext;
@@ -39,7 +38,7 @@ public abstract class ChunkMapMixin implements UpdatableGeneratorChunkMap {
         if (generator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
             this.randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), seed, noiseBasedChunkGenerator.generatorSettings().value());
         } else {
-            this.randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), seed, false, Blocks.STONE.defaultBlockState(), 63, NoiseRouterData.none());
+            this.randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), seed, false, 63, NoiseRouterData.none());
         }
         this.chunkGeneratorState = generator.createState(registryAccess.lookupOrThrow(Registries.STRUCTURE_SET), this.randomState, seed);
         this.worldGenContext = new WorldGenContext(this.worldGenContext.level(), generator, this.worldGenContext.structureManager(), this.worldGenContext.lightEngine(), this.worldGenContext.mainThreadExecutor(), this.worldGenContext.unsavedListener());

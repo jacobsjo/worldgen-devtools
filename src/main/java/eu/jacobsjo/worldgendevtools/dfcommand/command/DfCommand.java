@@ -18,7 +18,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
@@ -66,7 +65,7 @@ public final class DfCommand{
         if (generatorSettings != null) {
             randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), generatorSettings);
         } else {
-            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), false, Blocks.STONE.defaultBlockState(), 63, NoiseRouterData.none());
+            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), false, 63, NoiseRouterData.none());
         }
 
         DensitySampler sampler = randomState.getSampler(densityFunction);

@@ -41,7 +41,6 @@
     "worldgendevtools.reloadregistries.mixins.json",
     "worldgendevtools.worldgensettings.mixins.json",
     "worldgendevtools.resetchunks.mixins.json",
-    "worldgendevtools.loggingimprovements.mixins.json",
     "worldgendevtools.profiling.mixins.json",
     "worldgendevtools.locatefeature.mixins.json",
     "worldgendevtools.externalprofiling.mixins.json",
@@ -67,7 +66,7 @@
   "depends": {
     "fabricloader": "*",
     "fabric-api": "*",
-    "minecraft": "~26.3-",
+    "minecraft": "~26.4-",
     "java": ">=21"
   }
 }

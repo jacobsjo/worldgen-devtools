@@ -4,14 +4,12 @@ import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainerFactory;
@@ -132,8 +130,8 @@ public class ChunkAccessMixin {
     }
 
     // Fix crash when fewer sections exist than the world it high (happens when chaning world height in reload)
-    @ModifyExpressionValue(method = "getNoiseBiome", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkAccess;getSectionIndex(I)I"))
-    public int getNoiseBiome(int original){
+    @ModifyExpressionValue(method = "getBiome", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkAccess;getSectionIndex(I)I"))
+    public int getBiome(int original){
         return Math.min(original, this.sections.length - 1);
     }
 }

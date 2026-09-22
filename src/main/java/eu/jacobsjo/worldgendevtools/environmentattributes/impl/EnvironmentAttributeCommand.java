@@ -15,12 +15,14 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.attribute.*;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.attribute.EnvironmentAttribute;
+import net.minecraft.world.attribute.EnvironmentAttributeProbe;
+import net.minecraft.world.attribute.SpatialAttributeInterpolator;
 
-@SuppressWarnings("UnstableApiUsage")
 public final class EnvironmentAttributeCommand {
     final static SpatialAttributeInterpolator biomeInterpolator = new SpatialAttributeInterpolator();
+
+    private static EnvironmentAttributeProbe PROBE = new EnvironmentAttributeProbe();
 
     public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher, final CommandBuildContext context) {
         commandDispatcher.register(
@@ -59,18 +61,15 @@ public final class EnvironmentAttributeCommand {
     }
 
     private static int getEnviromentAttribute(CommandSourceStack stack, Holder<EnvironmentAttribute<?>> environmentAttribute) {
-        biomeInterpolator.clear();
-        GaussianSampler.sample(
-                stack.getPosition().scale(0.25), stack.getLevel().getBiomeManager()::getNoiseBiomeAtQuart, (d, holder) -> biomeInterpolator.accumulate(d, holder.value().getAttributes())
-        );
+        PROBE.tick(stack.getLevel(), stack.getPosition());
 
-        DataResult<Tag> value = getAndEncodeAttribute(stack.getLevel().environmentAttributes(), stack.getPosition(), environmentAttribute.value());
+        DataResult<Tag> value =  getAndEncodeAttribute(environmentAttribute.value());
         stack.sendSuccess(() -> Component.translatable("worldgendevtools.environmentattributes.environmentattribute.get.success", environmentAttribute.getRegisteredName(), NbtUtils.toPrettyComponent(value.getOrThrow())), true);
         return 1;
     }
 
-    private static <T> DataResult<Tag> getAndEncodeAttribute(EnvironmentAttributeReader attributeReader, Vec3 pos, EnvironmentAttribute<T> attribute){
-        return attribute.valueCodec().encodeStart(NbtOps.INSTANCE, attributeReader.getValue(attribute, pos, EnvironmentAttributeCommand.biomeInterpolator));
+    private static <T> DataResult<Tag> getAndEncodeAttribute(EnvironmentAttribute<T> attribute){
+        return attribute.valueCodec().encodeStart(NbtOps.INSTANCE, PROBE.getValue(attribute, 0));
     }
 
     private static int setEnviromentAttribute(CommandSourceStack stack, Holder<EnvironmentAttribute<?>> environmentAttribute, Tag value){
