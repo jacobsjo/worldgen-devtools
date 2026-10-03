@@ -22,6 +22,14 @@ public class FrozenHolder<T> extends Holder.Reference<T> {
         this.wrapping = wrapping;
     }
 
+    public Holder<T> getWrapping(){
+        return wrapping;
+    }
+
+    public void refresh() {
+        this.value = null;
+    }
+
     @Override
     public T value() {
         if (value == null){
