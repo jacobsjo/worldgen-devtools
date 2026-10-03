@@ -28,6 +28,7 @@ import net.minecraft.tags.TagLoader;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.slf4j.Logger;
@@ -138,13 +139,14 @@ public class RegistryReloader {
 
             ChunkGenerator chunkGenerator;
             if (levelStem.isPresent()) {
-                if (level.dimensionType().minY() != levelStem.get().type().value().minY() || level.dimensionType().height() != levelStem.get().type().value().height()) {
-                    throw new IllegalStateException("Can't change world height of dimension " + key + ". Requires reloading the world.");
-                }
-
+                RegistryReloader.throwIfDimensionTypeNotUpdatable(level.dimensionType(), levelStem.get().type().value(),key);
                 level.dimensionTypeRegistration = new FrozenHolder<>(levelStem.get().type());
                 chunkGenerator = levelStem.get().generator();
             } else {
+                if (level.dimensionTypeRegistration instanceof FrozenHolder<DimensionType> frozenHolder){
+                    RegistryReloader.throwIfDimensionTypeNotUpdatable(frozenHolder.value(), frozenHolder.getWrapping().value(),key);
+                    frozenHolder.refresh();
+                }
                 chunkGenerator = ChunkGenerator.CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, dimensionContextProvider), oldGenerators.get(key)).result().orElseThrow();
             }
 
@@ -162,6 +164,12 @@ public class RegistryReloader {
 
             ((UpdatableGeneratorChunkMap) chunkMap).worldgenDevtools$setGenerator(chunkGenerator);
         });
+    }
+
+    private static void throwIfDimensionTypeNotUpdatable(DimensionType oldType, DimensionType newType, Identifier dimensionId) {
+        if (oldType.minY() != newType.minY() || oldType.height() != newType.height()){
+            throw new IllegalStateException("Can't change world height of dimension " + dimensionId + ". Requires reloading the world.");
+        };
     }
 
     /**
