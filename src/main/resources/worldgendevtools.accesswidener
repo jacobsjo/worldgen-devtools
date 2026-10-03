@@ -26,3 +26,7 @@ mutable field net/minecraft/world/level/validation/DirectoryValidator symlinkTar
 #accessible class net/minecraft/world/level/levelgen/RandomState$1NoiseWiringHelper
 
 accessible method net/minecraft/commands/arguments/ResourceKeyArgument resolveKey (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;Lnet/minecraft/resources/ResourceKey;Lcom/mojang/brigadier/exceptions/DynamicCommandExceptionType;)Lnet/minecraft/core/Holder$Reference;
+
+accessible field net/minecraft/client/multiplayer/ClientLevel environmentAttributes Lnet/minecraft/world/attribute/EnvironmentAttributeSystem;
+mutable field net/minecraft/client/multiplayer/ClientLevel environmentAttributes Lnet/minecraft/world/attribute/EnvironmentAttributeSystem;
+accessible method net/minecraft/client/multiplayer/ClientLevel addEnvironmentAttributeLayers (Lnet/minecraft/world/attribute/EnvironmentAttributeSystem$Builder;)Lnet/minecraft/world/attribute/EnvironmentAttributeSystem$Builder;
