@@ -56,18 +56,4 @@ public class ChunkGeneratorMixin {
         event.commit();
         return result;
     }
-
-    @WrapMethod(
-            method = "tryGenerateStructure"
-    )
-    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry selected, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess centerChunk, ChunkPos sourceChunkPos, ResourceKey<Level> level, Climate.Sampler climateSampler, Operation<Boolean> original){
-        try (Zone zone = Profiler.get().zone("structure")) {
-            zone.addText(selected.structure().getRegisteredName());
-            boolean result = original.call(selected, structureManager, registryAccess, randomState, structureTemplateManager, seed, centerChunk, sourceChunkPos, level, climateSampler);
-            if (!result) {
-                zone.addText("(not placed)");
-            }
-            return result;
-        }
-    }
 }

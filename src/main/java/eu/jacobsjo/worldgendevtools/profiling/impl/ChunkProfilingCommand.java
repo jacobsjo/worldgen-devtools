@@ -1,11 +1,11 @@
 package eu.jacobsjo.worldgendevtools.profiling.impl;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.jacobsjo.util.TextUtil;
 import eu.jacobsjo.worldgendevtools.profiling.ProfilingInit;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.IntegerArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -32,8 +32,8 @@ public class ChunkProfilingCommand {
         commandDispatcher.register(
                 Commands.literal("chunkprofiling")
                         .executes((commandContext) -> getProfiling(commandContext.getSource(), 0))
-                        .then((Commands.argument("range", IntegerArgumentType.integer(0, 8))
-                                .executes(commandContext -> getProfiling(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "range")))))
+                        .then((Commands.argument("range", IntegerArgument.integer(0, 8))
+                                .executes(commandContext -> getProfiling(commandContext.getSource(), IntegerArgument.getInteger(commandContext, "range")))))
 
         );
     }

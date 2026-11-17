@@ -2,8 +2,8 @@ package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.HolderStructureStart;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
@@ -32,12 +32,14 @@ public abstract class StructureMixin {
      */
     @SuppressWarnings("DataFlowIssue")
     @Inject(method = "generate", at = @At("RETURN"), cancellable = true)
-    public void generate(Holder<Structure> selected, ResourceKey<Level> dimension, RegistryAccess registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, Climate.Sampler climateSampler, RandomState randomState, StructureTemplateManager structureTemplateManager, long seed, ChunkPos sourceChunkPos, int references, LevelHeightAccessor heightAccessor, Predicate<Holder<Biome>> validBiome, CallbackInfoReturnable<StructureStart> cir) {
+    public void generate(Holder<Structure> selected, ResourceKey<Level> dimension, HolderGetter.Provider registryAccess, ChunkGenerator chunkGenerator, BiomeSource biomeSource, Climate.Sampler climateSampler, RandomState randomState, StructureTemplateManager structureTemplateManager, long seed, ChunkPos sourceChunkPos, LevelHeightAccessor heightAccessor, Predicate<Holder<Biome>> validBiome, CallbackInfoReturnable<StructureStart> cir) {
         try {
-            Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
-            ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.get(registry.getResourceKey((Structure) (Object) this).orElseThrow()).orElseThrow());
+            HolderGetter<Structure> getter = registryAccess.lookupOrThrow(Registries.STRUCTURE);
+			if (getter instanceof Registry<Structure> registry) {
+                ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.get(registry.getResourceKey((Structure) (Object) this).orElseThrow()).orElseThrow());
+			}
         } catch(Exception e)  {
-            cir.setReturnValue(StructureStart.INVALID_START);
+            cir.setReturnValue(null);
         }
     }
 }

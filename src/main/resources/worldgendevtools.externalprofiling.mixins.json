@@ -8,7 +8,8 @@
     "ChunkStepMixin",
     "JfrProfilerMixin",
     "JigsawPlacementPlacerMixin",
-    "NoiseBasedChunkGeneratorMixin"
+    "NoiseBasedChunkGeneratorMixin",
+    "StructureSetMixin"
   ],
   "client": [
   ],

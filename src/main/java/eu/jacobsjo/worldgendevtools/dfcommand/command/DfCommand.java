@@ -9,7 +9,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.jacobsjo.util.TextUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ResourceKeyArgument;
+import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -19,10 +19,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.NoiseRouterData;
-import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
 import net.minecraft.world.level.levelgen.densityfunction.DensitySampler;
 import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
@@ -41,7 +38,7 @@ public final class DfCommand{
 
         commandDispatcher.register(
             Commands.literal("getdensity")
-                .then(Commands.argument("density_function", ResourceKeyArgument.key(Registries.DENSITY_FUNCTION))
+                .then(Commands.argument("density_function", ResourceArgument.resource(Registries.DENSITY_FUNCTION))
                     .executes((commandContext)-> getDensityFunctionDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPos.containing(commandContext.getSource().getPosition()), commandContext.getSource().getLevel()))
                     .then(Commands.argument("pos", BlockPosArgument.blockPos())
                         .executes((commandContext)-> getDensityFunctionDensity(commandContext.getSource(), getRegistryKeyType(commandContext, "density_function", Registries.DENSITY_FUNCTION, ERROR_INVALID_DENSITY_FUNCTION), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), commandContext.getSource().getLevel())))
@@ -63,9 +60,9 @@ public final class DfCommand{
         HolderGetter.Provider registryAccess = level.registryAccess();
         RandomState randomState;
         if (generatorSettings != null) {
-            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), generatorSettings);
+            randomState = RandomState.createForTesting(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), generatorSettings);
         } else {
-            randomState = RandomState.create(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), false, 63, NoiseRouterData.none());
+            randomState = new RandomState(registryAccess.lookupOrThrow(Registries.NOISE), level.getSeed(), false, NoiseRouterData.none(), VerticalAnchor.Context.from(level));
         }
 
         DensitySampler sampler = randomState.getSampler(densityFunction);

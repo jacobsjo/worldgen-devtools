@@ -26,6 +26,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Objects;
+
 /**
  * In vanilla, {@link StructureStart} uses direct references to {@link Structure}s. This is problematic when reloading the
  * registries. Therefore, this mixin changes it to use a {@link Holder}< Structure > instead. The {@link #worldgenDevtools$setHolder}
@@ -57,10 +59,10 @@ public class StructureStartMixin implements HolderStructureStart {
     /**
      * calls {@link #worldgenDevtools$setHolder} after creation from loading.
      */
-    @Inject(method = "loadStaticStart", at = @At("RETURN"))
-    private static void loadStaticStart(StructurePieceSerializationContext structurePieceSerializationContext, CompoundTag compoundTag, long l, CallbackInfoReturnable<StructureStart> cir, @Local String string){
-        Registry<Structure> registry = structurePieceSerializationContext.registryAccess().lookupOrThrow(Registries.STRUCTURE);
-        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getOrThrow(ResourceKey.create(Registries.STRUCTURE, Identifier.parse(string))));
+    @Inject(method = "load", at = @At("RETURN"))
+    private static void load(StructurePieceSerializationContext context, CompoundTag tag, long seed, Structure structure, CallbackInfoReturnable<StructureStart> cir){
+        Registry<Structure> registry = context.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getOrThrow(ResourceKey.create(Registries.STRUCTURE, Objects.requireNonNull(registry.getKey(structure)))));
     }
 
     /**

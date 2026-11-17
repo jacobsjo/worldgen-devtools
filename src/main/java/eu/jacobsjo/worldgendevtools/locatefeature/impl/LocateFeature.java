@@ -8,7 +8,7 @@ import eu.jacobsjo.worldgendevtools.locatefeature.LocateFeatureInit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ResourceKeyArgument;
+import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.*;
@@ -30,16 +30,15 @@ import java.util.stream.Stream;
 public class LocateFeature {
     private static final int MAX_RANGE = 10;
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final DynamicCommandExceptionType ERROR_INVALID_FEATURE = new DynamicCommandExceptionType((value) -> Component.translatableEscape("commands.place.feature.invalid", new Object[]{value}));
 
     public static LiteralArgumentBuilder<CommandSourceStack> addSubcommand(LiteralArgumentBuilder<CommandSourceStack> command){
         return command.then(
             Commands.literal("feature")
                 .then(
-                    Commands.argument("feature", ResourceKeyArgument.key(Registries.FEATURE))
+                    Commands.argument("feature", ResourceArgument.resource(Registries.FEATURE))
                         .executes(
                             commandContext -> locateFeature(
-                                commandContext.getSource(), ResourceKeyArgument.resolveKey(commandContext, "feature", Registries.FEATURE, ERROR_INVALID_FEATURE).key()
+                                commandContext.getSource(), ResourceArgument.getResource(commandContext, "feature", Registries.FEATURE).key()
                             )
                         )
                 )
