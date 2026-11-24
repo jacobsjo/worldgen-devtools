@@ -28,7 +28,7 @@ public final class EnvironmentAttributeCommand {
         commandDispatcher.register(
                 Commands.literal("environmentattribute")
                         .then(Commands.literal("get")
-                                .then(Commands.argument("environmentAttribute", ResourceArgument.resource(context, Registries.ENVIRONMENT_ATTRIBUTE))
+                                .then(Commands.argument("environmentAttribute", ResourceArgument.resource(Registries.ENVIRONMENT_ATTRIBUTE))
                                         .executes(c -> getEnviromentAttribute(
                                                 c.getSource(),
                                                 ResourceArgument.getResource(c, "environmentAttribute", Registries.ENVIRONMENT_ATTRIBUTE)
@@ -36,7 +36,7 @@ public final class EnvironmentAttributeCommand {
                                 )
                         )
                         .then(Commands.literal("set")
-                                .then(Commands.argument("environmentAttribute", ResourceArgument.resource(context, Registries.ENVIRONMENT_ATTRIBUTE))
+                                .then(Commands.argument("environmentAttribute", ResourceArgument.resource(Registries.ENVIRONMENT_ATTRIBUTE))
                                         .then(Commands.argument("value", NbtTagArgument.nbtTag())
                                                 .executes(c -> setEnviromentAttribute(
                                                         c.getSource(),
@@ -47,7 +47,7 @@ public final class EnvironmentAttributeCommand {
                                 )
                         )
                         .then(Commands.literal("reset")
-                                .then(Commands.argument("environmentAttribute", ResourceArgument.resource(context, Registries.ENVIRONMENT_ATTRIBUTE))
+                                .then(Commands.argument("environmentAttribute", ResourceArgument.resource(Registries.ENVIRONMENT_ATTRIBUTE))
                                         .executes(c -> resetEnviromentAttribute(
                                                 c.getSource(),
                                                 ResourceArgument.getResource(c, "environmentAttribute", Registries.ENVIRONMENT_ATTRIBUTE)

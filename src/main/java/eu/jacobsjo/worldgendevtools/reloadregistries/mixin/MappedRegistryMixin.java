@@ -6,6 +6,7 @@ import eu.jacobsjo.worldgendevtools.reloadregistries.api.ReloadableRegistry;
 import eu.jacobsjo.worldgendevtools.reloadregistries.impl.RegistryReloader;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import net.minecraft.util.DevUtil;
 import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -106,7 +107,7 @@ public abstract class MappedRegistryMixin<T> implements ReloadableRegistry  {
 
             if (this.byValue.containsKey(value)) {
                 // would also crash if reassigning value to new key, but this shouldn't happen in practice.
-                Util.pauseInIde(new IllegalStateException("Adding duplicate value '" + value + "' to registry"));
+                DevUtil.pauseInIde(new IllegalStateException("Adding duplicate value '" + value + "' to registry"));
             }
 
             Holder.Reference<T> reference = this.byKey.computeIfAbsent(key, resourceKeyx -> Holder.Reference.createStandAlone((MappedRegistry<T>) (Object) this, resourceKeyx));

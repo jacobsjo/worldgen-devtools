@@ -42,7 +42,7 @@ public class PackDropScreen extends Screen {
     protected void init() {
         super.init();
         this.display = MultiLineLabel.create(this.font, this.datapacks, this.width - 50);
-        int messageHeight = Mth.clamp(this.messageTop() + this.messageHeight() + 20, this.height / 6 + 96, this.height - 24);
+        int messageHeight = Math.clamp(this.messageTop() + this.messageHeight() + 20, this.height / 6 + 96, this.height - 24);
         this.addButtons(messageHeight);
     }
 
@@ -53,15 +53,15 @@ public class PackDropScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
-        super.extractRenderState(graphics, mouseX, mouseY, a);
+    public void extractRenderState(final GuiGraphicsExtractor graphics) {
+        super.extractRenderState(graphics);
         graphics.centeredText(this.font, this.title, this.width / 2, this.titleTop(), -1);
         this.display.visitLines(TextAlignment.CENTER, this.width / 2, this.messageTop(), 9, graphics.textRenderer());
     }
 
     private int titleTop() {
         int i = (this.height - this.messageHeight()) / 2;
-        return Mth.clamp(i - 20 - 9, 10, 80);
+        return Math.clamp(i - 20 - 9, 10, 80);
     }
 
     private int messageTop() {

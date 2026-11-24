@@ -1,13 +1,11 @@
 package eu.jacobsjo.worldgendevtools.reloadregistries.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import eu.jacobsjo.worldgendevtools.reloadregistries.api.HolderStructureStart;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -25,6 +23,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Objects;
 
 /**
  * In vanilla, {@link StructureStart} uses direct references to {@link Structure}s. This is problematic when reloading the
@@ -57,10 +57,13 @@ public class StructureStartMixin implements HolderStructureStart {
     /**
      * calls {@link #worldgenDevtools$setHolder} after creation from loading.
      */
-    @Inject(method = "loadStaticStart", at = @At("RETURN"))
-    private static void loadStaticStart(StructurePieceSerializationContext structurePieceSerializationContext, CompoundTag compoundTag, long l, CallbackInfoReturnable<StructureStart> cir, @Local String string){
-        Registry<Structure> registry = structurePieceSerializationContext.registryAccess().lookupOrThrow(Registries.STRUCTURE);
-        ((HolderStructureStart) (Object) cir.getReturnValue()).worldgenDevtools$setHolder(registry.getOrThrow(ResourceKey.create(Registries.STRUCTURE, Identifier.parse(string))));
+    @Inject(method = "load", at = @At("RETURN"))
+    private static void load(StructurePieceSerializationContext context, CompoundTag tag, long seed, Structure structure, CallbackInfoReturnable<@Nullable StructureStart> cir){
+        StructureStart structureStart = cir.getReturnValue();
+        if (structureStart != null) {
+            Registry<Structure> registry = context.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+            ((HolderStructureStart) (Object) structureStart).worldgenDevtools$setHolder(registry.getOrThrow(ResourceKey.create(Registries.STRUCTURE, Objects.requireNonNull(registry.getKey(structure)))));
+        }
     }
 
     /**

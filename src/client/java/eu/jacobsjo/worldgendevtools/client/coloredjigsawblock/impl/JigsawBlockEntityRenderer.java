@@ -28,9 +28,11 @@ public class JigsawBlockEntityRenderer implements BlockEntityRenderer<JigsawBloc
     private static final Identifier EMPTY_RESOURCE_LOCATION = Identifier.withDefaultNamespace("empty");
 
     private static final ModelPart modelPart = new MeshDefinition().getRoot().addOrReplaceChild("cube", CubeListBuilder.create().texOffs(0, 0).addBox(0f, 0f, 0f, 16f, 16f, 16f), PartPose.ZERO).bake(64, 64);
-    public JigsawBlockEntityRenderer(@SuppressWarnings("unused") BlockEntityRendererProvider.Context conext) { }
-
-    @Override
+	
+	public JigsawBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+	}
+	
+	@Override
     public boolean shouldRender(JigsawBlockEntity blockEntity, Vec3 cameraPos) {
         if (!BlockEntityRenderer.super.shouldRender(blockEntity, cameraPos)) return false;
 
